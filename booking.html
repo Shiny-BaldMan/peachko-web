@@ -97,7 +97,7 @@
 <script type="module">
     // 1. Firebase 코어, 인증, 그리고 "Firestore(데이터베이스)" 모듈 불러오기
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, collection, doc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     // 2. peachko 개발용 설정값
@@ -146,32 +146,72 @@
       submitBtn.disabled = true;
 
       try {
-        // 'bookings'라는 이름의 폴더(컬렉션)에 데이터를 추가합니다.
-        const docRef = await addDoc(collection(db, "bookings"), {
-          userEmail: currentUserEmail, // 누가 예약했는지
-          serviceType: document.getElementById('f-service').value,
-          artist: document.getElementById('f-artist').value,
-          reservationDate: document.getElementById('f-date').value,
-          reservationTime: document.getElementById('f-time').value,
-          hotelAddress: document.getElementById('f-hotel').value,
-          specialRequests: document.getElementById('f-requests').value,
-          createdAt: serverTimestamp(), // 예약이 접수된 정확한 서버 시간
-          status: "pending" // 향후 관리자 페이지를 위한 예약 상태(대기중)
+        // 입력된 값들 미리 가져오기
+        const artistVal = document.getElementById('f-artist').value;
+        const dateVal = document.getElementById('f-date').value;
+        const timeVal = document.getElementById('f-time').value;
+
+        // 1. 고유 슬롯 ID 생성 (예: soyeon_2026-04-28_16:00)
+        const slotId = `${artistVal}_${dateVal}_${timeVal}`;
+        const slotRef = doc(db, "bookings", slotId);
+
+        // 2. 트랜잭션 실행
+        await runTransaction(db, async (transaction) => {
+          const sfDoc = await transaction.get(slotRef);
+          
+          if (!sfDoc.exists()) {
+            // 자리가 비어있으면 저장!
+            transaction.set(slotRef, {
+              userEmail: currentUserEmail,
+              serviceType: document.getElementById('f-service').value,
+              artist: artistVal,
+              reservationDate: dateVal,
+              reservationTime: timeVal,
+              hotelAddress: document.getElementById('f-hotel').value,
+              specialRequests: document.getElementById('f-requests').value,
+              createdAt: serverTimestamp(),
+              status: "pending"
+            });
+          } else {
+            // 이미 예약된 자리면 강제 취소!
+            throw new Error("이미 예약이 완료된 시간입니다. 다른 시간을 선택해 주세요.");
+          }
         });
 
-        console.log("예약 성공! 문서 ID:", docRef.id);
-
+        console.log("예약 성공! 슬롯 ID:", slotId);
         // 성공 시 폼 숨기고 완료 메시지 띄우기
         form.classList.add('hidden');
         successMsg.classList.remove('hidden');
 
       } catch (error) {
         console.error("예약 저장 실패:", error);
-        alert("예약 접수 중 문제가 발생했습니다. 다시 시도해주세요.");
+        alert(error.message); // 트랜잭션 실패 에러 메시지(중복 예약 등)를 띄워줍니다.
         submitBtn.textContent = "Confirm Booking";
         submitBtn.disabled = false;
       }
     });
   </script>
+  <!-- 여기서부터 추가 -->
+  <script>
+    const currentLang = localStorage.getItem("peachko_lang") || "EN";
+    
+    // 예약 폼 번역 사전
+    const T_BOOK = {
+      "EN": { "face": "Face Makeup (₩80,000~)", "hair": "Face + Hair (₩130,000~)" },
+      "KO": { "face": "페이스 메이크업 (₩80,000~)", "hair": "페이스 + 헤어 (₩130,000~)" },
+      "ZH": { "face": "面部彩妆 (₩80,000起)", "hair": "面部+发型 (₩130,000起)" },
+      "JP": { "face": "フェイスメイク (₩80,000〜)", "hair": "フェイス＋ヘア (₩130,000〜)" }
+    };
+
+    // 저장된 언어에 맞춰서 select 박스 안의 글자 바꿔치기
+    if (T_BOOK[currentLang]) {
+      const faceOption = document.querySelector('#f-service option[value="face"]');
+      const hairOption = document.querySelector('#f-service option[value="hair-face"]');
+      
+      if (faceOption) faceOption.innerText = T_BOOK[currentLang]["face"];
+      if (hairOption) hairOption.innerText = T_BOOK[currentLang]["hair"];
+    }
+  </script>
+  <!-- 여기까지 추가 -->
 </body>
 </html>

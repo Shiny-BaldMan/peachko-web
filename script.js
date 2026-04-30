@@ -7,6 +7,7 @@ booking form, animations
 // 1. import 문은 무조건 파일 최상단에 있어야 합니다!
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import { collection, doc, runTransaction } from "firebase/firestore";
 
 // 2. 환경에 따른 Firebase 설정값 분리
 let firebaseConfig;
@@ -376,6 +377,7 @@ btn.addEventListener("click", (e) => {
 e.stopPropagation();
 const lang = btn.dataset.lang;
 currentLang = lang;
+localStorage.setItem("peachko_lang", lang);
 toggle.textContent = LANG_LABELS[lang] + " ▾";
 opts.forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
 dropdown.classList.remove("open");
