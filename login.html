@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PICHIKO — Login</title>
+  <title>peachko — Login</title>
   
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,7 +36,7 @@
 <body class="bg-gradient">
 
   <header id="header" class="scrolled">
-    <div class="logo" style="cursor:pointer;" onclick="location.href='index.html'">PICHIKO</div>
+    <div class="logo" style="cursor:pointer;" onclick="location.href='index.html'">peachko</div>
     <nav>
       <button class="btn-ghost" onclick="location.href='index.html'">Back to Home</button>
     </nav>
@@ -75,12 +75,12 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-    // 2. 전달해주신 PICHIKO 개발용 설정값
+    // 2. 전달해주신 peachko 개발용 설정값
     const firebaseConfig = {
       apiKey: "AIzaSyCnByhLp-UyVaVOpEERqNBJKeIcipPILE0",
-      authDomain: "pichiko-dev.firebaseapp.com",
-      projectId: "pichiko-dev",
-      storageBucket: "pichiko-dev.firebasestorage.app",
+      authDomain: "peachko-dev.firebaseapp.com",
+      projectId: "peachko-dev",
+      storageBucket: "peachko-dev.firebasestorage.app",
       messagingSenderId: "675915261853",
       appId: "1:675915261853:web:58dce392b1103dd6c1b174"
     };
@@ -147,7 +147,7 @@
         // [회원가입 로직]
         createUserWithEmailAndPassword(auth, email, password)
           .then((userCredential) => {
-            alert("회원가입 완료! PICHIKO에 오신 것을 환영합니다.");
+            alert("회원가입 완료! peachko에 오신 것을 환영합니다.");
             // 가입 성공 시 메인 홈페이지로 이동
             window.location.href = "index.html";
           })

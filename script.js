@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-PICHIKO — script.js
+peachko — script.js
 All interactivity: language, rendering, scroll,
 booking form, animations
 ═══════════════════════════════════════════════ */
@@ -16,9 +16,9 @@ if (window.location.hostname === "localhost" || window.location.hostname === "12
   console.log("🛠️ 로컬 테스트 모드입니다.");
   firebaseConfig = {
     apiKey: "AIzaSyCnByhLp-UyVaVOpEERqNBJKeIcipPILE0",
-    authDomain: "pichiko-dev.firebaseapp.com",
-    projectId: "pichiko-dev",
-    storageBucket: "pichiko-dev.firebasestorage.app",
+    authDomain: "peachko-dev.firebaseapp.com",
+    projectId: "peachko-dev",
+    storageBucket: "peachko-dev.firebasestorage.app",
     messagingSenderId: "675915261853",
     appId: "1:675915261853:web:58dce392b1103dd6c1b174"
   };
@@ -27,9 +27,9 @@ if (window.location.hostname === "localhost" || window.location.hostname === "12
   console.log("🚀 실제 운영 모드입니다.");
   firebaseConfig = {
     apiKey: "AIzaSyCnByhLp-UyVaVOpEERqNBJKeIcipPILE0",
-    authDomain: "pichiko-dev.firebaseapp.com",
-    projectId: "pichiko-dev",
-    storageBucket: "pichiko-dev.firebasestorage.app",
+    authDomain: "peachko-dev.firebaseapp.com",
+    projectId: "peachko-dev",
+    storageBucket: "peachko-dev.firebasestorage.app",
     messagingSenderId: "675915261853",
     appId: "1:675915261853:web:58dce392b1103dd6c1b174"
   };
@@ -50,8 +50,8 @@ hero_sub: "Skip the search. Skip the commute. Choose your artist, share your hot
 hero_cta: "Reserve Now", hero_cta2: "Meet Artists",
 stat1n: "500+", stat1l: "Guests", stat2n: "15", stat2l: "Artists", stat3n: "4.9★", stat3l: "Rated",
 badge_sub: "Today’s Look", badge_title: "K-Glow Ready",
-before: "Before", pichiko_label: "Pichiko",
-prob_label: "Why Pichiko", prob_h: "We Solved the Hassle",
+before: "Before", peachko_label: "peachko",
+prob_label: "Why peachko", prob_h: "We Solved the Hassle",
 prob_bad:  ["Searching Korean websites", "Navigating unfamiliar streets", "Language barriers at salons", "Losing precious travel time"],
 prob_good: ["Book in English in minutes", "Artist comes to your hotel", "Zero language barriers", "Start your day glowing"],
 how_label: "3 Simple Steps", how_h: "How It Works",
@@ -88,7 +88,7 @@ f_cta: "Go to Booking Page",
 done_h: "You’re All Set!", done_sub: "Booking received. We’ll confirm within 30 minutes.", done_back: "Book Another",
 chat_h: "Need Help?", chat_sub: "Questions about services or custom requests?",
 kakao: "KakaoTalk", whatsapp: "WhatsApp",
-footer: "© 2025 Pichiko · Seoul, Korea",
+footer: "© 2025 peachko · Seoul, Korea",
 },
 KO: {
 nav0: "서비스", nav1: "아티스트", nav2: "예약", chat: "상담", nav_login: "로그인", nav_logout: "로그아웃",
@@ -98,7 +98,7 @@ hero_sub: "직접 찾아다닐 필요 없어요. 아티스트를 고르고 숙�
 hero_cta: "지금 예약", hero_cta2: "아티스트 보기",
 stat1n: "500+", stat1l: "고객", stat2n: "15명", stat2l: "아티스트", stat3n: "4.9★", stat3l: "평점",
 badge_sub: "오늘의 룩", badge_title: "K-글로우 레디",
-before: "Before", pichiko_label: "피치코",
+before: "Before", peachko_label: "피치코",
 prob_label: "피치코 소개", prob_h: "불편함을 해결했습니다",
 prob_bad:  ["한국 사이트 검색", "낯선 길 찾아가기", "언어 장벽", "소중한 여행 시간 낭비"],
 prob_good: ["영어로 간편 예약", "아티스트가 숙소로 방문", "언어 걱정 없음", "메이크업 후 바로 여행"],
@@ -146,8 +146,8 @@ hero_sub: "自分でサロンを探す必要なし。アーティストを選ん
 hero_cta: "今すぐ予約", hero_cta2: "アーティストを見る",
 stat1n: "500+", stat1l: "名のゲスト", stat2n: "15名", stat2l: "アーティスト", stat3n: "4.9★", stat3l: "評価",
 badge_sub: "本日のルック", badge_title: "Kグロウ レディ",
-before: "Before", pichiko_label: "PICHIKO",
-prob_label: "PICHIKOとは", prob_h: "不便を解決しました",
+before: "Before", peachko_label: "peachko",
+prob_label: "peachkoとは", prob_h: "不便を解決しました",
 prob_bad:  ["韓国語サイトで検索", "知らない道を歩く", "言語の壁", "旅行時間のロス"],
 prob_good: ["英語で簡単予約", "ホテルへ出張訪問", "言語の心配なし", "メイク後すぐ観光"],
 how_label: "3ステップ", how_h: "ご利用方法",
@@ -184,7 +184,7 @@ f_cta: "予約ページへ",
 done_h: "予約完了！", done_sub: "ご予約を受け付けました。30分以内にご連絡します。", done_back: "もう一度予約",
 chat_h: "お問い合わせ", chat_sub: "サービスや特別リクエストはこちら",
 kakao: "KakaoTalk", whatsapp: "WhatsApp",
-footer: "© 2025 PICHIKO · ソウル, 韓国",
+footer: "© 2025 peachko · ソウル, 韓国",
 },
 ZH: {
 nav0: "服务", nav1: "艺术家", nav2: "预约", chat: "咨询", nav_login: "登录", nav_logout: "登出",
@@ -194,8 +194,8 @@ hero_sub: "无需自己搜索沙龙，无需担心语言障碍。选择艺术家
 hero_cta: "立即预约", hero_cta2: "查看艺术家",
 stat1n: "500+", stat1l: "位顾客", stat2n: "15位", stat2l: "艺术家", stat3n: "4.9★", stat3l: "评分",
 badge_sub: "今日造型", badge_title: "K光芒 准备好了",
-before: "以前", pichiko_label: "PICHIKO",
-prob_label: "关于PICHIKO", prob_h: "我们解决了烦恼",
+before: "以前", peachko_label: "peachko",
+prob_label: "关于peachko", prob_h: "我们解决了烦恼",
 prob_bad:  ["搜索韩语网站", "在陌生街道迷路", "语言障碍", "浪费旅行时间"],
 prob_good: ["用中文轻松预约", "艺术家上门服务", "无语言障碍", "化妆后直接出发"],
 how_label: "简单3步", how_h: "使用方法",
@@ -232,7 +232,7 @@ f_cta: "前往预约",
 done_h: "预约成功！", done_sub: "您的预约已收到，我们将在30分钟内与您确认。", done_back: "再次预约",
 chat_h: "需要帮助？", chat_sub: "有关服务或特殊要求的问题，请联系我们",
 kakao: "KakaoTalk", whatsapp: "WhatsApp",
-footer: "© 2025 PICHIKO · 首尔, 韩国",
+footer: "© 2025 peachko · 首尔, 韩国",
 },
 };
 
