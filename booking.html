@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>peachko — Book Your Look</title>
+  
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  
+  <style>
+    .booking-section { min-height: 100vh; padding: 120px 5% 80px; }
+    .booking-container { max-width: 600px; margin: 0 auto; }
+    /* 모바일 대응을 위한 폼 레이아웃 조정 */
+    @media (max-width: 480px) {
+      .booking-form { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="bg-peach">
+
+  <header id="header" class="scrolled">
+    <div class="logo" style="cursor:pointer;" onclick="location.href='index.html'">peachko</div>
+    <nav>
+      <button class="btn-ghost" onclick="location.href='index.html'">Back to Home</button>
+    </nav>
+  </header>
+
+  <section class="booking-section">
+    <div class="booking-container">
+      
+      <div class="section-head reveal visible">
+        <div class="label-sm">Reservation</div>
+        <h2 class="fd">Complete Your Booking</h2>
+        <p class="fb" style="margin-top:10px; color:var(--muted); font-size:14px;">
+          Please provide your details for the perfect K-Beauty experience.
+        </p>
+      </div>
+
+      <form class="booking-form reveal visible" id="mainBookingForm">
+        
+        <div class="form-row full">
+          <label class="form-label">Service Type</label>
+          <select id="f-service" required>
+            <option value="">Select a service</option>
+            <option value="face">Face Makeup (₩80,000~)</option>
+            <option value="hair-face">Face + Hair (₩130,000~)</option>
+            <option value="full-glam">Full Glam (₩180,000~)</option>
+            <option value="special">Special Occasion (₩220,000~)</option>
+          </select>
+        </div>
+
+        <div class="form-row full">
+          <label class="form-label">Preferred Artist</label>
+          <select id="f-artist" required>
+            <option value="">Select an artist</option>
+            <option value="soyeon">Soyeon (Glass Skin)</option>
+            <option value="minjae">Minjae (K-Pop Idol)</option>
+            <option value="haerin">Haerin (Bridal)</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">Date</label>
+          <input type="date" id="f-date" required />
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">Time</label>
+          <input type="time" id="f-time" required />
+        </div>
+
+        <div class="form-row full">
+          <label class="form-label">Hotel Name / Address in Seoul</label>
+          <input type="text" id="f-hotel" placeholder="e.g. Lotte Hotel Seoul, Myeongdong" required />
+        </div>
+
+        <div class="form-row full">
+          <label class="form-label">Additional Requests (Optional)</label>
+          <input type="text" id="f-requests" placeholder="e.g. Sensitive skin, specific style..." />
+        </div>
+
+        <button type="submit" class="btn-accent full-btn" style="margin-top:20px;">Confirm Booking</button>
+      </form>
+
+      <div class="booking-done hidden" id="successMessage">
+        <div class="done-icon">✨</div>
+        <h3 class="fd">Booking Received!</h3>
+        <p class="fb">Thank you for choosing peachko. We will send a confirmation message to your email/account shortly.</p>
+        <button class="btn-ghost" onclick="location.href='index.html'">Back to Home</button>
+      </div>
+
+    </div>
+  </section>
+
+<script type="module">
+    // 1. Firebase 코어, 인증, 그리고 "Firestore(데이터베이스)" 모듈 불러오기
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    // 2. peachko 개발용 설정값
+    const firebaseConfig = {
+      apiKey: "AIzaSyCnByhLp-UyVaVOpEERqNBJKeIcipPILE0",
+      authDomain: "peachko-dev.firebaseapp.com",
+      projectId: "peachko-dev",
+      storageBucket: "peachko-dev.firebasestorage.app",
+      messagingSenderId: "675915261853",
+      appId: "1:675915261853:web:58dce392b1103dd6c1b174"
+    };
+
+    // 3. Firebase 초기화
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app); // 데이터베이스 객체 생성!
+
+    // ==========================================
+    // 로그인 상태 감시 및 유저 정보 저장
+    // ==========================================
+    let currentUserEmail = ""; // 예약자의 이메일을 기억할 변수
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUserEmail = user.email; // 로그인 성공 시 이메일 저장
+        console.log("현재 접속 중인 예약자:", currentUserEmail);
+      } else {
+        alert("예약을 진행하려면 먼저 로그인이 필요합니다.");
+        window.location.href = "login.html"; 
+      }
+    });
+
+    // ==========================================
+    // 예약 데이터 Firestore에 저장하기
+    // ==========================================
+    const form = document.getElementById('mainBookingForm');
+    const successMsg = document.getElementById('successMessage');
+
+    // 폼 제출 시 비동기(async)로 데이터를 서버에 보냅니다.
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault(); 
+      
+      // 제출 버튼 비활성화 (중복 클릭 방지)
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.textContent = "Processing...";
+      submitBtn.disabled = true;
+
+      try {
+        // 'bookings'라는 이름의 폴더(컬렉션)에 데이터를 추가합니다.
+        const docRef = await addDoc(collection(db, "bookings"), {
+          userEmail: currentUserEmail, // 누가 예약했는지
+          serviceType: document.getElementById('f-service').value,
+          artist: document.getElementById('f-artist').value,
+          reservationDate: document.getElementById('f-date').value,
+          reservationTime: document.getElementById('f-time').value,
+          hotelAddress: document.getElementById('f-hotel').value,
+          specialRequests: document.getElementById('f-requests').value,
+          createdAt: serverTimestamp(), // 예약이 접수된 정확한 서버 시간
+          status: "pending" // 향후 관리자 페이지를 위한 예약 상태(대기중)
+        });
+
+        console.log("예약 성공! 문서 ID:", docRef.id);
+
+        // 성공 시 폼 숨기고 완료 메시지 띄우기
+        form.classList.add('hidden');
+        successMsg.classList.remove('hidden');
+
+      } catch (error) {
+        console.error("예약 저장 실패:", error);
+        alert("예약 접수 중 문제가 발생했습니다. 다시 시도해주세요.");
+        submitBtn.textContent = "Confirm Booking";
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
