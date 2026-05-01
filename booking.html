@@ -191,25 +191,95 @@
       }
     });
   </script>
-  <!-- 여기서부터 추가 -->
+<!-- 여기서부터 추가 (예약 페이지 다국어 스크립트) -->
   <script>
-    const currentLang = localStorage.getItem("peachko_lang") || "EN";
+    // 홈페이지에서 설정한 언어 가져오기 (없으면 KO)
+    const currentLang = localStorage.getItem("peachko_lang") || "KO";
     
-    // 예약 폼 번역 사전
+    // 예약 폼 전체 번역 사전
     const T_BOOK = {
-      "EN": { "face": "Face Makeup (₩80,000~)", "hair": "Face + Hair (₩130,000~)" },
-      "KO": { "face": "페이스 메이크업 (₩80,000~)", "hair": "페이스 + 헤어 (₩130,000~)" },
-      "ZH": { "face": "面部彩妆 (₩80,000起)", "hair": "面部+发型 (₩130,000起)" },
-      "JP": { "face": "フェイスメイク (₩80,000〜)", "hair": "フェイス＋ヘア (₩130,000〜)" }
+      "EN": {
+        back: "Back to Home", label: "Reservation", title: "Complete Your Booking", desc: "Please provide your details for the perfect K-Beauty experience.",
+        l_svc: "Service Type", l_art: "Preferred Artist", l_date: "Date", l_time: "Time",
+        l_hotel: "Hotel Name / Address in Seoul", p_hotel: "e.g. Lotte Hotel Seoul, Myeongdong",
+        l_req: "Additional Requests (Optional)", p_req: "e.g. Sensitive skin, specific style...",
+        btn: "Confirm Booking", done_h: "Booking Received!", done_p: "Thank you for choosing peachko. We will send a confirmation message shortly.",
+        svc_def: "Select a service", art_def: "Select an artist",
+        s_face: "Face Makeup (₩80,000~)", s_hair: "Face + Hair (₩130,000~)", s_glam: "Full Glam (₩180,000~)", s_spec: "Special Occasion (₩220,000~)",
+        a_soyeon: "Soyeon (Glass Skin)", a_minjae: "Minjae (K-Pop Idol)", a_haerin: "Haerin (Bridal)"
+      },
+      "KO": {
+        back: "홈으로 돌아가기", label: "예약하기", title: "예약 정보 입력", desc: "완벽한 K-뷰티 경험을 위해 상세 정보를 입력해주세요.",
+        l_svc: "서비스 종류", l_art: "담당 아티스트", l_date: "예약 날짜", l_time: "예약 시간",
+        l_hotel: "숙소명 및 주소 (서울)", p_hotel: "예) 롯데호텔 서울, 명동",
+        l_req: "추가 요청사항 (선택)", p_req: "예) 민감성 피부, 원하는 특정 스타일...",
+        btn: "예약 완료하기", done_h: "예약이 접수되었습니다!", done_p: "피치코를 이용해 주셔서 감사합니다. 곧 확정 메시지를 보내드립니다.",
+        svc_def: "서비스를 선택해주세요", art_def: "아티스트를 선택해주세요",
+        s_face: "페이스 메이크업 (₩80,000~)", s_hair: "페이스 + 헤어 (₩130,000~)", s_glam: "풀 글램 (₩180,000~)", s_spec: "스페셜 오케이전 (₩220,000~)",
+        a_soyeon: "소연 (글래스 스킨)", a_minjae: "민재 (K-팝 아이돌)", a_haerin: "해린 (웨딩)"
+      },
+      "JP": {
+        back: "ホームに戻る", label: "ご予約", title: "予約情報の入力", desc: "完璧なK-ビューティー体験のために詳細をご入力ください。",
+        l_svc: "サービス", l_art: "担当アーティスト", l_date: "日付", l_time: "時間",
+        l_hotel: "ホテル名 / ソウルの住所", p_hotel: "例) ロッテホテルソウル 明洞",
+        l_req: "特別リクエスト (任意)", p_req: "例) 敏感肌、希望のスタイルなど...",
+        btn: "予約を確定する", done_h: "予約完了！", done_p: "ご予約ありがとうございます。間もなく確認メッセージをお送りします。",
+        svc_def: "サービスを選択", art_def: "アーティストを選択",
+        s_face: "フェイスメイク (₩80,000〜)", s_hair: "フェイス＋ヘア (₩130,000〜)", s_glam: "フルグラム (₩180,000〜)", s_spec: "スペシャル (₩220,000〜)",
+        a_soyeon: "ソヨン (グラスキン)", a_minjae: "ミンジェ (K-POPアイドル)", a_haerin: "ヘリン (ブライダル)"
+      },
+      "ZH": {
+        back: "返回首页", label: "预约", title: "填写预约信息", desc: "请提供您的详细信息，以享受完美的K-美妆体验。",
+        l_svc: "服务类型", l_art: "首选艺术家", l_date: "日期", l_time: "时间",
+        l_hotel: "首尔酒店名称/地址", p_hotel: "例如: 首尔乐天酒店, 明洞",
+        l_req: "额外要求 (选填)", p_req: "例如: 敏感肌，特定风格...",
+        btn: "确认预约", done_h: "预约成功！", done_p: "感谢您选择peachko。我们将很快发送确认信息。",
+        svc_def: "选择服务", art_def: "选择艺术家",
+        s_face: "面部彩妆 (₩80,000起)", s_hair: "面部+发型 (₩130,000起)", s_glam: "全套精致妆 (₩180,000起)", s_spec: "特殊场合 (₩220,000起)",
+        a_soyeon: "素妍 (玻璃肌)", a_minjae: "敏在 (K-POP偶像)", a_haerin: "海林 (婚礼)"
+      }
     };
 
-    // 저장된 언어에 맞춰서 select 박스 안의 글자 바꿔치기
-    if (T_BOOK[currentLang]) {
-      const faceOption = document.querySelector('#f-service option[value="face"]');
-      const hairOption = document.querySelector('#f-service option[value="hair-face"]');
+    // 현재 언어에 맞춰 화면 글자 바꿔치기
+    const t = T_BOOK[currentLang];
+    if (t) {
+      // 1. 일반 텍스트 및 버튼 변경
+      document.querySelectorAll('.btn-ghost').forEach(b => b.innerText = t.back);
+      document.querySelector('.label-sm').innerText = t.label;
+      document.querySelector('.section-head h2').innerText = t.title;
+      document.querySelector('.section-head p').innerText = t.desc;
+      document.querySelector('button[type="submit"]').innerText = t.btn;
+      document.querySelector('.booking-done h3').innerText = t.done_h;
+      document.querySelector('.booking-done p').innerText = t.done_p;
       
-      if (faceOption) faceOption.innerText = T_BOOK[currentLang]["face"];
-      if (hairOption) hairOption.innerText = T_BOOK[currentLang]["hair"];
+      // 2. 폼 라벨(Label) 변경
+      const labels = document.querySelectorAll('.form-label');
+      if(labels.length >= 6) {
+        labels[0].innerText = t.l_svc;
+        labels[1].innerText = t.l_art;
+        labels[2].innerText = t.l_date;
+        labels[3].innerText = t.l_time;
+        labels[4].innerText = t.l_hotel;
+        labels[5].innerText = t.l_req;
+      }
+      
+      // 3. 입력창 가이드 텍스트(Placeholder) 변경
+      document.getElementById('f-hotel').placeholder = t.p_hotel;
+      document.getElementById('f-requests').placeholder = t.p_req;
+      
+      // 4. 셀렉트 박스(옵션) 변경
+      const svc = document.getElementById('f-service');
+      if(svc.options[0]) svc.options[0].text = t.svc_def;
+      if(svc.options[1]) svc.options[1].text = t.s_face;
+      if(svc.options[2]) svc.options[2].text = t.s_hair;
+      if(svc.options[3]) svc.options[3].text = t.s_glam;
+      if(svc.options[4]) svc.options[4].text = t.s_spec;
+      
+      const art = document.getElementById('f-artist');
+      if(art.options[0]) art.options[0].text = t.art_def;
+      if(art.options[1]) art.options[1].text = t.a_soyeon;
+      if(art.options[2]) art.options[2].text = t.a_minjae;
+      if(art.options[3]) art.options[3].text = t.a_haerin;
     }
   </script>
   <!-- 여기까지 추가 -->

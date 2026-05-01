@@ -447,11 +447,26 @@ function initBooking() {
 INIT
 ══════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
-render("EN");
-initLangSwitcher();
-initScroll();
-initBooking();
-observeReveal();
+  // 1. 저장된 언어가 없으면 기본값을 "KO"로 설정합니다.
+  const savedLang = localStorage.getItem("peachko_lang") || "KO";
+  currentLang = savedLang;
+  
+  // 2. 우측 상단 언어 선택 버튼의 글자도 초기 언어에 맞게 바꿔줍니다.
+  const LANG_LABELS = { EN: "🇬🇧 EN", KO: "🇰🇷 KO", JP: "🇯🇵 JP", ZH: "🇨🇳 ZH" };
+  const toggleBtn = document.getElementById("langToggle");
+  if (toggleBtn) toggleBtn.textContent = LANG_LABELS[savedLang] + " ▾";
+  
+  // 3. 드롭다운 리스트에서 현재 언어에 'active' 효과를 줍니다.
+  document.querySelectorAll(".lang-opt").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.lang === savedLang);
+  });
+
+  // 4. 화면을 렌더링합니다.
+  render(savedLang);
+  initLangSwitcher();
+  initScroll();
+  initBooking();
+  observeReveal();
 });
 
 window.selectArtist = selectArtist;
