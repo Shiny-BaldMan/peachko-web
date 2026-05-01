@@ -98,8 +98,8 @@
     // 1. Firebase 코어, 인증, 그리고 "Firestore(데이터베이스)" 모듈 불러오기
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getFirestore, collection, doc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    
     // 2. peachko 개발용 설정값
     const firebaseConfig = {
       apiKey: "AIzaSyCnByhLp-UyVaVOpEERqNBJKeIcipPILE0",
