@@ -149,55 +149,95 @@
 
     // 3. Firestore에서 예약 데이터 불러오기
     // 3. Firestore에서 예약 데이터 불러오기 (엑스레이 진단 버전)
+    // 3. Firestore에서 예약 데이터 불러오기 및 통계 계산
     async function loadBookings() {
       const tbody = document.getElementById('bookingList');
-      tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>데이터를 열심히 찾는 중입니다...</td></tr>"; 
+      // 통계 표시용 엘리먼트들
+      const totalEl = document.getElementById('totalBookings');
+      const artistEl = document.getElementById('topArtist');
+      const confirmedEl = document.getElementById('confirmedCount');
+
+      tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>데이터를 불러오는 중입니다...</td></tr>"; 
 
       try {
-        console.log("1. 데이터베이스 연결 시도...");
-        const q = query(collection(db, "bookings")); 
-        const querySnapshot = await getDocs(q);
+        // 예약 날짜 최신순으로 정렬하여 가져오기
+        const q = query(collection(db, "bookings"), orderBy("reservationDate", "desc"));[cite: 1]
+        const querySnapshot = await getDocs(q);[cite: 1]
 
-        console.log("2. 파이어베이스가 찾아낸 문서 개수:", querySnapshot.size, "개");
+        // 통계용 변수 초기화
+        let totalThisMonth = 0;
+        let confirmedTotal = 0;
+        const artistStats = {}; // { "Soyeon": 5, "Minjae": 3 } 형태
+        const currentMonth = new Date().toISOString().substring(0, 7); // 현재 월 (예: "2026-05")
 
         if (querySnapshot.empty) {
-          tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>접수된 예약이 없습니다. (파이어베이스가 데이터를 0개로 인식함)</td></tr>";
+          tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>접수된 예약이 없습니다.</td></tr>";
+          totalEl.textContent = "0";
+          confirmedEl.textContent = "0";
+          artistEl.textContent = "-";
           return;
         }
 
-        // 가져온 데이터를 표(테이블)에 하나씩 그려주기
-        tbody.innerHTML = ""; // 글씨 지우기
+        tbody.innerHTML = ""; // 기존 문구 지우기
         querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          const id = docSnap.id; 
+          const data = docSnap.data();[cite: 1]
+          const id = docSnap.id;[cite: 1]
 
+          // --- [통계 계산 로직] ---
+          // 1. 이번 달 총 예약 건수 (YYYY-MM 비교)
+          if (data.reservationDate && data.reservationDate.startsWith(currentMonth)) {
+            totalThisMonth++;[cite: 1]
+          }
+          // 2. 확정된 예약 건수
+          if (data.status === "confirmed") {
+            confirmedTotal++;[cite: 1]
+          }
+          // 3. 아티스트별 예약 카운트
+          if (data.artist) {
+            artistStats[data.artist] = (artistStats[data.artist] || 0) + 1;[cite: 1]
+          }
+
+          // --- [테이블 행 생성] ---[cite: 1, 2]
           let statusText = "대기중";
           if(data.status === "confirmed") statusText = "예약 확정";
           if(data.status === "canceled") statusText = "취소됨";
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td><strong>${data.reservationDate || '날짜없음'}</strong><br><span style="color:#888;">${data.reservationTime || ''}</span></td>
-            <td>${data.userEmail || '이메일없음'}</td>
-            <td><strong>${data.artist || '미지정'}</strong></td>
+            <td><strong>${data.reservationDate || '-'}</strong><br><small>${data.reservationTime || ''}</small></td>
+            <td>${data.userEmail || '-'}</td>
+            <td><strong>${data.artist || '-'}</strong></td>
             <td>${data.serviceType || '-'}</td>
             <td>
-              <div>🏨 ${data.hotelAddress || '-'}</div>
-              <div style="font-size:12px; color:#888; margin-top:4px;">💬 ${data.specialRequests || '요청사항 없음'}</div>
+              <div style="font-size:13px;">🏨 ${data.hotelAddress || '-'}</div>
+              <div style="font-size:11px; color:#888; margin-top:4px;">💬 ${data.specialRequests || '-'}</div>
             </td>
             <td><span class="status ${data.status}">${statusText}</span></td>
             <td>
               <select onchange="updateStatus('${id}', this.value)">
-                <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>대기중 (Pending)</option>
-                <option value="confirmed" ${data.status === 'confirmed' ? 'selected' : ''}>확정 (Confirm)</option>
-                <option value="canceled" ${data.status === 'canceled' ? 'selected' : ''}>취소 (Cancel)</option>
+                <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>대기중</option>
+                <option value="confirmed" ${data.status === 'confirmed' ? 'selected' : ''}>확정</option>
+                <option value="canceled" ${data.status === 'canceled' ? 'selected' : ''}>취소</option>
               </select>
             </td>
           `;
           tbody.appendChild(tr);
         });
-        
-        console.log("3. 화면에 표 그리기 완료!");
+
+        // --- [통계 화면 업데이트] ---
+        totalEl.textContent = totalThisMonth;
+        confirmedEl.textContent = confirmedTotal;
+
+        // 가장 인기 있는 아티스트 계산
+        let topArtistName = "-";
+        let maxCount = 0;
+        for (const [name, count] of Object.entries(artistStats)) {
+          if (count > maxCount) {
+            maxCount = count;
+            topArtistName = name;
+          }
+        }
+        artistEl.textContent = topArtistName !== "-" ? `${topArtistName} (${maxCount}건)` : "-";[cite: 1]
         
       } catch (error) {
         console.error("데이터 로딩 실패:", error);
