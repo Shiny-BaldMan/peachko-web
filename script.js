@@ -15,23 +15,23 @@ if (window.location.hostname === "localhost" || window.location.hostname === "12
   // 내 컴퓨터(로컬 테스트) 환경
   console.log("🛠️ 로컬 테스트 모드입니다.");
   firebaseConfig = {
-    apiKey: "AIzaSyCnByhLp-UyVaVOpEERqNBJKeIcipPILE0",
+    apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
     authDomain: "peachko-dev.firebaseapp.com",
     projectId: "peachko-dev",
     storageBucket: "peachko-dev.firebasestorage.app",
-    messagingSenderId: "675915261853",
-    appId: "1:675915261853:web:58dce392b1103dd6c1b174"
+    messagingSenderId: "561367230685",
+    appId: "1:561367230685:web:5576c1897b5989c243d334"
   };
 } else {
   // Vercel 등 실제 배포 환경 (나중에 운영용 DB를 만들면 값을 교체합니다)
   console.log("🚀 실제 운영 모드입니다.");
   firebaseConfig = {
-    apiKey: "AIzaSyCnByhLp-UyVaVOpEERqNBJKeIcipPILE0",
+    apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
     authDomain: "peachko-dev.firebaseapp.com",
     projectId: "peachko-dev",
     storageBucket: "peachko-dev.firebasestorage.app",
-    messagingSenderId: "675915261853",
-    appId: "1:675915261853:web:58dce392b1103dd6c1b174"
+    messagingSenderId: "561367230685",
+    appId: "1:561367230685:web:5576c1897b5989c243d334"
   };
 }
 
