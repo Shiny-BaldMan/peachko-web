@@ -434,11 +434,10 @@ function initBooking() {
     redirectBtn.addEventListener("click", () => {
       // script.js의 initBooking 함수 부분
       const bookingUrl = "booking.html"; // 외부 URL 대신 우리가 만든 파일로 변경
-      // 새 창(새 탭)에서 예약 페이지 열기
-      window.open(bookingUrl, "_blank");
+
       
       // (참고) 만약 현재 창에서 바로 페이지를 넘기고 싶다면 위 window.open 대신 아래 코드를 사용하세요:
-      // window.location.href = bookingUrl;
+      window.location.href = bookingUrl;
     });
   }
 }

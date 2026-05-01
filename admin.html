@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>peachko - 관리자 대시보드</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  
+  <style>
+    /* 관리자 전용 깔끔한 스타일 */
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #E8704A; /* peachko 메인 컬러 */
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { margin: 0; font-size: 20px; }
+    .btn-logout {
+      background: white; color: #E8704A; border: none;
+      padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;
+    }
+    .container { padding: 30px; max-width: 1200px; margin: 0 auto; }
+    
+    /* 테이블 스타일 */
+    .table-wrapper {
+      background: white; border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 15px; border-bottom: 1px solid #eee; }
+    th { background-color: #fafbfc; color: #666; font-size: 13px; text-transform: uppercase; }
+    td { font-size: 14px; }
+    tr:hover { background-color: #fcfcfc; }
+    
+    /* 상태 뱃지 (Badge) 디자인 */
+    .status { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+    .status.pending { background-color: #fff3cd; color: #856404; }
+    .status.confirmed { background-color: #d4edda; color: #155724; }
+    .status.canceled { background-color: #f8d7da; color: #721c24; }
+    
+    /* 상태 변경 드롭다운 */
+    select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🍑 peachko Admin Dashboard</h1>
+    <button class="btn-logout" id="logoutBtn">로그아웃</button>
+  </header>
+
+  <div class="container">
+    <h2 style="margin-bottom: 20px;">예약 현황 관리</h2>
+    
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>예약 일시</th>
+            <th>고객 이메일</th>
+            <th>아티스트</th>
+            <th>서비스</th>
+            <th>호텔 주소 및 요청사항</th>
+            <th>현재 상태</th>
+            <th>상태 변경</th>
+          </tr>
+        </thead>
+        <tbody id="bookingList">
+          <!-- 데이터가 로딩되는 동안 보여질 문구 -->
+          <tr><td colspan="7" style="text-align:center;">예약 데이터를 불러오는 중입니다...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCnByhLp-UyVaVOpEERqNBJKeIcipPILE0",
+      authDomain: "peachko-dev.firebaseapp.com",
+      projectId: "peachko-dev",
+      storageBucket: "peachko-dev.firebasestorage.app",
+      messagingSenderId: "675915261853",
+      appId: "1:675915261853:web:58dce392b1103dd6c1b174"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // 🔴 [중요] 여기에 질문자님의 (관리자용) 이메일을 적어주세요!
+    const ADMIN_EMAIL = "admin@admin.com"; 
+
+    // 1. 보안 체크: 관리자 이메일이 맞는지 확인
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (user.email !== ADMIN_EMAIL) {
+          alert("접근 권한이 없습니다. 관리자 계정으로 로그인해주세요.");
+          window.location.href = "index.html"; // 일반 유저는 쫓아냄
+        } else {
+          loadBookings(); // 관리자가 맞으면 예약 데이터 불러오기
+        }
+      } else {
+        window.location.href = "login.html"; // 로그인 안 한 사람도 쫓아냄
+      }
+    });
+
+    // 2. 로그아웃 기능
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    });
+
+    // 3. Firestore에서 예약 데이터 불러오기
+    async function loadBookings() {
+      const tbody = document.getElementById('bookingList');
+      tbody.innerHTML = ""; // 테이블 초기화
+
+      try {
+        // 예약 날짜(reservationDate)를 기준으로 내림차순 정렬해서 가져옴
+        const q = query(collection(db, "bookings"), orderBy("reservationDate", "desc"));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>접수된 예약이 없습니다.</td></tr>";
+          return;
+        }
+
+        // 가져온 데이터를 표(테이블)에 하나씩 그려주기
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const id = docSnap.id; // 문서 고유 ID
+
+          // 상태에 따른 뱃지 글자와 색상 클래스 지정
+          let statusText = "대기중";
+          if(data.status === "confirmed") statusText = "예약 확정";
+          if(data.status === "canceled") statusText = "취소됨";
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${data.reservationDate}</strong><br><span style="color:#888;">${data.reservationTime}</span></td>
+            <td>${data.userEmail}</td>
+            <td><strong>${data.artist}</strong></td>
+            <td>${data.serviceType}</td>
+            <td>
+              <div>🏨 ${data.hotelAddress}</div>
+              <div style="font-size:12px; color:#888; margin-top:4px;">💬 ${data.specialRequests || '요청사항 없음'}</div>
+            </td>
+            <td><span class="status ${data.status}">${statusText}</span></td>
+            <td>
+              <select onchange="updateStatus('${id}', this.value)">
+                <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>대기중 (Pending)</option>
+                <option value="confirmed" ${data.status === 'confirmed' ? 'selected' : ''}>확정 (Confirm)</option>
+                <option value="canceled" ${data.status === 'canceled' ? 'selected' : ''}>취소 (Cancel)</option>
+              </select>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (error) {
+        console.error("데이터 로딩 실패:", error);
+        tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center;">데이터를 불러오는 중 오류가 발생했습니다: ${error.message}</td></tr>`;
+      }
+    }
+
+    // 4. 예약 상태 업데이트 기능 (셀렉트 박스에서 값을 바꿀 때 실행됨)
+    window.updateStatus = async function(docId, newStatus) {
+      // 실수로 누를 수도 있으니 확인창 띄우기
+      if(!confirm("이 예약의 상태를 변경하시겠습니까?")) return;
+
+      try {
+        const bookingRef = doc(db, "bookings", docId);
+        await updateDoc(bookingRef, {
+          status: newStatus
+        });
+        alert("상태가 성공적으로 변경되었습니다.");
+        loadBookings(); // 변경된 데이터로 표 다시 그리기
+      } catch (error) {
+        console.error("업데이트 실패:", error);
+        alert("상태 변경에 실패했습니다.");
+      }
+    };
+  </script>
+</body>
+</html>
