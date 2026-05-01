@@ -89,52 +89,44 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
+    // ✅ 다른 파일들과 100% 일치하는 새 프로젝트 설정값입니다.
     const firebaseConfig = {
-      apiKey: "AIzaSyCnByhLp-UyVaVOpEERqNBJKeIcipPILE0",
+      apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
       authDomain: "peachko-dev.firebaseapp.com",
       projectId: "peachko-dev",
       storageBucket: "peachko-dev.firebasestorage.app",
-      messagingSenderId: "675915261853",
-      appId: "1:675915261853:web:58dce392b1103dd6c1b174"
+      messagingSenderId: "561367230685",
+      appId: "1:561367230685:web:5576c1897b5989c243d334"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // 🔴 [중요] 여기에 질문자님의 (관리자용) 이메일을 적어주세요!
     const ADMIN_EMAIL = "admin@admin.com"; 
 
-    // 1. 보안 체크: 관리자 이메일이 맞는지 확인
-    // admin.html 내의 인증 확인 부분
-    let isAuthChecked = false; // 인증 확인이 끝났는지 체크하는 변수
-
     onAuthStateChanged(auth, (user) => {
-      if (isAuthChecked) return; // 이미 확인했다면 중단
+      // 0. 로그로 현재 상태 확인 (F12 콘솔창에서 확인 가능)
+      console.log("검사 중인 유저:", user ? user.email : "로그아웃 상태");
 
-      console.log("검사 중인 유저 정보:", user);
-
-     if (!user) {
-    // 1. 유저 정보가 아예 없는 경우
-        console.log("로그인 정보가 없습니다. 로그인 페이지로 이동합니다.");
-       window.location.href = "login.html";
+      if (!user) {
+        // 1. 로그인이 안 되어 있으면 즉시 로그인 페이지로 이동
+        window.location.href = "login.html";
       } else {
-        // 2. 유저 정보가 있는 경우
-        isAuthChecked = true; // 확인 완료!
-    
-       // 이메일이 관리자 이메일과 일치하는지 확인
-       if (user.email === ADMIN_EMAIL) {
-          console.log("관리자 확인 성공!");
-         loadBookings(); // 예약 목록 불러오기 함수 실행
-       } else {
-          console.log("관리자가 아닙니다. 메인으로 이동합니다.");
-          alert("관리자 권한이 없습니다.");
+        // 2. 로그인은 되어 있는 경우, 이메일 일치 여부 확인
+        // .toLowerCase()를 붙여 대소문자 실수를 방지합니다.
+        if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+          console.log("✅ 관리자 로그인 성공!");
+          loadBookings(); 
+        } else {
+          // 3. 관리자가 아니면 경고창을 띄우고 메인으로 이동
+          alert("관리자 권한이 없는 계정입니다: " + user.email);
           window.location.href = "index.html";
         }
-     }
+      }
     });
 
-    // 2. 로그아웃 기능
+    // 로그아웃 버튼 이벤트
     document.getElementById('logoutBtn').addEventListener('click', () => {
       signOut(auth).then(() => {
         window.location.href = "login.html";
