@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>peachko - Artist Profile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    .profile-header { padding: 120px 5% 40px; text-align: center; background: #fff; }
+    .profile-photo { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; border: 5px solid var(--peach); }
+    .tag-container { display: flex; gap: 8px; justify-content: center; margin: 15px 0; }
+    .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; background: var(--soft); color: var(--accent); font-family: 'DM Sans', sans-serif; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; padding: 40px 5%; }
+    .gallery-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; transition: transform 0.3s; }
+    .gallery-img:hover { transform: scale(1.02); }
+    .insta-btn { background: #E1306C; color: white; padding: 10px 20px; border-radius: 50px; text-decoration: none; font-size: 14px; font-weight: bold; }
+  </style>
+</head>
+<body class="bg-peach">
+
+  <header id="header" class="scrolled">
+    <div class="logo" style="cursor:pointer;" onclick="location.href='index.html'">peachko</div>
+    <nav><button class="btn-ghost" onclick="history.back()">Back</button></nav>
+  </header>
+
+  <section class="profile-header">
+    <img id="detailPhoto" src="" class="profile-photo" alt="Artist">
+    <h1 id="detailName" class="fd" style="font-size: 42px; margin-bottom: 10px;">Artist Name</h1>
+    <p id="detailIntro" class="fb" style="color: #666; max-width: 600px; margin: 0 auto 20px;">한 줄 소개가 들어가는 자리입니다.</p>
+    
+    <div id="styleTags" class="tag-container"></div>
+    
+    <div style="margin: 30px 0;">
+      <a id="instaLink" href="#" target="_blank" class="insta-btn" style="display:none;">📸 Follow on Instagram</a>
+    </div>
+
+    <div style="background: white; padding: 30px; border-radius: 12px; max-width: 800px; margin: 0 auto; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+      <h3 class="fd">Career & Expertise</h3>
+      <p id="detailCareer" style="white-space: pre-wrap; line-height: 1.8; color: #444; margin-top: 15px;">경력 상세 내용...</p>
+      <div id="serviceTags" class="tag-container" style="justify-content: flex-start; margin-top: 20px;"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="fd" style="text-align: center; margin-top: 50px;">Portfolio Gallery</h2>
+    <div id="portfolioGrid" class="gallery-grid">
+      <!-- 포트폴리오 이미지들이 여기에 들어감 -->
+    </div>
+  </section>
+
+  <div style="text-align: center; padding: 60px 0;">
+    <button class="btn-accent" style="padding: 20px 60px; font-size: 18px;" onclick="location.href='booking.html'">Book Now with this Artist</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    // ✅ 본인의 Firebase 설정값을 그대로 사용하세요
+    const firebaseConfig = { ... }; 
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // URL에서 ID 파라미터 읽기
+    const urlParams = new URLSearchParams(window.location.search);
+    const artistId = urlParams.get('id');
+
+    async function loadArtistDetail() {
+      if (!artistId) return;
+      const docRef = doc(db, "artists", artistId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const a = docSnap.data();
+        document.getElementById('detailName').innerText = a.name;
+        document.getElementById('detailPhoto').src = a.photoUrl;
+        document.getElementById('detailIntro').innerText = a.intro;
+        document.getElementById('detailCareer').innerText = a.career;
+
+        if(a.snsLink) {
+          const insta = document.getElementById('instaLink');
+          insta.href = a.snsLink;
+          insta.style.display = 'inline-block';
+        }
+
+        // 태그 그리기
+        const tagBox = document.getElementById('styleTags');
+        a.styleTags?.forEach(tag => {
+          tagBox.innerHTML += `<span class="badge">${tag}</span>`;
+        });
+
+        // 갤러리 그리기
+        const grid = document.getElementById('portfolioGrid');
+        a.portfolioUrls?.forEach(url => {
+          grid.innerHTML += `<img src="${url}" class="gallery-img">`;
+        });
+      }
+    }
+    loadArtistDetail();
+  </script>
+</body>
+</html>

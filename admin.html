@@ -29,7 +29,11 @@
       background: white; color: #E8704A; border: none;
       padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;
     }
-    .container { padding: 30px; max-width: 1200px; margin: 0 auto; }
+    .container { 
+      padding: 30px; 
+      max-width: 1200px; 
+      margin: 0 auto; 
+    }
     
     /* 통계 카드 스타일 추가 */
     .stats-grid {
@@ -76,7 +80,38 @@
 
   <div class="container">
     <h2 style="margin-bottom: 25px;">실시간 현황 대시보드</h2>
+    <!-- admin.html의 container 내부, stats-grid 위쪽에 추가 -->
+    <div class="card" style="margin-bottom: 30px; text-align: left;">
+      <h3 style="margin-bottom: 20px;">🎨 새 아티스트 등록</h3>
+      <form id="artistForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+       <input type="text" id="a-name" placeholder="아티스트 이름" required style="padding: 10px;">
+       <input type="text" id="a-photo" placeholder="프로필 사진 URL" required style="padding: 10px;">
+       <input type="text" id="a-sns" placeholder="인스타그램 링크" style="padding: 10px;">
+       <input type="text" id="a-area" placeholder="활동 지역 (예: 강남, 홍대)" style="padding: 10px;">
+       <div style="grid-column: 1 / -1;">
+         <textarea id="a-intro" placeholder="한 줄 소개" style="width: 100%; padding: 10px;"></textarea>
+       </div>
     
+        <!-- 스타일 태그 선택 (On/Off) -->
+        <div style="grid-column: 1 / -1;">
+          <p style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">스타일 태그 선택</p>
+          <label><input type="checkbox" name="styleTag" value="Glass Skin"> Glass Skin</label>
+         <label><input type="checkbox" name="styleTag" value="K-Pop Idol"> K-Pop Idol</label>
+          <label><input type="checkbox" name="styleTag" value="Bridal"> Bridal</label>
+          <label><input type="checkbox" name="styleTag" value="Editorial"> Editorial</label>
+       </div>
+
+       <!-- 가능 서비스 선택 (On/Off) -->
+       <div style="grid-column: 1 / -1;">
+         <p style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">가능 서비스 선택</p>
+         <label><input type="checkbox" name="service" value="Face"> Face</label>
+         <label><input type="checkbox" name="service" value="Hair"> Hair</label>
+         <label><input type="checkbox" name="service" value="Full Glam"> Full Glam</label>
+       </div>
+
+        <button type="submit" class="btn-accent" style="grid-column: 1 / -1; padding: 15px;">아티스트 등록하기</button>
+     </form>
+    </div>
     <!-- 1. 통계 대시보드 섹션 (ID는 여기에만 존재해야 함) -->
     <div class="stats-grid">
       <div class="card">

@@ -295,11 +295,45 @@ grid.innerHTML = t.services.map((s, i) => ` <div class="svc-card reveal${i > 0 ?
 observeReveal();
 }
 
-function renderArtists(t) {
-const grid = document.getElementById("artists-grid");
-if (!grid) return;
-grid.innerHTML = t.artists.map((a, i) => ` <div class="artist-card reveal${i > 0 ? " delay" + i : ""}"> <div class="artist-photo"> <img src="${a.img}" alt="${a.name} K-Makeup" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\\'artist-photo-fallback\\'>💄</div>')" /> <div class="artist-tag">${a.tag}</div> </div> <div class="artist-info"> <div class="artist-name">${a.name}</div> <div class="artist-spec">${a.spec}</div> <div class="artist-rating">★ ${a.rating} · ${a.rev} ${t.art_reviews}</div> <button class="btn-accent artist-btn" onclick="selectArtist('${a.name}')">${t.art_book} ${a.name}</button> </div> </div>`).join("");
-observeReveal();
+// script.js 내의 renderArtists 함수 수정
+async function renderArtists(t) {
+  const grid = document.getElementById("artists-grid");
+  if (!grid) return;
+
+  try {
+    // 1. Firestore에서 아티스트 목록 가져오기
+    const querySnapshot = await getDocs(collection(db, "artists"));
+    
+    if (querySnapshot.empty) {
+      grid.innerHTML = "<p>등록된 아티스트가 없습니다.</p>";
+      return;
+    }
+
+    grid.innerHTML = "";
+    querySnapshot.forEach((docSnap) => {
+      const a = docSnap.data();
+      const id = docSnap.id;
+
+      // 2. index.html에는 사진, 이름, 별점, 태그만 노출
+      grid.innerHTML += `
+        <div class="artist-card reveal">
+          <div class="artist-photo" onclick="location.href='artist.html?id=${id}'" style="cursor:pointer;">
+            <img src="${a.photoUrl}" alt="${a.name}">
+            <div class="artist-tag">${a.styleTags ? a.styleTags[0] : 'Artist'}</div>
+          </div>
+          <div class="artist-info">
+            <div class="artist-name">${a.name}</div>
+            <div class="artist-rating">★ 5.0 (New)</div>
+            <button class="btn-accent artist-btn" onclick="location.href='artist.html?id=${id}'">
+              상세 정보 보기
+            </button>
+          </div>
+        </div>
+      `;
+    });
+  } catch (error) {
+    console.error("아티스트 로딩 실패:", error);
+  }
 }
 
 function renderReviews(t) {
