@@ -127,37 +127,41 @@
     });
 
     // 3. Firestore에서 예약 데이터 불러오기
+    // 3. Firestore에서 예약 데이터 불러오기 (엑스레이 진단 버전)
     async function loadBookings() {
       const tbody = document.getElementById('bookingList');
-      tbody.innerHTML = ""; // 테이블 초기화
+      tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>데이터를 열심히 찾는 중입니다...</td></tr>"; 
 
       try {
-        const q = query(collection(db, "bookings"));
+        console.log("1. 데이터베이스 연결 시도...");
+        const q = query(collection(db, "bookings")); 
         const querySnapshot = await getDocs(q);
 
+        console.log("2. 파이어베이스가 찾아낸 문서 개수:", querySnapshot.size, "개");
+
         if (querySnapshot.empty) {
-          tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>접수된 예약이 없습니다.</td></tr>";
+          tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>접수된 예약이 없습니다. (파이어베이스가 데이터를 0개로 인식함)</td></tr>";
           return;
         }
 
         // 가져온 데이터를 표(테이블)에 하나씩 그려주기
+        tbody.innerHTML = ""; // 글씨 지우기
         querySnapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          const id = docSnap.id; // 문서 고유 ID
+          const id = docSnap.id; 
 
-          // 상태에 따른 뱃지 글자와 색상 클래스 지정
           let statusText = "대기중";
           if(data.status === "confirmed") statusText = "예약 확정";
           if(data.status === "canceled") statusText = "취소됨";
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td><strong>${data.reservationDate}</strong><br><span style="color:#888;">${data.reservationTime}</span></td>
-            <td>${data.userEmail}</td>
-            <td><strong>${data.artist}</strong></td>
-            <td>${data.serviceType}</td>
+            <td><strong>${data.reservationDate || '날짜없음'}</strong><br><span style="color:#888;">${data.reservationTime || ''}</span></td>
+            <td>${data.userEmail || '이메일없음'}</td>
+            <td><strong>${data.artist || '미지정'}</strong></td>
+            <td>${data.serviceType || '-'}</td>
             <td>
-              <div>🏨 ${data.hotelAddress}</div>
+              <div>🏨 ${data.hotelAddress || '-'}</div>
               <div style="font-size:12px; color:#888; margin-top:4px;">💬 ${data.specialRequests || '요청사항 없음'}</div>
             </td>
             <td><span class="status ${data.status}">${statusText}</span></td>
@@ -171,9 +175,12 @@
           `;
           tbody.appendChild(tr);
         });
+        
+        console.log("3. 화면에 표 그리기 완료!");
+        
       } catch (error) {
         console.error("데이터 로딩 실패:", error);
-        tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center;">데이터를 불러오는 중 오류가 발생했습니다: ${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center;">오류 발생: ${error.message}</td></tr>`;
       }
     }
 
