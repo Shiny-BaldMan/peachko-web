@@ -3,161 +3,317 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>peachko — Login</title>
-  
+  <title>PEACHKO — Login & Sign Up</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/600.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400-italic.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/300.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css" />
   <style>
-    /* 로그인 화면 전용 레이아웃 보정 (화면 중앙 정렬) */
-    .auth-section { 
-      min-height: 100vh; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      padding-top: 60px; 
+    .auth-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 60px;
+      padding-bottom: 60px;
     }
-    .auth-toggle { 
-      font-family: var(--fb); 
-      font-size: 13px; 
-      color: var(--muted); 
-      text-align: center; 
-      margin-top: 15px; 
-      cursor: pointer; 
-      text-decoration: underline; 
+    .auth-toggle {
+      font-family: var(--fb);
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 15px;
+      cursor: pointer;
+      text-decoration: underline;
       transition: color 0.2s;
     }
-    .auth-toggle:hover {
-      color: var(--accent);
+    .auth-toggle:hover { color: var(--accent); }
+
+    /* 회원가입 전용 필드 - 기본 숨김 */
+    .signup-only { display: none; flex-direction: column; gap: 14px; }
+    .signup-only.show { display: flex; }
+    
+    /* 2열 그리드 */
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width:480px) { .form-row-2 { grid-template-columns: 1fr; } }
+    
+    /* 개인정보 동의 영역 */
+    .privacy-consent {
+      background: var(--soft); border: 1px solid var(--border);
+      padding: 16px 18px; font-family: var(--fb); font-size: 13px;
+      color: var(--muted); line-height: 1.75; border-radius: var(--r-md);
     }
+    .consent-title {
+      font-family: var(--fb); font-size: 11px; font-weight: 500; color: var(--text);
+      letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .privacy-consent a { color: var(--accent); text-decoration: underline; cursor: pointer; }
+    .consent-check { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; cursor: pointer; }
+    .consent-check input[type="checkbox"] {
+      width: 16px; height: 16px; min-width: 16px; margin-top: 2px;
+      accent-color: var(--accent); cursor: pointer;
+    }
+    .consent-check span { font-family: var(--fb); font-size: 13px; color: var(--text); line-height: 1.5; }
+    .consent-check span em { color: var(--accent); font-style: normal; font-weight: 600; }
+    
+    /* 구분선 */
+    .form-divider {
+      font-family: var(--fb); font-size: 10px; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--muted); text-align: center; position: relative; margin: 8px 0;
+    }
+    .form-divider::before, .form-divider::after {
+      content: ""; position: absolute; top: 50%; width: 36%; height: 1px; background: var(--border);
+    }
+    .form-divider::before { left: 0; } .form-divider::after { right: 0; }
+    
+    .req { color: var(--accent); }
   </style>
 </head>
 <body class="bg-gradient">
 
   <header id="header" class="scrolled">
-    <div class="logo" style="cursor:pointer;" onclick="location.href='index.html'">peachko</div>
+    <div class="logo" style="cursor:pointer;" onclick="location.href='index.html'">PEACHKO</div>
     <nav>
       <button class="btn-ghost" onclick="location.href='index.html'">Back to Home</button>
     </nav>
   </header>
 
   <section class="auth-section">
-    <div class="booking-wrap" style="width: 100%; max-width: 420px;">
-      
+    <div class="booking-wrap" style="width: 100%; max-width: 440px;">
+
       <div class="section-head" style="margin-bottom: 30px;">
         <div class="label-sm" id="authLabel">Welcome Back</div>
         <h2 class="fd" id="authTitle">Log In</h2>
       </div>
 
-      <div class="booking-form" style="display: flex; flex-direction: column; gap: 16px; padding: 40px 32px;">
-        
-        <div class="form-row full">
-          <label class="form-label">Email Address</label>
-          <input type="email" id="emailInput" placeholder="name@example.com" required />
+      <div class="booking-form" style="display: flex; flex-direction: column; gap: 14px; padding: 40px 32px; background: var(--white); border: 1px solid var(--border-lt); border-radius: var(--r-lg); box-shadow: var(--shadow-lg);">
+
+        <!-- 회원가입 전용 필드 -->
+        <div class="signup-only" id="signupFields">
+          <div class="form-row-2">
+            <div>
+              <label class="form-label">Name <span class="req">*</span></label>
+              <input type="text" id="nameInput" placeholder="e.g. Emma Smith" autocomplete="name" />
+            </div>
+            <div>
+              <label class="form-label">Nationality <span class="req">*</span></label>
+              <select id="nationalityInput">
+                <option value="">Select</option>
+                <optgroup label="Asia">
+                  <option value="KR">South Korea</option><option value="JP">Japan</option>
+                  <option value="CN">China</option><option value="TW">Taiwan</option>
+                  <option value="HK">Hong Kong</option><option value="SG">Singapore</option>
+                </optgroup>
+                <optgroup label="Americas">
+                  <option value="US">United States</option><option value="CA">Canada</option>
+                </optgroup>
+                <optgroup label="Europe / Oceania">
+                  <option value="GB">United Kingdom</option><option value="FR">France</option>
+                  <option value="DE">Germany</option><option value="AU">Australia</option>
+                </optgroup>
+                <optgroup label="Other"><option value="OTHER">Other</option></optgroup>
+              </select>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div>
+              <label class="form-label">Date of Birth <span class="req">*</span></label>
+              <input type="date" id="dobInput" autocomplete="bday" />
+            </div>
+            <div>
+              <label class="form-label">Phone <span class="req">*</span></label>
+              <input type="tel" id="phoneInput" placeholder="+1 234 567 8900" autocomplete="tel" />
+            </div>
+          </div>
+          <div class="form-divider">Account Details</div>
         </div>
-        
+
+        <!-- 공통 필드 (로그인 / 회원가입 모두 사용) -->
         <div class="form-row full">
-          <label class="form-label">Password</label>
-          <input type="password" id="passwordInput" placeholder="••••••••" required />
+          <label class="form-label">Email Address <span class="req">*</span></label>
+          <input type="email" id="emailInput" placeholder="name@example.com" required autocomplete="email" />
+        </div>
+        <div class="form-row full">
+          <label class="form-label">Password <span class="req">*</span></label>
+          <input type="password" id="passwordInput" placeholder="••••••••" required autocomplete="current-password" />
+          <p id="pwHint" style="display:none; font-family:var(--fb); font-size:11px; color:var(--muted); margin-top:5px; line-height:1.5;">
+            Must be at least 8 characters long.
+          </p>
+        </div>
+
+        <!-- 개인정보 동의 (회원가입 전용) -->
+        <div class="signup-only" id="consentBlock">
+          <div class="privacy-consent">
+            <div class="consent-title">Privacy Policy Consent</div>
+            <p>We collect your name, nationality, date of birth, phone number, and email to manage your bookings and account. Your data will not be shared with third parties. Read our full <a onclick="window.open('privacy.html','_blank')">Privacy Policy</a>.</p>
+            <label class="consent-check">
+              <input type="checkbox" id="consentCheck" />
+              <span>I agree to the collection and use of my personal data. <em>(Required)</em></span>
+            </label>
+          </div>
         </div>
 
         <button class="btn-accent full-btn" id="authActionBtn">Log In</button>
-
         <div class="auth-toggle" id="authToggleBtn">Don't have an account? Sign up</div>
-        
+
       </div>
     </div>
   </section>
 
   <script type="module">
-    // 1. Firebase 라이브러리 불러오기 (최신 v10 모듈 방식)
+    // 1. Firebase v10 모듈 가져오기 (팀원 코드 적용)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    // 2. 전달해주신 peachko 개발용 설정값
-    const firebaseConfig = {
-    apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
-    authDomain: "peachko-dev.firebaseapp.com",
-    projectId: "peachko-dev",
-    storageBucket: "peachko-dev.firebasestorage.app",
-    messagingSenderId: "561367230685",
-    appId: "1:561367230685:web:5576c1897b5989c243d334"
-    };
+    // 2. 환경 분리 설정 (팀원 코드 적용)
+    let firebaseConfig;
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      firebaseConfig = {
+        apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+        authDomain: "peachko-dev.firebaseapp.com",
+        projectId: "peachko-dev",
+        storageBucket: "peachko-dev.firebasestorage.app",
+        messagingSenderId: "561367230685",
+        appId: "1:561367230685:web:5576c1897b5989c243d334"
+      };
+    } else {
+      firebaseConfig = {
+        apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+        authDomain: "peachko-dev.firebaseapp.com",
+        projectId: "peachko-dev",
+        storageBucket: "peachko-dev.firebasestorage.app",
+        messagingSenderId: "561367230685",
+        appId: "1:561367230685:web:5576c1897b5989c243d334"
+      };
+    }
 
-    // 3. Firebase 초기화 및 인증 객체 가져오기
-    const app = initializeApp(firebaseConfig);
+    // 3. Firebase 초기화
+    const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-
-    // ==========================================
-    // UI 조작 및 로그인 로직
-    // ==========================================
-    let isLogin = true;
+    const db   = getFirestore(app);
     
-    const authLabel = document.getElementById('authLabel');
-    const authTitle = document.getElementById('authTitle');
-    const authActionBtn = document.getElementById('authActionBtn');
-    const authToggleBtn = document.getElementById('authToggleBtn');
-    const emailInput = document.getElementById('emailInput');
-    const passwordInput = document.getElementById('passwordInput');
+    let isLogin = true;
 
-    // 하단 텍스트 클릭 시 (로그인 <-> 회원가입 전환)
-    authToggleBtn.addEventListener('click', () => {
+    // DOM 요소 선택
+    const authLabel        = document.getElementById("authLabel");
+    const authTitle        = document.getElementById("authTitle");
+    const authActionBtn    = document.getElementById("authActionBtn");
+    const authToggleBtn    = document.getElementById("authToggleBtn");
+    const emailInput       = document.getElementById("emailInput");
+    const passwordInput    = document.getElementById("passwordInput");
+    const pwHint           = document.getElementById("pwHint");
+    const nameInput        = document.getElementById("nameInput");
+    const nationalityInput = document.getElementById("nationalityInput");
+    const dobInput         = document.getElementById("dobInput");
+    const phoneInput       = document.getElementById("phoneInput");
+    const consentCheck     = document.getElementById("consentCheck");
+    const signupFields     = document.getElementById("signupFields");
+    const consentBlock     = document.getElementById("consentBlock");
+
+    // 생년월일 최대값을 오늘로 제한
+    dobInput.setAttribute("max", new Date().toISOString().split("T")[0]);
+
+    // 토글 버튼 로직 (로그인 <-> 회원가입 전환)
+    authToggleBtn.addEventListener("click", () => {
       isLogin = !isLogin;
       if (isLogin) {
-        authLabel.textContent = "Welcome Back";
-        authTitle.textContent = "Log In";
+        authLabel.textContent     = "Welcome Back";
+        authTitle.textContent     = "Log In";
         authActionBtn.textContent = "Log In";
         authToggleBtn.textContent = "Don't have an account? Sign up";
+        signupFields.classList.remove("show");
+        consentBlock.classList.remove("show");
+        pwHint.style.display = "none";
+        passwordInput.setAttribute("autocomplete", "current-password");
       } else {
-        authLabel.textContent = "Join Us";
-        authTitle.textContent = "Create Account";
+        authLabel.textContent     = "Join Us";
+        authTitle.textContent     = "Create Account";
         authActionBtn.textContent = "Sign Up";
         authToggleBtn.textContent = "Already have an account? Log in";
+        signupFields.classList.add("show");
+        consentBlock.classList.add("show");
+        pwHint.style.display = "block";
+        passwordInput.setAttribute("autocomplete", "new-password");
       }
     });
 
-    // 메인 버튼 (Log In 또는 Sign Up) 클릭 시 실행할 함수
-    authActionBtn.addEventListener('click', (e) => {
-      e.preventDefault(); // 폼 기본 제출 동작 방지
-      
-      const email = emailInput.value;
+    // 메인 액션 버튼 로직
+    authActionBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const email    = emailInput.value.trim();
       const password = passwordInput.value;
 
-      // 간단한 입력 확인
-      if (!email || !password) {
-        alert("이메일과 비밀번호를 모두 입력해주세요.");
+      if (isLogin) {
+        // [로그인]
+        if (!email || !password) {
+          alert("Please enter both email and password.");
+          return;
+        }
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          alert("Login successful! Welcome back.");
+          window.location.href = "index.html";
+        } catch (err) { alert(getErrorMsg(err.code)); }
         return;
       }
 
-      if (isLogin) {
-        // [로그인 로직]
-        signInWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            alert("로그인 성공! 환영합니다.");
-            // 로그인 성공 시 메인 홈페이지로 이동
-            window.location.href = "index.html"; 
-          })
-          .catch((error) => {
-            alert("로그인 실패: " + error.message);
-            console.error(error);
-          });
-          
-      } else {
-        // [회원가입 로직]
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            alert("회원가입 완료! peachko에 오신 것을 환영합니다.");
-            // 가입 성공 시 메인 홈페이지로 이동
-            window.location.href = "index.html";
-          })
-          .catch((error) => {
-            // 이미 있는 이메일이거나 비밀번호가 6자리 미만일 때 에러 표시
-            alert("회원가입 실패: " + error.message);
-            console.error(error);
-          });
+      // [회원가입]
+      const name        = nameInput.value.trim();
+      const nationality = nationalityInput.value;
+      const dob         = dobInput.value;
+      const phone       = phoneInput.value.trim();
+
+      if (!name || !nationality || !dob || !phone || !email || !password) {
+        alert("Please fill in all required fields (*)."); return;
+      }
+      if (password.length < 8) {
+        alert("Password must be at least 8 characters long."); return;
+      }
+      if (!consentCheck.checked) {
+        alert("You must agree to the Privacy Policy to sign up."); return;
+      }
+
+      authActionBtn.disabled    = true;
+      authActionBtn.textContent = "Processing...";
+
+      try {
+        // 인증 생성
+        const { user } = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // Firestore에 추가 정보 저장 (고도화 로직 유지)
+        await setDoc(doc(db, "users", user.uid), {
+          name, nationality, dob, phone, email,
+          consentAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
+        });
+        
+        alert("Sign up successful! Welcome to PEACHKO.");
+        window.location.href = "index.html";
+      } catch (err) {
+        authActionBtn.disabled    = false;
+        authActionBtn.textContent = "Sign Up";
+        alert(getErrorMsg(err.code));
       }
     });
+
+    // 에러 메시지 맵핑
+    function getErrorMsg(code) {
+      const m = {
+        "auth/email-already-in-use":   "This email is already registered.",
+        "auth/invalid-email":          "Please enter a valid email address.",
+        "auth/weak-password":          "Password is too weak. Please use at least 8 characters.",
+        "auth/user-not-found":         "Incorrect email or password.",
+        "auth/wrong-password":         "Incorrect email or password.",
+        "auth/invalid-credential":     "Incorrect email or password.",
+        "auth/too-many-requests":      "Too many failed attempts. Please try again later.",
+      };
+      return m[code] || "An error occurred. (" + code + ")";
+    }
   </script>
+
 </body>
 </html>

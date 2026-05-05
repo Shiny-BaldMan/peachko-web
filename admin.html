@@ -153,7 +153,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     // ✅ 다른 파일들과 100% 일치하는 새 프로젝트 설정값입니다.
     const firebaseConfig = {
@@ -199,8 +199,51 @@
       });
     });
 
-    // 3. Firestore에서 예약 데이터 불러오기
-    // 3. Firestore에서 예약 데이터 불러오기 (엑스레이 진단 버전)
+    // 아티스트 등록 폼 이벤트 처리
+    const artistForm = document.getElementById('artistForm');
+    if (artistForm) {
+      artistForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // 버튼 상태 변경
+        const submitBtn = e.target.querySelector('button');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "등록 중...";
+
+        try {
+          // 체크박스 값 가져오기
+          const styleTags = Array.from(document.querySelectorAll('input[name="styleTag"]:checked')).map(cb => cb.value);
+          const services = Array.from(document.querySelectorAll('input[name="service"]:checked')).map(cb => cb.value);
+          
+          // 포트폴리오 URL 쉼표로 분리하여 배열 만들기
+          const portfolioUrls = document.getElementById('a-portfolio').value.split(',').map(url => url.trim());
+
+          // Firestore에 데이터 저장
+          await addDoc(collection(db, "artists"), {
+            name: document.getElementById('a-name').value,
+            photoUrl: document.getElementById('a-photo').value,
+            snsLink: document.getElementById('a-sns').value,
+            area: document.getElementById('a-area').value,
+            intro: document.getElementById('a-intro').value,
+            career: document.getElementById('a-career').value,
+            styleTags: styleTags,
+            services: services,
+            portfolioUrls: portfolioUrls,
+            createdAt: new Date()
+          });
+
+          alert("아티스트가 성공적으로 등록되었습니다!");
+          artistForm.reset(); // 폼 초기화
+        } catch (error) {
+          console.error("아티스트 등록 오류:", error);
+          alert("등록에 실패했습니다: " + error.message);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerText = "아티스트 등록 완료";
+        }
+      });
+    }
+
     // 3. Firestore에서 예약 데이터 불러오기 및 통계 계산
     async function loadBookings() {
       const tbody = document.getElementById('bookingList');

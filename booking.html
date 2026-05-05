@@ -3,285 +3,401 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>peachko — Book Your Look</title>
-  
+  <title>PEACHKO — Book Your Look</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/600.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400-italic.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/300.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css" />
   <style>
-    .booking-section { min-height: 100vh; padding: 120px 5% 80px; }
+    .booking-page { min-height: 100vh; padding: 120px 5% 80px; background: linear-gradient(140deg, var(--bg), var(--peach)); }
     .booking-container { max-width: 600px; margin: 0 auto; }
-    /* 모바일 대응을 위한 폼 레이아웃 조정 */
-    @media (max-width: 480px) {
-      .booking-form { grid-template-columns: 1fr; }
-    }
+
+    /* 상태 배너 */
+    .status-banner { padding: 12px 16px; border-radius: 2px; font-family: var(--fb); font-size: 14px; margin-bottom: 16px; display: none; }
+    .status-banner.show { display: block; }
+    .status-banner.checking { background: #FFF8F0; border: 1px solid var(--peach-mid); color: var(--muted); }
+    .status-banner.error { background: #FFF2F2; border: 1px solid #E85A4A; color: #D94040; }
+    .status-banner.conflict { background: #FFF2F2; border: 1px solid #E85A4A; color: #D94040; }
+
+    /* 예약된 슬롯 뱃지 */
+    .slots-panel { background: var(--soft); border: 1px solid var(--border); border-radius: 2px; padding: 12px 16px; margin-bottom: 16px; display: none; }
+    .slots-panel.show { display: block; }
+    .slots-label { font-family: var(--fb); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+    .slots-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .slot-badge { font-family: var(--fb); font-size: 12px; padding: 4px 12px; border-radius: 20px; background: var(--peach); color: var(--accent-dk); border: 1px solid var(--peach-mid); }
+    .slot-badge.conflict { background: #FFE0E0; color: #D94040; border-color: #E85A4A; font-weight: 600; }
+    .slots-empty { font-family: var(--fb); font-size: 13px; color: #2E9E5B; }
+
+    /* 스피너 */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; vertical-align: middle; margin-right: 7px; }
+
+    @media (max-width: 480px) { .booking-form { grid-template-columns: 1fr !important; } }
   </style>
 </head>
-<body class="bg-peach">
+<body>
 
   <header id="header" class="scrolled">
-    <div class="logo" style="cursor:pointer;" onclick="location.href='index.html'">peachko</div>
-    <nav>
-      <button class="btn-ghost" onclick="location.href='index.html'">Back to Home</button>
+    <div class="logo" style="cursor:pointer;" onclick="location.href='index.html'">PEACHKO</div>
+    <nav style="display:flex;align-items:center;gap:8px;">
+      <!-- 언어 선택 -->
+      <div class="lang-wrap">
+        <button class="lang-toggle" id="langToggle">🇬🇧 EN ▾</button>
+        <div class="lang-dropdown" id="langDropdown">
+          <button class="lang-opt" data-lang="EN">🇬🇧 EN</button>
+          <button class="lang-opt" data-lang="KO">🇰🇷 KO</button>
+          <button class="lang-opt" data-lang="JP">🇯🇵 JP</button>
+          <button class="lang-opt" data-lang="ZH">🇨🇳 ZH</button>
+        </div>
+      </div>
+      <button class="btn-ghost" id="backBtn" onclick="location.href='index.html'">← Back</button>
     </nav>
   </header>
 
-  <section class="booking-section">
+  <section class="booking-page">
     <div class="booking-container">
-      
-      <div class="section-head reveal visible">
-        <div class="label-sm">Reservation</div>
-        <h2 class="fd">Complete Your Booking</h2>
-        <p class="fb" style="margin-top:10px; color:var(--muted); font-size:14px;">
+
+      <div class="section-head" style="margin-bottom:36px;">
+        <div class="label-sm" id="txt-label">Reservation</div>
+        <h2 class="fd" id="txt-title">Complete Your Booking</h2>
+        <p class="fb" style="margin-top:10px;color:var(--muted);font-size:14px;" id="txt-subtitle">
           Please provide your details for the perfect K-Beauty experience.
         </p>
       </div>
 
-      <form class="booking-form reveal visible" id="mainBookingForm">
-        
-        <div class="form-row full">
-          <label class="form-label">Service Type</label>
-          <select id="f-service" required>
-            <option value="">Select a service</option>
-            <option value="face">Face Makeup (₩80,000~)</option>
-            <option value="hair-face">Face + Hair (₩130,000~)</option>
-            <option value="full-glam">Full Glam (₩180,000~)</option>
-            <option value="special">Special Occasion (₩220,000~)</option>
-          </select>
+      <div id="bookingFormWrap">
+        <!-- 예약된 시간 현황 패널 (Premium UI) -->
+        <div class="slots-panel" id="slotsPanel">
+          <div class="slots-label" id="txt-slots-label">Booked slots</div>
+          <div class="slots-list" id="slotsList"></div>
         </div>
 
-        <div class="form-row full">
-          <label class="form-label">Preferred Artist</label>
-          <select id="f-artist" required>
-            <option value="">Select an artist</option>
-            <option value="soyeon">Soyeon (Glass Skin)</option>
-            <option value="minjae">Minjae (K-Pop Idol)</option>
-            <option value="haerin">Haerin (Bridal)</option>
-          </select>
-        </div>
+        <div class="status-banner" id="statusBanner"></div>
 
-        <div class="form-row">
-          <label class="form-label">Date</label>
-          <input type="date" id="f-date" required />
-        </div>
+        <form class="booking-form" id="mainBookingForm"
+          style="display:grid;grid-template-columns:1fr 1fr;gap:13px;background:var(--white);border:1px solid var(--border);padding:36px 32px;box-shadow:0 10px 36px rgba(200,100,60,.07);">
+          <div class="form-row full">
+            <label class="form-label" id="lbl-service">Service Type</label>
+            <select id="f-service" required>
+              <option value="">Select a service</option>
+            </select>
+          </div>
+          <div class="form-row full">
+            <label class="form-label" id="lbl-artist">Preferred Artist</label>
+            <select id="f-artist" required>
+              <option value="">Select an artist</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label" id="lbl-date">Date</label>
+            <input type="date" id="f-date" required />
+          </div>
+          <div class="form-row">
+            <label class="form-label" id="lbl-time">Time</label>
+            <input type="time" id="f-time" required />
+          </div>
+          <div class="form-row full">
+            <label class="form-label" id="lbl-hotel">Hotel / Address in Seoul</label>
+            <input type="text" id="f-hotel" placeholder="e.g. Lotte Hotel Seoul, Myeongdong" required />
+          </div>
+          <div class="form-row full">
+            <label class="form-label" id="lbl-requests">Additional Requests (Optional)</label>
+            <input type="text" id="f-requests" placeholder="e.g. Sensitive skin, specific style..." />
+          </div>
+          <div class="form-row full" style="margin-top:8px;">
+            <button type="submit" class="btn-accent full-btn" id="submitBtn">Confirm Booking</button>
+            <p style="font-family:var(--fb);font-size:11px;color:var(--muted);text-align:center;margin-top:8px;" id="txt-secure">
+              🔒 Secured by Firebase
+            </p>
+          </div>
+        </form>
+      </div>
 
-        <div class="form-row">
-          <label class="form-label">Time</label>
-          <input type="time" id="f-time" required />
-        </div>
-
-        <div class="form-row full">
-          <label class="form-label">Hotel Name / Address in Seoul</label>
-          <input type="text" id="f-hotel" placeholder="e.g. Lotte Hotel Seoul, Myeongdong" required />
-        </div>
-
-        <div class="form-row full">
-          <label class="form-label">Additional Requests (Optional)</label>
-          <input type="text" id="f-requests" placeholder="e.g. Sensitive skin, specific style..." />
-        </div>
-
-        <button type="submit" class="btn-accent full-btn" style="margin-top:20px;">Confirm Booking</button>
-      </form>
-
-      <div class="booking-done hidden" id="successMessage">
-        <div class="done-icon">✨</div>
-        <h3 class="fd">Booking Received!</h3>
-        <p class="fb">Thank you for choosing peachko. We will send a confirmation message to your email/account shortly.</p>
-        <button class="btn-ghost" onclick="location.href='index.html'">Back to Home</button>
+      <!-- 완료 화면 -->
+      <div class="booking-done hidden" id="successMessage"
+        style="background:var(--white);border:1.5px solid var(--peach-mid);padding:52px 32px;text-align:center;">
+        <div style="font-size:52px;margin-bottom:20px;">🌸</div>
+        <h3 class="fd" id="txt-done-h" style="font-size:28px;margin-bottom:12px;">Booking Confirmed!</h3>
+        <p class="fb" id="txt-done-p" style="color:var(--muted);line-height:1.8;margin-bottom:16px;">
+          We'll send a confirmation to your email shortly.
+        </p>
+        <div id="bookingSummary" style="background:var(--soft);border:1px solid var(--border);padding:16px 20px;border-radius:2px;text-align:left;margin-bottom:28px;font-family:var(--fb);font-size:13px;"></div>
+        <button class="btn-ghost" onclick="location.href='index.html'" id="txt-done-btn" style="padding:12px 28px;font-size:13px;">Back to Home</button>
       </div>
 
     </div>
   </section>
 
-<script type="module">
-    // 1. Firebase 코어, 인증, 그리고 "Firestore(데이터베이스)" 모듈 불러오기
+  <script type="module">
+    // Firebase v10 모듈 임포트 (팀원 코드 적용)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, collection, doc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    
-    // 2. peachko 개발용 설정값
-    const firebaseConfig = {
-    apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
-    authDomain: "peachko-dev.firebaseapp.com",
-    projectId: "peachko-dev",
-    storageBucket: "peachko-dev.firebasestorage.app",
-    messagingSenderId: "561367230685",
-    appId: "1:561367230685:web:5576c1897b5989c243d334"
-    };
+    import { getFirestore, collection, query, where, getDocs, runTransaction, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    // 3. Firebase 초기화
-    const app = initializeApp(firebaseConfig);
+    // 환경 분리
+    let firebaseConfig;
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      firebaseConfig = {
+        apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+        authDomain: "peachko-dev.firebaseapp.com",
+        projectId: "peachko-dev",
+        storageBucket: "peachko-dev.firebasestorage.app",
+        messagingSenderId: "561367230685",
+        appId: "1:561367230685:web:5576c1897b5989c243d334"
+      };
+    } else {
+      firebaseConfig = {
+        apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+        authDomain: "peachko-dev.firebaseapp.com",
+        projectId: "peachko-dev",
+        storageBucket: "peachko-dev.firebasestorage.app",
+        messagingSenderId: "561367230685",
+        appId: "1:561367230685:web:5576c1897b5989c243d334"
+      };
+    }
+
+    const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app); // 데이터베이스 객체 생성!
+    const db   = getFirestore(app);
 
-    // ==========================================
-    // 로그인 상태 감시 및 유저 정보 저장
-    // ==========================================
-    let currentUserEmail = ""; // 예약자의 이메일을 기억할 변수
-
+    // 로그인 체크 (팀원 코드 로직)
+    let currentUserEmail = "";
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        currentUserEmail = user.email; // 로그인 성공 시 이메일 저장
-        console.log("현재 접속 중인 예약자:", currentUserEmail);
+        currentUserEmail = user.email;
       } else {
-        alert("예약을 진행하려면 먼저 로그인이 필요합니다.");
-        window.location.href = "login.html"; 
+        alert("로그인이 필요합니다.");
+        window.location.href = "login.html";
       }
     });
 
-    // ==========================================
-    // 예약 데이터 Firestore에 저장하기
-    // ==========================================
-    const form = document.getElementById('mainBookingForm');
-    const successMsg = document.getElementById('successMessage');
+    /* ── 번역 데이터 ── */
+    const BOOK_T = {
+      EN: {
+        label: "Reservation", title: "Complete Your Booking", subtitle: "Please provide your details for the perfect K-Beauty experience.", back: "← Back",
+        lbl_service: "Service Type", lbl_artist: "Preferred Artist", lbl_date: "Date", lbl_time: "Time", lbl_hotel: "Hotel / Address in Seoul", lbl_requests: "Additional Requests (Optional)",
+        opt_service: "Select a service", opt_artist: "Select an artist", hotel_ph: "e.g. Lotte Hotel Seoul, Myeongdong", requests_ph: "e.g. Sensitive skin, specific style...",
+        submit: "Confirm Booking", secure: "🔒 Secured by Firebase", slots_label: "Already booked on this date", slots_empty: "✓ All times available", checking: "Checking availability...",
+        err_fill: "Please fill in all fields.", err_past: "Please select a future date and time.", err_conflict: (artist) => `⚠️ ${artist} is already booked at this time.`, err_fail: "An error occurred. Please try again.",
+        done_h: "Booking Confirmed! 🌸", done_p: "We'll send a confirmation to your email shortly.", done_btn: "Back to Home",
+        services: [ { v: "face", l: "Face Makeup (₩80,000~)" }, { v: "hair-face", l: "Face + Hair (₩130,000~)" }, { v: "full-glam", l: "Full Glam (₩180,000~)" }, { v: "special", l: "Special Occasion (₩220,000~)" } ],
+        summary: (d) => `📅 ${d.date} ${d.time}<br>💄 ${d.artist} — ${d.service}<br>🏨 ${d.hotel}`,
+      },
+      KO: {
+        label: "예약", title: "예약 완료하기", subtitle: "완벽한 K-뷰티 경험을 위해 정보를 입력해주세요.", back: "← 홈으로",
+        lbl_service: "서비스 종류", lbl_artist: "아티스트 선택", lbl_date: "날짜", lbl_time: "시간", lbl_hotel: "숙소 / 서울 주소", lbl_requests: "추가 요청사항 (선택)",
+        opt_service: "서비스를 선택하세요", opt_artist: "아티스트를 선택하세요", hotel_ph: "예) 롯데호텔 서울, 명동", requests_ph: "예) 민감성 피부, 원하는 스타일...",
+        submit: "예약 확인", secure: "🔒 Firebase 보안 연결", slots_label: "해당 날짜 예약된 시간", slots_empty: "✓ 모든 시간 예약 가능", checking: "예약 가능 여부 확인 중...",
+        err_fill: "모든 항목을 입력해주세요.", err_past: "미래의 날짜와 시간을 선택해주세요.", err_conflict: (artist) => `⚠️ ${artist} 아티스트는 해당 시간에 이미 예약이 있습니다.`, err_fail: "오류가 발생했습니다. 다시 시도해주세요.",
+        done_h: "예약 완료! 🌸", done_p: "예약이 접수되었습니다. 30분 내로 확인 연락 드릴게요.", done_btn: "홈으로 돌아가기",
+        services: [ { v: "face", l: "페이스 메이크업 (₩80,000~)" }, { v: "hair-face", l: "페이스 + 헤어 (₩130,000~)" }, { v: "full-glam", l: "풀 글램 (₩180,000~)" }, { v: "special", l: "스페셜 오케이전 (₩220,000~)" } ],
+        summary: (d) => `📅 ${d.date} ${d.time}<br>💄 ${d.artist} — ${d.service}<br>🏨 ${d.hotel}`,
+      },
+      JP: {
+        label: "ご予約", title: "予約を完了する", subtitle: "最高のKビューティー体験のために詳細を入力してください。", back: "← ホームへ",
+        lbl_service: "サービスの種類", lbl_artist: "アーティスト選択", lbl_date: "日付", lbl_time: "時間", lbl_hotel: "ホテル / ソウルの住所", lbl_requests: "ご要望 (任意)",
+        opt_service: "サービスを選択", opt_artist: "アーティストを選択", hotel_ph: "例: ロッテホテルソウル 明洞", requests_ph: "例: 敏感肌、ご希望のスタイル...",
+        submit: "予約を確定する", secure: "🔒 Firebaseセキュア接続", slots_label: "この日の予約済み時間", slots_empty: "✓ 全時間帯予約可能", checking: "空き状況確認中...",
+        err_fill: "すべての項目を入力してください。", err_past: "未来の日時を選択してください。", err_conflict: (artist) => `⚠️ ${artist}は選択した時間に既に予約が入っています。`, err_fail: "エラーが発生しました。",
+        done_h: "予約完了！ 🌸", done_p: "ご予約を受け付けました。30分以内にご連絡します。", done_btn: "ホームへ戻る",
+        services: [ { v: "face", l: "フェイスメイク (₩80,000〜)" }, { v: "hair-face", l: "フェイス＋ヘア (₩130,000〜)" }, { v: "full-glam", l: "フルグラム (₩180,000〜)" }, { v: "special", l: "スペシャル (₩220,000〜)" } ],
+        summary: (d) => `📅 ${d.date} ${d.time}<br>💄 ${d.artist} — ${d.service}<br>🏨 ${d.hotel}`,
+      },
+      ZH: {
+        label: "预约", title: "完成您的预约", subtitle: "请填写以下信息，享受完美的K-美妆体验。", back: "← 返回首页",
+        lbl_service: "服务类型", lbl_artist: "选择艺术家", lbl_date: "日期", lbl_time: "时间", lbl_hotel: "酒店 / 首尔地址", lbl_requests: "特殊要求（可选）",
+        opt_service: "选择服务", opt_artist: "选择艺术家", hotel_ph: "例如: 首尔乐天酒店, 明洞", requests_ph: "例如: 敏感肌肤、特定风格...",
+        submit: "确认预约", secure: "🔒 Firebase 安全连接", slots_label: "该日期已预约时间", slots_empty: "✓ 所有时间均可预约", checking: "正在确认预约可用性...",
+        err_fill: "请填写所有字段。", err_past: "请选择未来的日期和时间。", err_conflict: (artist) => `⚠️ ${artist}在该时间已有预约，请选择其他时间。`, err_fail: "发生错误，请重试。",
+        done_h: "预约成功！ 🌸", done_p: "您的预约已收到，我们将在30分钟内与您确认。", done_btn: "返回首页",
+        services: [ { v: "face", l: "面部彩妆 (₩80,000起)" }, { v: "hair-face", l: "面部+发型 (₩130,000起)" }, { v: "full-glam", l: "全套精致妆 (₩180,000起)" }, { v: "special", l: "特殊场合 (₩220,000起)" } ],
+        summary: (d) => `📅 ${d.date} ${d.time}<br>💄 ${d.artist} — ${d.service}<br>🏨 ${d.hotel}`,
+      }
+    };
 
-    // 폼 제출 시 비동기(async)로 데이터를 서버에 보냅니다.
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault(); 
+    const LANG_LABELS = { EN:"🇬🇧 EN", KO:"🇰🇷 KO", JP:"🇯🇵 JP", ZH:"🇨🇳 ZH" };
+    let currentLang = localStorage.getItem("peachko_lang") || "EN";
+    if (!BOOK_T[currentLang]) currentLang = "EN";
+    
+    const params = new URLSearchParams(window.location.search);
+    const preArtist = params.get("artist") || ""; 
+
+    async function loadArtistsToSelect(t, prevArt) {
+      const artSel = document.getElementById("f-artist");
+      artSel.innerHTML = `<option value="">${t.opt_artist}</option>`;
       
-      // 제출 버튼 비활성화 (중복 클릭 방지)
-      const submitBtn = form.querySelector('button[type="submit"]');
-      submitBtn.textContent = "Processing...";
-      submitBtn.disabled = true;
+      try {
+        const querySnapshot = await getDocs(collection(db, "artists"));
+        querySnapshot.forEach((doc) => {
+          const a = doc.data();
+          artSel.innerHTML += `<option value="${a.name}">${a.name}</option>`;
+        });
+        
+        if (preArtist && !prevArt) {
+          Array.from(artSel.options).forEach(opt => {
+            if (opt.value.toLowerCase() === preArtist.toLowerCase()) artSel.value = opt.value;
+          });
+        } else if (prevArt) {
+          artSel.value = prevArt;
+        }
+      } catch (err) { console.error("Artist load error", err); }
+    }
+
+    function applyLang(lang) {
+      const t = BOOK_T[lang];
+      currentLang = lang;
+      localStorage.setItem("peachko_lang", lang);
+
+      document.getElementById("txt-label").textContent = t.label;
+      document.getElementById("txt-title").textContent = t.title;
+      document.getElementById("txt-subtitle").textContent = t.subtitle;
+      document.getElementById("backBtn").textContent = t.back;
+      document.getElementById("lbl-service").textContent = t.lbl_service;
+      document.getElementById("lbl-artist").textContent = t.lbl_artist;
+      document.getElementById("lbl-date").textContent = t.lbl_date;
+      document.getElementById("lbl-time").textContent = t.lbl_time;
+      document.getElementById("lbl-hotel").textContent = t.lbl_hotel;
+      document.getElementById("lbl-requests").textContent = t.lbl_requests;
+      document.getElementById("submitBtn").textContent = t.submit;
+      document.getElementById("txt-secure").textContent = t.secure;
+      document.getElementById("txt-slots-label").textContent = t.slots_label;
+      document.getElementById("txt-done-h").textContent = t.done_h;
+      document.getElementById("txt-done-p").textContent = t.done_p;
+      document.getElementById("txt-done-btn").textContent = t.done_btn;
+      document.getElementById("f-hotel").placeholder = t.hotel_ph;
+      document.getElementById("f-requests").placeholder = t.requests_ph;
+
+      const svcSel = document.getElementById("f-service");
+      const prevSvc = svcSel.value;
+      svcSel.innerHTML = `<option value="">${t.opt_service}</option>` + t.services.map(s => `<option value="${s.v}">${s.l}</option>`).join("");
+      if (prevSvc) svcSel.value = prevSvc;
+
+      loadArtistsToSelect(t, document.getElementById("f-artist").value);
+
+      document.getElementById("langToggle").textContent = LANG_LABELS[lang] + " ▾";
+      document.querySelectorAll(".lang-opt").forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
+    }
+
+    document.getElementById("langToggle").addEventListener("click", (e) => {
+      e.stopPropagation(); document.getElementById("langDropdown").classList.toggle("open");
+    });
+    document.addEventListener("click", () => document.getElementById("langDropdown").classList.remove("open"));
+    document.querySelectorAll(".lang-opt").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation(); applyLang(btn.dataset.lang); document.getElementById("langDropdown").classList.remove("open");
+      });
+    });
+
+    applyLang(currentLang);
+
+    /* ── 실시간 예약 슬롯 체크 ── */
+    async function loadBookedSlots(artist, date) {
+      const panel = document.getElementById("slotsPanel");
+      const list  = document.getElementById("slotsList");
+      if (!artist || !date) { panel.classList.remove("show"); return; }
 
       try {
-        // 입력된 값들 미리 가져오기
-        const artistVal = document.getElementById('f-artist').value;
-        const dateVal = document.getElementById('f-date').value;
-        const timeVal = document.getElementById('f-time').value;
+        const q = query(collection(db, "bookings"), where("artist", "==", artist), where("reservationDate", "==", date));
+        const snap = await getDocs(q);
+        const bookedTimes = snap.docs.map(d => d.data().reservationTime).sort();
 
-        // 1. 고유 슬롯 ID 생성 (예: soyeon_2026-04-28_16:00)
-        const slotId = `${artistVal}_${dateVal}_${timeVal}`;
+        panel.classList.add("show");
+        if (bookedTimes.length === 0) {
+          list.innerHTML = `<span class="slots-empty">${BOOK_T[currentLang].slots_empty}</span>`;
+        } else {
+          const currentTime = document.getElementById("f-time").value;
+          list.innerHTML = bookedTimes.map(t => {
+            const isConflict = t === currentTime;
+            return `<span class="slot-badge${isConflict ? " conflict" : ""}">${isConflict ? "✗ " : ""}${t}</span>`;
+          }).join("");
+        }
+      } catch (e) { panel.classList.remove("show"); }
+    }
+
+    ["f-artist", "f-date", "f-time"].forEach(id => {
+      document.getElementById(id).addEventListener("change", () => {
+        const artist = document.getElementById("f-artist").value;
+        const date   = document.getElementById("f-date").value;
+        if (artist && date) loadBookedSlots(artist, date);
+        hideBanner();
+      });
+    });
+
+    function showBanner(type, msg) {
+      const b = document.getElementById("statusBanner");
+      b.className = `status-banner show ${type}`; b.textContent = msg;
+    }
+    function hideBanner() { document.getElementById("statusBanner").className = "status-banner"; }
+
+    /* ── 폼 제출 및 트랜잭션 (팀원 코드 적용) ── */
+    const form = document.getElementById("mainBookingForm");
+    const successEl = document.getElementById("successMessage");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const t = BOOK_T[currentLang];
+      const service  = document.getElementById("f-service").value;
+      const artist   = document.getElementById("f-artist").value;
+      const date     = document.getElementById("f-date").value;
+      const time     = document.getElementById("f-time").value;
+      const hotel    = document.getElementById("f-hotel").value;
+      const requests = document.getElementById("f-requests").value;
+
+      if (!service || !artist || !date || !time || !hotel) { showBanner("error", t.err_fill); return; }
+      if (new Date(`${date}T${time}`) <= new Date()) { showBanner("error", t.err_past); return; }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="spinner"></span>${t.checking}`;
+      hideBanner();
+
+      try {
+        // 팀원 코드를 따른 고유 슬롯 ID 생성 및 트랜잭션 처리
+        const slotId = `${artist}_${date}_${time}`;
         const slotRef = doc(db, "bookings", slotId);
 
-        // 2. 트랜잭션 실행
         await runTransaction(db, async (transaction) => {
           const sfDoc = await transaction.get(slotRef);
           
           if (!sfDoc.exists()) {
-            // 자리가 비어있으면 저장!
             transaction.set(slotRef, {
               userEmail: currentUserEmail,
-              serviceType: document.getElementById('f-service').value,
-              artist: artistVal,
-              reservationDate: dateVal,
-              reservationTime: timeVal,
-              hotelAddress: document.getElementById('f-hotel').value,
-              specialRequests: document.getElementById('f-requests').value,
+              serviceType: service,
+              artist: artist,
+              reservationDate: date,
+              reservationTime: time,
+              hotelAddress: hotel,
+              specialRequests: requests,
               createdAt: serverTimestamp(),
               status: "pending"
             });
           } else {
-            // 이미 예약된 자리면 강제 취소!
-            throw new Error("이미 예약이 완료된 시간입니다. 다른 시간을 선택해 주세요.");
+            throw new Error("CONFLICT");
           }
         });
 
-        console.log("예약 성공! 슬롯 ID:", slotId);
-        // 성공 시 폼 숨기고 완료 메시지 띄우기
-        form.classList.add('hidden');
-        successMsg.classList.remove('hidden');
+        form.parentElement.classList.add("hidden");
+        document.getElementById("bookingFormWrap").style.display = "none";
+        successEl.classList.remove("hidden");
 
-      } catch (error) {
-        console.error("예약 저장 실패:", error);
-        alert(error.message); // 트랜잭션 실패 에러 메시지(중복 예약 등)를 띄워줍니다.
-        submitBtn.textContent = "Confirm Booking";
+        const serviceName = BOOK_T[currentLang].services.find(s => s.v === service)?.l || service;
+        document.getElementById("bookingSummary").innerHTML = t.summary({ date, time, artist, service: serviceName, hotel });
+
+      } catch (err) {
+        if (err.message === "CONFLICT") {
+          showBanner("conflict", t.err_conflict(artist));
+          loadBookedSlots(artist, date);
+        } else {
+          showBanner("error", t.err_fail);
+          console.error(err);
+        }
         submitBtn.disabled = false;
+        submitBtn.textContent = t.submit;
       }
     });
   </script>
-<!-- 여기서부터 추가 (예약 페이지 다국어 스크립트) -->
-  <script>
-    // 홈페이지에서 설정한 언어 가져오기 (없으면 KO)
-    const currentLang = localStorage.getItem("peachko_lang") || "KO";
-    
-    // 예약 폼 전체 번역 사전
-    const T_BOOK = {
-      "EN": {
-        back: "Back to Home", label: "Reservation", title: "Complete Your Booking", desc: "Please provide your details for the perfect K-Beauty experience.",
-        l_svc: "Service Type", l_art: "Preferred Artist", l_date: "Date", l_time: "Time",
-        l_hotel: "Hotel Name / Address in Seoul", p_hotel: "e.g. Lotte Hotel Seoul, Myeongdong",
-        l_req: "Additional Requests (Optional)", p_req: "e.g. Sensitive skin, specific style...",
-        btn: "Confirm Booking", done_h: "Booking Received!", done_p: "Thank you for choosing peachko. We will send a confirmation message shortly.",
-        svc_def: "Select a service", art_def: "Select an artist",
-        s_face: "Face Makeup (₩80,000~)", s_hair: "Face + Hair (₩130,000~)", s_glam: "Full Glam (₩180,000~)", s_spec: "Special Occasion (₩220,000~)",
-        a_soyeon: "Soyeon (Glass Skin)", a_minjae: "Minjae (K-Pop Idol)", a_haerin: "Haerin (Bridal)"
-      },
-      "KO": {
-        back: "홈으로 돌아가기", label: "예약하기", title: "예약 정보 입력", desc: "완벽한 K-뷰티 경험을 위해 상세 정보를 입력해주세요.",
-        l_svc: "서비스 종류", l_art: "담당 아티스트", l_date: "예약 날짜", l_time: "예약 시간",
-        l_hotel: "숙소명 및 주소 (서울)", p_hotel: "예) 롯데호텔 서울, 명동",
-        l_req: "추가 요청사항 (선택)", p_req: "예) 민감성 피부, 원하는 특정 스타일...",
-        btn: "예약 완료하기", done_h: "예약이 접수되었습니다!", done_p: "피치코를 이용해 주셔서 감사합니다. 곧 확정 메시지를 보내드립니다.",
-        svc_def: "서비스를 선택해주세요", art_def: "아티스트를 선택해주세요",
-        s_face: "페이스 메이크업 (₩80,000~)", s_hair: "페이스 + 헤어 (₩130,000~)", s_glam: "풀 글램 (₩180,000~)", s_spec: "스페셜 오케이전 (₩220,000~)",
-        a_soyeon: "소연 (글래스 스킨)", a_minjae: "민재 (K-팝 아이돌)", a_haerin: "해린 (웨딩)"
-      },
-      "JP": {
-        back: "ホームに戻る", label: "ご予約", title: "予約情報の入力", desc: "完璧なK-ビューティー体験のために詳細をご入力ください。",
-        l_svc: "サービス", l_art: "担当アーティスト", l_date: "日付", l_time: "時間",
-        l_hotel: "ホテル名 / ソウルの住所", p_hotel: "例) ロッテホテルソウル 明洞",
-        l_req: "特別リクエスト (任意)", p_req: "例) 敏感肌、希望のスタイルなど...",
-        btn: "予約を確定する", done_h: "予約完了！", done_p: "ご予約ありがとうございます。間もなく確認メッセージをお送りします。",
-        svc_def: "サービスを選択", art_def: "アーティストを選択",
-        s_face: "フェイスメイク (₩80,000〜)", s_hair: "フェイス＋ヘア (₩130,000〜)", s_glam: "フルグラム (₩180,000〜)", s_spec: "スペシャル (₩220,000〜)",
-        a_soyeon: "ソヨン (グラスキン)", a_minjae: "ミンジェ (K-POPアイドル)", a_haerin: "ヘリン (ブライダル)"
-      },
-      "ZH": {
-        back: "返回首页", label: "预约", title: "填写预约信息", desc: "请提供您的详细信息，以享受完美的K-美妆体验。",
-        l_svc: "服务类型", l_art: "首选艺术家", l_date: "日期", l_time: "时间",
-        l_hotel: "首尔酒店名称/地址", p_hotel: "例如: 首尔乐天酒店, 明洞",
-        l_req: "额外要求 (选填)", p_req: "例如: 敏感肌，特定风格...",
-        btn: "确认预约", done_h: "预约成功！", done_p: "感谢您选择peachko。我们将很快发送确认信息。",
-        svc_def: "选择服务", art_def: "选择艺术家",
-        s_face: "面部彩妆 (₩80,000起)", s_hair: "面部+发型 (₩130,000起)", s_glam: "全套精致妆 (₩180,000起)", s_spec: "特殊场合 (₩220,000起)",
-        a_soyeon: "素妍 (玻璃肌)", a_minjae: "敏在 (K-POP偶像)", a_haerin: "海林 (婚礼)"
-      }
-    };
-
-    // 현재 언어에 맞춰 화면 글자 바꿔치기
-    const t = T_BOOK[currentLang];
-    if (t) {
-      // 1. 일반 텍스트 및 버튼 변경
-      document.querySelectorAll('.btn-ghost').forEach(b => b.innerText = t.back);
-      document.querySelector('.label-sm').innerText = t.label;
-      document.querySelector('.section-head h2').innerText = t.title;
-      document.querySelector('.section-head p').innerText = t.desc;
-      document.querySelector('button[type="submit"]').innerText = t.btn;
-      document.querySelector('.booking-done h3').innerText = t.done_h;
-      document.querySelector('.booking-done p').innerText = t.done_p;
-      
-      // 2. 폼 라벨(Label) 변경
-      const labels = document.querySelectorAll('.form-label');
-      if(labels.length >= 6) {
-        labels[0].innerText = t.l_svc;
-        labels[1].innerText = t.l_art;
-        labels[2].innerText = t.l_date;
-        labels[3].innerText = t.l_time;
-        labels[4].innerText = t.l_hotel;
-        labels[5].innerText = t.l_req;
-      }
-      
-      // 3. 입력창 가이드 텍스트(Placeholder) 변경
-      document.getElementById('f-hotel').placeholder = t.p_hotel;
-      document.getElementById('f-requests').placeholder = t.p_req;
-      
-      // 4. 셀렉트 박스(옵션) 변경
-      const svc = document.getElementById('f-service');
-      if(svc.options[0]) svc.options[0].text = t.svc_def;
-      if(svc.options[1]) svc.options[1].text = t.s_face;
-      if(svc.options[2]) svc.options[2].text = t.s_hair;
-      if(svc.options[3]) svc.options[3].text = t.s_glam;
-      if(svc.options[4]) svc.options[4].text = t.s_spec;
-      
-      const art = document.getElementById('f-artist');
-      if(art.options[0]) art.options[0].text = t.art_def;
-      if(art.options[1]) art.options[1].text = t.a_soyeon;
-      if(art.options[2]) art.options[2].text = t.a_minjae;
-      if(art.options[3]) art.options[3].text = t.a_haerin;
-    }
-  </script>
-  <!-- 여기까지 추가 -->
 </body>
 </html>
