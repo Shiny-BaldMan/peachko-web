@@ -23,44 +23,6 @@
       margin: 0 auto;
     }
 
-    /* 상태 표시 배너 스타일 */
-    .status-banner {
-      padding: 15px;
-      border-radius: var(--r-md);
-      margin-bottom: 20px;
-      font-family: var(--fb);
-      font-size: 14px;
-      display: none;
-    }
-
-    .status-banner.show {
-      display: block;
-    }
-
-    .status-banner.checking {
-      background: #e3f2fd;
-      color: #1976d2;
-      border: 1px solid #bbdefb;
-    }
-
-    .status-banner.available {
-      background: #e8f5e9;
-      color: #2e7d32;
-      border: 1px solid #c8e6c9;
-    }
-
-    .status-banner.conflict {
-      background: #ffebee;
-      color: #c62828;
-      border: 1px solid #ffcdd2;
-    }
-
-    .status-banner.error {
-      background: #fff3e0;
-      color: #ef6c00;
-      border: 1px solid #ffe0b2;
-    }
-
     .hidden {
       display: none !important;
     }
@@ -87,96 +49,114 @@
   <section class="booking-page">
     <div class="booking-container">
 
+      <!-- 예약 폼 영역 -->
       <div id="bookingFormWrap" class="reveal">
-        <div class="section-head" style="text-align: left; margin-bottom: 40px;">
-          <div class="label-sm">Reservation</div>
-          <h2 id="pageTitle">Book Your Beauty Experience</h2>
-          <p class="fb" style="color: var(--muted); margin-top: 10px;">Select your preferred artist, date, and time.</p>
+        <div class="section-head" style="text-align:left; margin-bottom:40px;">
+          <div class="label-sm" data-key="book_page_label">예약</div>
+          <h2 class="fd" data-key="book_page_title">뷰티 예약하기</h2>
+          <p class="fb" style="color:var(--muted); margin-top:10px;" data-key="book_page_sub">
+            원하시는 아티스트, 날짜, 시간을 선택해주세요.
+          </p>
         </div>
 
         <div id="statusBanner" class="status-banner"></div>
 
         <form id="realBookingForm" class="booking-form">
+
+          <!-- 서비스 선택 -->
           <div class="form-row full">
-            <label class="form-label">Select Service</label>
+            <label class="form-label" data-key="svc_label">서비스 선택</label>
             <select id="bookService" required>
               <option value="" disabled selected>Choose a service...</option>
-              <option value="makeup">Personal Makeup ($120)</option>
-              <option value="hair">K-Pop Idol Hair ($80)</option>
-              <option value="full">Full Wedding/Snap Styling ($250)</option>
+              <option value="makeup" data-key="svc_opt_makeup">퍼스널 메이크업 ($120)</option>
+              <option value="hair" data-key="svc_opt_hair">K-팝 아이돌 헤어 ($80)</option>
+              <option value="full" data-key="svc_opt_full">웨딩/스냅 풀 스타일링 ($250)</option>
             </select>
           </div>
 
+          <!-- 아티스트 -->
           <div class="form-row">
-            <label class="form-label">Artist</label>
+            <label class="form-label" data-key="art_label">아티스트</label>
             <select id="bookArtist" required>
-              <option value="" disabled selected>Select Artist...</option>
+              <option value="" disabled selected data-key="art_placeholder">아티스트 선택...</option>
             </select>
           </div>
 
+          <!-- 날짜 -->
           <div class="form-row">
-            <label class="form-label">Date</label>
+            <label class="form-label" data-key="date_label">날짜</label>
             <input type="date" id="bookDate" required />
           </div>
 
+          <!-- 시간 -->
           <div class="form-row">
-            <label class="form-label">Time</label>
+            <label class="form-label" data-key="time_label">시간</label>
             <select id="bookTime" required>
-              <option value="" disabled selected>Time...</option>
-              <option value="10:00">10:00 AM</option>
-              <option value="11:30">11:30 AM</option>
-              <option value="13:00">01:00 PM</option>
-              <option value="14:30">02:30 PM</option>
-              <option value="16:00">04:00 PM</option>
-              <option value="17:30">05:30 PM</option>
+              <option value="" disabled selected data-key="time_placeholder">시간...</option>
+              <option value="10:00" data-key="time_10">오전 10:00</option>
+              <option value="11:30" data-key="time_1130">오전 11:30</option>
+              <option value="13:00" data-key="time_13">오후 01:00</option>
+              <option value="14:30" data-key="time_1430">오후 02:30</option>
+              <option value="16:00" data-key="time_16">오후 04:00</option>
+              <option value="17:30" data-key="time_1730">오후 05:30</option>
             </select>
           </div>
 
-          <div class="form-row" style="justify-content: flex-end; align-items: flex-end;">
-            <button type="button" id="checkAvailability" class="btn-ghost" style="padding: 12px; width: 100%;">Check
-              Availability</button>
+          <!-- 예약 가능 확인 버튼 -->
+          <div class="form-row" style="justify-content:flex-end; align-items:flex-end;">
+            <button type="button" id="checkAvailability" class="btn-ghost" style="padding:12px; width:100%;"
+              data-key="check_avail_btn">예약 가능 여부 확인</button>
           </div>
 
+          <!-- 호텔 주소 -->
           <div class="form-row full">
-            <label class="form-label">Hotel / Accommodation Address in Seoul</label>
-            <input type="text" id="bookHotel" placeholder="Detailed address for the artist to visit" required />
+            <label class="form-label" data-key="hotel_label">서울 내 호텔/숙소 주소</label>
+            <input type="text" id="bookHotel" data-ph-key="hotel_placeholder" placeholder="아티스트 방문 주소를 상세히 입력해주세요"
+              required />
           </div>
 
+          <!-- 특별 요청 -->
           <div class="form-row full">
-            <label class="form-label">Special Requests</label>
-            <textarea id="bookRequests" rows="3" placeholder="Any allergies, specific styles, or questions?"></textarea>
+            <label class="form-label" data-key="req_label">특별 요청사항</label>
+            <textarea id="bookRequests" rows="3" data-ph-key="req_placeholder"
+              placeholder="알레르기, 원하는 스타일, 기타 문의사항을 입력해주세요."></textarea>
           </div>
 
-          <h1 class="fd" data-key="book_title">Book Your Look</h1>
-          <p class="fb" data-key="book_desc">Please select...</p>
+          <!-- 제출 버튼 -->
+          <button type="submit" id="submitBtn" class="btn-accent full-btn" data-key="btn_confirm" disabled>
+            예약 확정하기
+          </button>
 
-          <label data-key="svc_label">Select Service</label>
-          <label data-key="art_label">Artist</label>
-          <button type="submit" class="btn-accent full-btn" data-key="btn_confirm">Confirm Reservation</button>
         </form>
       </div>
 
+      <!-- 예약 완료 화면 -->
       <div id="bookingDone" class="booking-done hidden reveal">
         <div class="done-icon">✉️</div>
-        <h3>Reservation Requested!</h3>
-        <p id="successMsg">
-          Your booking request has been sent. The artist will review it and you'll receive a confirmation email shortly.
+        <h3 class="fd" data-key="done_h">예약이 신청되었습니다!</h3>
+        <p data-key="done_p">
+          예약 요청이 전송되었습니다. 아티스트가 검토 후 곧 확인 이메일을 보내드립니다.
         </p>
-        <div id="bookingSummary"
-          style="background: var(--soft); padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: left; font-family: var(--fb); font-size: 14px;">
+        <div id="bookingSummary" style="background:var(--soft); padding:20px; border-radius:8px; margin-bottom:30px;
+                 text-align:left; font-family:var(--fb); font-size:14px; line-height:1.8;">
         </div>
-        <button class="btn-accent" onclick="location.href='index.html'">Return to Home</button>
+        <button class="btn-accent" onclick="location.href='index.html'" data-key="btn_home">홈으로 돌아가기</button>
       </div>
 
     </div>
   </section>
 
+  <!-- script.js 번역 시스템 먼저 로드 -->
   <script type="module" src="script.js"></script>
 
+  <!-- Firebase 예약 로직 -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, getDocs, collection, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import {
+      getFirestore, doc, getDoc, getDocs, collection,
+      setDoc, serverTimestamp, runTransaction
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
@@ -184,7 +164,7 @@
       projectId: "peachko-dev",
       storageBucket: "peachko-dev.firebasestorage.app",
       messagingSenderId: "561367230685",
-      appId: "1:561367230685:web:5576c1897b598"
+      appId: "1:561367230685:web:5576c1897b5989c243d334"
     };
 
     const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
@@ -193,7 +173,10 @@
 
     let currentUserEmail = "";
 
-    // 1. 초기화: 로그인 체크 및 아티스트 목록 로드
+    const submitBtn = document.getElementById('submitBtn');
+    const banner = document.getElementById('statusBanner');
+
+    // ── 로그인 체크 ──
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         alert("Please login first to make a reservation.");
@@ -203,29 +186,31 @@
       }
     });
 
+    // ── 아티스트 목록 + 초기화 ──
     async function initPage() {
       const artistSelect = document.getElementById('bookArtist');
+
+      // URL 파라미터로 아티스트 pre-select
+      const params = new URLSearchParams(window.location.search);
+      const preArtist = params.get('artist') || '';
+
       try {
-        const querySnapshot = await getDocs(collection(db, "artists"));
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
+        const snap = await getDocs(collection(db, "artists"));
+        snap.forEach((d) => {
+          const data = d.data();
           const opt = document.createElement('option');
           opt.value = data.name;
           opt.textContent = data.name;
+          if (data.name === preArtist) opt.selected = true;
           artistSelect.appendChild(opt);
         });
-      } catch (err) {
-        console.error("Error loading artists:", err);
-      }
-      document.querySelector('.reveal').classList.add('visible');
+      } catch (err) { console.error("Artist load error:", err); }
+
+      document.querySelector('.reveal')?.classList.add('visible');
     }
 
-    // 2. 실시간 예약 가능 여부 확인
-    const checkBtn = document.getElementById('checkAvailability');
-    const banner = document.getElementById('statusBanner');
-    const submitBtn = document.getElementById('submitBtn');
-
-    checkBtn.addEventListener('click', async () => {
+    // ── 예약 가능 여부 확인 ──
+    document.getElementById('checkAvailability').addEventListener('click', async () => {
       const artist = document.getElementById('bookArtist').value;
       const date = document.getElementById('bookDate').value;
       const time = document.getElementById('bookTime').value;
@@ -235,13 +220,14 @@
         return;
       }
 
+      const t = window.peachkoLang?.t || ((k) => k);
+
       banner.className = "status-banner show checking";
       banner.textContent = "Checking availability...";
 
       try {
-        // 예약 슬롯 ID 생성 (아티스트_날짜_시간 조합으로 고유성 보장)
         const slotId = `${artist}_${date}_${time}`.replace(/\s+/g, '_');
-        const slotRef = doc(db, "bookings", slotId);
+        const slotRef = doc(db, "slots", slotId); // slots 컬렉션으로 분리
         const slotSnap = await getDoc(slotRef);
 
         if (slotSnap.exists()) {
@@ -250,7 +236,7 @@
           submitBtn.disabled = true;
         } else {
           banner.className = "status-banner show available";
-          banner.textContent = "Great! This slot is available for reservation.";
+          banner.textContent = "Great! This slot is available.";
           submitBtn.disabled = false;
         }
       } catch (err) {
@@ -259,9 +245,8 @@
       }
     });
 
-    // 3. 예약 제출 (트랜잭션 사용으로 중복 방지)
-    const form = document.getElementById('realBookingForm');
-    form.addEventListener('submit', async (e) => {
+    // ── 예약 제출 ──
+    document.getElementById('realBookingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const artist = document.getElementById('bookArtist').value;
@@ -269,60 +254,54 @@
       const time = document.getElementById('bookTime').value;
       const service = document.getElementById('bookService').value;
       const hotel = document.getElementById('bookHotel').value;
-      const requests = document.getElementById('bookRequests').value;
+      const req = document.getElementById('bookRequests').value;
 
       submitBtn.disabled = true;
       submitBtn.textContent = "Processing...";
 
       const slotId = `${artist}_${date}_${time}`.replace(/\s+/g, '_');
-      const slotRef = doc(db, "bookings", slotId);
+      const slotRef = doc(db, "slots", slotId);
 
       try {
-        await runTransaction(db, async (transaction) => {
-          const sfDoc = await transaction.get(slotRef);
-          if (sfDoc.exists()) {
-            throw "Already booked by someone else!";
-          }
+        await runTransaction(db, async (tx) => {
+          const slotDoc = await tx.get(slotRef);
+          if (slotDoc.exists()) throw new Error("Already booked by someone else!");
 
-          transaction.set(slotRef, {
+          const bookingData = {
             userEmail: currentUserEmail,
-            artist: artist,
-            reservationDate: date,
-            reservationTime: time,
-            serviceType: service,
-            hotelAddress: hotel,
-            specialRequests: requests,
-            status: "pending",
+            artist, reservationDate: date, reservationTime: time,
+            serviceType: service, hotelAddress: hotel,
+            specialRequests: req, status: "pending",
             createdAt: serverTimestamp()
-          });
+          };
+          // slots 컬렉션: 슬롯 잠금
+          tx.set(slotRef, { bookedAt: serverTimestamp(), artist, date, time });
+          // bookings 컬렉션: 실제 예약 데이터 (addDoc 대신 slotId 기반 문서 ID 사용)
+          tx.set(doc(db, "bookings", slotId), bookingData);
         });
 
-        // 성공 UI 전환
+        // 성공 UI
         document.getElementById('bookingFormWrap').classList.add('hidden');
         const doneBox = document.getElementById('bookingDone');
         doneBox.classList.remove('hidden');
         doneBox.classList.add('visible');
 
+        const t = window.peachkoLang?.t || ((k) => k);
         document.getElementById('bookingSummary').innerHTML = `
-          <strong>Service:</strong> ${service.toUpperCase()}<br>
-          <strong>Artist:</strong> ${artist}<br>
-          <strong>Schedule:</strong> ${date} at ${time}<br>
-          <strong>Location:</strong> ${hotel}
+          <strong>${t('summary_service')}:</strong> ${service.toUpperCase()}<br>
+          <strong>${t('summary_artist')}:</strong> ${artist}<br>
+          <strong>${t('summary_schedule')}:</strong> ${date} at ${time}<br>
+          <strong>${t('summary_location')}:</strong> ${hotel}
         `;
 
       } catch (err) {
-        alert("Reservation failed: " + err);
+        alert("Reservation failed: " + err.message);
         submitBtn.disabled = false;
-        submitBtn.textContent = "Confirm Reservation";
+        submitBtn.textContent = window.peachkoLang?.t('btn_confirm') || 'Confirm';
       }
     });
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const savedLang = localStorage.getItem("peachko_lang") || "ko";
-      if (window.applyLanguage) window.applyLanguage(savedLang);
-    });
-
-    initPage();
+    document.addEventListener("DOMContentLoaded", initPage);
   </script>
 </body>
 

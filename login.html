@@ -118,11 +118,34 @@
       font-weight: 500;
     }
 
-    /* Additional signup fields */
     .signup-extra {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+    }
+
+    .consent-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 5px 0;
+    }
+
+    .consent-row input[type="checkbox"] {
+      width: auto;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .consent-row label {
+      text-transform: none !important;
+      font-size: 12px !important;
+      color: var(--muted) !important;
+      letter-spacing: 0 !important;
+    }
+
+    .consent-row label a {
+      color: var(--accent);
     }
   </style>
 </head>
@@ -145,64 +168,69 @@
 
   <section class="auth-section">
     <div class="auth-container reveal">
+
       <div class="auth-tabs">
-        <button class="auth-tab active" id="tab-login">Login</button>
-        <button class="auth-tab" id="tab-signup">Sign Up</button>
+        <button class="auth-tab active" id="tab-login" data-key="login_tab">로그인</button>
+        <button class="auth-tab" id="tab-signup" data-key="signup_tab">회원가입</button>
       </div>
 
+      <!-- 로그인 폼 -->
       <form id="loginForm" class="auth-form active">
         <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="loginEmail" placeholder="example@mail.com" required />
+          <label data-key="email_label">이메일 주소</label>
+          <input type="email" id="loginEmail" data-ph-key="email_label" placeholder="이메일 주소" required />
         </div>
         <div class="form-group">
-          <label>Password</label>
+          <label data-key="pass_label">비밀번호</label>
           <input type="password" id="loginPassword" placeholder="••••••••" required />
         </div>
-        <button type="submit" class="btn-accent auth-btn">Login</button>
+        <button type="submit" class="btn-accent auth-btn" data-key="btn_login">로그인</button>
         <div class="auth-footer">
-          <a href="#">Forgot password?</a>
+          <a href="#" data-key="forgot_pw">비밀번호를 잊으셨나요?</a>
         </div>
       </form>
 
+      <!-- 회원가입 폼 -->
       <form id="signupForm" class="auth-form">
         <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="signupName" placeholder="Your Name" required />
+          <label data-key="name_label">이름</label>
+          <input type="text" id="signupName" data-ph-key="name_label" placeholder="이름" required />
         </div>
         <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" id="signupEmail" placeholder="example@mail.com" required />
+          <label data-key="email_label">이메일 주소</label>
+          <input type="email" id="signupEmail" data-ph-key="email_label" placeholder="이메일 주소" required />
         </div>
         <div class="signup-extra">
           <div class="form-group">
-            <label>Nationality</label>
-            <input type="text" id="signupNation" placeholder="e.g. USA" required />
+            <label data-key="nation_label">국적</label>
+            <input type="text" id="signupNation" data-ph-key="nation_label" placeholder="국적" required />
           </div>
           <div class="form-group">
-            <label>Phone</label>
-            <input type="tel" id="signupPhone" placeholder="+82..." required />
+            <label data-key="phone_label">전화번호</label>
+            <input type="tel" id="signupPhone" data-ph-key="phone_label" placeholder="+82..." required />
           </div>
         </div>
         <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="signupPassword" placeholder="At least 8 characters" required />
+          <label data-key="pass_label">비밀번호</label>
+          <input type="password" id="signupPassword" placeholder="8자 이상" required />
         </div>
-        <div style="display: flex; align-items: flex-start; gap: 10px; margin: 5px 0;">
-          <input type="checkbox" id="consent" style="width: auto; margin-top: 4px;" required />
-          <label for="consent" style="text-transform: none; font-size: 12px; color: var(--muted); letter-spacing: 0;">
-            I agree to the <a href="privacy.html" target="_blank" style="color: var(--accent);">Privacy Policy</a>.
+        <div class="consent-row">
+          <input type="checkbox" id="consent" required />
+          <label for="consent">
+            <span data-key="consent_text">개인정보 처리방침에 동의합니다.</span>
+            (<a href="privacy.html" target="_blank">Privacy Policy</a>)
           </label>
         </div>
-        <button type="submit" class="btn-accent auth-btn">Create Account</button>
+        <button type="submit" class="btn-accent auth-btn" data-key="btn_signup">회원가입</button>
       </form>
+
     </div>
   </section>
 
   <script type="module" src="script.js"></script>
 
   <script type="module">
-    import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
@@ -219,93 +247,66 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // 탭 전환 로직
+    // 탭 전환
     const loginTab = document.getElementById('tab-login');
     const signupTab = document.getElementById('tab-signup');
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
 
     loginTab.addEventListener('click', () => {
-      loginTab.classList.add('active');
-      signupTab.classList.remove('active');
-      loginForm.classList.add('active');
-      signupForm.classList.remove('active');
+      loginTab.classList.add('active'); signupTab.classList.remove('active');
+      loginForm.classList.add('active'); signupForm.classList.remove('active');
     });
-
     signupTab.addEventListener('click', () => {
-      signupTab.classList.add('active');
-      loginTab.classList.remove('active');
-      signupForm.classList.add('active');
-      loginForm.classList.remove('active');
+      signupTab.classList.add('active'); loginTab.classList.remove('active');
+      signupForm.classList.add('active'); loginForm.classList.remove('active');
     });
 
-    // 로그인 처리
+    // 로그인
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
-      const pass = document.getElementById('loginPassword').value;
-      const btn = loginForm.querySelector('button');
-
+      const btn = loginForm.querySelector('button[type="submit"]');
       try {
-        btn.disabled = true;
-        btn.textContent = "Logging in...";
-        await signInWithEmailAndPassword(auth, email, pass);
+        btn.disabled = true; btn.textContent = "...";
+        await signInWithEmailAndPassword(auth,
+          document.getElementById('loginEmail').value,
+          document.getElementById('loginPassword').value
+        );
         window.location.href = "index.html";
       } catch (err) {
         alert("Login failed: " + err.message);
         btn.disabled = false;
-        btn.textContent = "Login";
+        btn.textContent = window.peachkoLang?.t('btn_login') || 'Login';
       }
     });
 
-    // 회원가입 처리
+    // 회원가입
     signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('signupName').value;
-      const email = document.getElementById('signupEmail').value;
-      const nation = document.getElementById('signupNation').value;
-      const phone = document.getElementById('signupPhone').value;
-      const pass = document.getElementById('signupPassword').value;
-      const btn = signupForm.querySelector('button');
-
+      const btn = signupForm.querySelector('button[type="submit"]');
       try {
-        btn.disabled = true;
-        btn.textContent = "Creating Account...";
-        const { user } = await createUserWithEmailAndPassword(auth, email, pass);
-
-        // Firestore에 사용자 추가 정보 저장
+        btn.disabled = true; btn.textContent = "...";
+        const { user } = await createUserWithEmailAndPassword(auth,
+          document.getElementById('signupEmail').value,
+          document.getElementById('signupPassword').value
+        );
         await setDoc(doc(db, "users", user.uid), {
-          name, email, nationality: nation, phone,
+          name: document.getElementById('signupName').value,
+          email: document.getElementById('signupEmail').value,
+          nationality: document.getElementById('signupNation').value,
+          phone: document.getElementById('signupPhone').value,
           role: "user",
           createdAt: serverTimestamp()
         });
-
         alert("Welcome to PEACHKO!");
         window.location.href = "index.html";
       } catch (err) {
         alert("Signup failed: " + err.message);
         btn.disabled = false;
-        btn.textContent = "Create Account";
+        btn.textContent = window.peachkoLang?.t('btn_signup') || 'Sign Up';
       }
     });
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const savedLang = localStorage.getItem("peachko_lang") || "ko";
-      if (window.applyLanguage) window.applyLanguage(savedLang); // 이름 변경 및 체크
-    });
-
   </script>
-  <button class="auth-tab active" id="tab-login" data-key="login_tab">Login</button>
-  <button class="auth-tab" id="tab-signup" data-key="signup_tab">Sign Up</button>
-
-  <div id="login-form-wrap">
-    <h2 data-key="login_h2">Welcome Back</h2>
-    <p data-key="login_p">Access your account...</p>
-    <label data-key="email_label">Email Address</label>
-    <label data-key="pass_label">Password</label>
-    <button type="submit" class="btn-accent full-btn" data-key="btn_login">Login</button>
-  </div>
-  <label data-key="email_l">Email Address</label>
 </body>
 
 </html>
