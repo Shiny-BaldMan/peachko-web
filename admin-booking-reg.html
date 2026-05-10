@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PEACHKO — 수동 예약 추가 (Admin)</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .reg-section {
+            padding: 100px 5%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .reg-card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full {
+            grid-column: span 2;
+        }
+
+        label {
+            font-family: var(--fb);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: var(--fb);
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body class="bg-silk">
+
+    <header id="header" class="scrolled">
+        <div class="logo" style="cursor:pointer;" onclick="location.href='admin.html'">PEACHKO ADMIN</div>
+        <nav><button class="btn-ghost" onclick="location.href='admin.html'">Back to Dashboard</button></nav>
+    </header>
+
+    <section class="reg-section">
+        <div class="reg-card">
+            <h2 class="fd" style="margin-bottom: 30px; font-size: 32px;">Add Manual Booking</h2>
+
+            <form id="bookingRegForm">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Customer Email (필수)</label>
+                        <input type="email" id="b-email" placeholder="customer@example.com" required>
+                        <small style="color:var(--muted); font-size:12px;">※ 비회원일 경우 임시 이메일(예: guest_01@peachko.com)을
+                            입력하세요.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Artist (아티스트)</label>
+                        <select id="b-artist" required>
+                            <option value="">로딩 중...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Service Type (서비스 종류)</label>
+                        <select id="b-service" required>
+                            <option value="Makeup">Makeup</option>
+                            <option value="Hair">Hair</option>
+                            <option value="Idol Makeup">Idol Makeup</option>
+                            <option value="Wedding">Wedding</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Reservation Date (날짜)</label>
+                        <input type="date" id="b-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Reservation Time (시간)</label>
+                        <input type="time" id="b-time" required>
+                    </div>
+                    <div class="form-group full">
+                        <label>Hotel / Service Address (방문 주소)</label>
+                        <input type="text" id="b-hotel" placeholder="호텔 이름 및 객실 번호 등" required>
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Special Requests (요청사항)</label>
+                        <textarea id="b-requests" rows="3" placeholder="고객의 특별한 요청사항을 적어주세요."></textarea>
+                    </div>
+                    <div class="form-group full">
+                        <label>Booking Status (예약 상태)</label>
+                        <select id="b-status" required>
+                            <option value="pending">Pending (대기 중)</option>
+                            <option value="confirmed" selected>Confirmed (예약 확정)</option>
+                            <option value="completed">Completed (완료됨)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-accent full-btn" style="height: 50px; font-size: 16px;">Save
+                    Booking</button>
+            </form>
+        </div>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+            authDomain: "peachko-dev.firebaseapp.com",
+            projectId: "peachko-dev",
+            storageBucket: "peachko-dev.firebasestorage.app",
+            messagingSenderId: "561367230685",
+            appId: "1:561367230685:web:5576c1897b5989c243d334"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // 1. 보안 체크 (관리자만 접근 가능)
+        document.body.style.display = "none";
+        onAuthStateChanged(auth, (user) => {
+            if (!user || user.email.toLowerCase() !== 'admin@admin.com') {
+                alert("관리자 권한이 없습니다.");
+                window.location.href = "login.html";
+            } else {
+                document.body.style.display = "block";
+                loadArtistOptions(); // 화면이 열리면 아티스트 목록부터 불러옵니다.
+            }
+        });
+
+        // 2. 아티스트 목록 불러와서 Select 박스에 채우기
+        async function loadArtistOptions() {
+            const artistSelect = document.getElementById('b-artist');
+            try {
+                const snapshot = await getDocs(collection(db, "artists"));
+                artistSelect.innerHTML = "<option value=''>아티스트 선택</option>"; // 초기화
+
+                snapshot.forEach((doc) => {
+                    const artist = doc.data();
+                    // value에는 아티스트 이름을, 화면에도 아티스트 이름을 보여줍니다.
+                    artistSelect.innerHTML += `<option value="${artist.name}">${artist.name}</option>`;
+                });
+            } catch (err) {
+                console.error("아티스트 로드 실패:", err);
+                artistSelect.innerHTML = "<option value=''>불러오기 실패</option>";
+            }
+        }
+
+        // 3. 예약 폼 제출 이벤트
+        document.getElementById('bookingRegForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Saving...";
+
+            const bookingData = {
+                userEmail: document.getElementById('b-email').value,
+                artist: document.getElementById('b-artist').value,
+                serviceType: document.getElementById('b-service').value,
+                reservationDate: document.getElementById('b-date').value,
+                reservationTime: document.getElementById('b-time').value,
+                hotelAddress: document.getElementById('b-hotel').value,
+                specialRequests: document.getElementById('b-requests').value,
+                status: document.getElementById('b-status').value, // 선택한 상태 저장
+                createdAt: serverTimestamp(),
+                isManualBooking: true // 시스템 예약과 수동 예약을 구분하기 위한 숨겨진 태그
+            };
+
+            try {
+                await addDoc(collection(db, "bookings"), bookingData);
+                alert("예약이 성공적으로 추가되었습니다!");
+                window.location.href = "admin.html";
+            } catch (err) {
+                console.error("예약 저장 에러:", err);
+                alert("예약 저장에 실패했습니다: " + err.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Save Booking";
+            }
+        });
+    </script>
+</body>
+
+</html>

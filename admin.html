@@ -169,6 +169,11 @@
           Manage Artist Inventory
         </button>
       </div>
+      <div style="text-align: right; margin-bottom: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn-ghost" onclick="location.href='trash.html'" style="border: 1px solid #777;">🗑️ 휴지통</button>
+        <button class="btn-ghost" onclick="location.href='admin-booking-reg.html'">+ 수동 예약 추가</button>
+        <button class="btn-ghost" onclick="location.href='artist-mgmt.html'">아티스트 관리</button>
+      </div>
       <!-- 1. 통계 대시보드 섹션 (ID는 여기에만 존재해야 함) -->
       <div class="stats-grid">
         <div class="card">
@@ -198,6 +203,7 @@
               <th>숙소 및 요청사항</th>
               <th>진행 상태</th>
               <th>상태 관리</th>
+              <th>관리</th>
             </tr>
           </thead>
           <tbody id="bookingList">
@@ -372,6 +378,9 @@
                 <option value="canceled" ${data.status === 'canceled' ? 'selected' : ''}>취소</option>
               </select>
             </td>
+            <td>
+              <button onclick="moveToTrash('bookings', '${doc.id}', ${JSON.stringify(data)})" style="color:red; background:none; border:none; cursor:pointer;">삭제</button>
+            </td>
           `;
             tbody.appendChild(tr);
           });
@@ -414,6 +423,21 @@
           alert("상태 변경에 실패했습니다.");
         }
       };
+
+      window.moveToTrash = async function (colName, docId, data) {
+        if (!confirm("이 데이터를 휴지통으로 보낼까요?")) return;
+        try {
+          await addDoc(collection(db, "trash"), {
+            ...data,
+            originalId: docId,
+            originalCollection: colName,
+            trashedAt: serverTimestamp()
+          });
+          await deleteDoc(doc(db, colName, docId));
+          alert("휴지통으로 이동되었습니다.");
+          location.reload();
+        } catch (e) { alert("이동 실패: " + e.message); }
+      }
     </script>
   </div>
 </body>

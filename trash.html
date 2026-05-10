@@ -54,11 +54,21 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getFirestore, collection, getDocs, deleteDoc, doc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getStorage, ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
-        const firebaseConfig = { /* 대표님의 설정값 */ };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+            authDomain: "peachko-dev.firebaseapp.com",
+            projectId: "peachko-dev",
+            storageBucket: "peachko-dev.firebasestorage.app",
+            messagingSenderId: "561367230685",
+            appId: "1:561367230685:web:5576c1897b5989c243d334"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const storage = getStorage(app);
 
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === 'admin@admin.com') { loadTrash(); }
@@ -110,6 +120,26 @@
                 location.reload();
             }
         }
+
+        window.permanentDelete = async (trashId, photoUrl) => {
+            if (!confirm("정말 영구 삭제하시겠습니까? 사진 파일까지 모두 삭제되며 복구할 수 없습니다.")) return;
+
+            try {
+                // 1. 아티스트일 경우 Storage 사진 삭제
+                if (photoUrl && photoUrl.includes('firebasestorage')) {
+                    const storageRef = ref(storage, photoUrl);
+                    await deleteObject(storageRef);
+                }
+
+                // 2. 휴지통 문서 삭제
+                await deleteDoc(doc(db, "trash", trashId));
+                alert("영구 삭제 완료.");
+                location.reload();
+            } catch (err) {
+                alert("삭제 실패: " + err.message);
+            }
+        };
+
         snapshot.forEach(docSnap => {
             const item = docSnap.data();
             const id = docSnap.id;
@@ -118,22 +148,21 @@
             const div = document.createElement('div');
             div.className = "item-card";
             div.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 15px;">
-      ${isArtist ? `<img src="${item.photoUrl}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">` : '📄'}
-      <div>
-        <span class="type-badge ${isArtist ? 'type-artist' : 'type-booking'}">${item.originalCollection}</span>
-        <strong style="display:block; margin-top:5px;">${item.name || item.userEmail}</strong>
-        <small style="color:#999;">삭제일: ${item.trashedAt?.toDate().toLocaleString() || '-'}</small>
-      </div>
-    </div>
-    <div>
-      <button onclick="restoreItem('${id}')" style="padding: 6px 12px; cursor:pointer;">복구</button>
-      <button onclick="permanentDelete('${id}', ${isArtist ? `'${item.photoUrl}'` : 'null'})" style="color:red; padding: 6px 12px; cursor:pointer; background:none; border:none;">영구 삭제</button>
-    </div>
-  `;
+                <div style="display: flex; align-items: center; gap: 15px;">
+                  ${isArtist ? `<img src="${item.photoUrl}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">` : '📄'}
+                  <div>
+                    <span class="type-badge ${isArtist ? 'type-artist' : 'type-booking'}">${item.originalCollection}</span>
+                    <strong style="display:block; margin-top:5px;">${item.name || item.userEmail}</strong>
+                    <small style="color:#999;">삭제일: ${item.trashedAt?.toDate().toLocaleString() || '-'}</small>
+                  </div>
+                </div>
+                <div>
+                  <button onclick="restoreItem('${id}')" style="padding: 6px 12px; cursor:pointer;">복구</button>
+                  <button onclick="permanentDelete('${id}', ${isArtist ? `'${item.photoUrl}'` : 'null'})" style="color:red; padding: 6px 12px; cursor:pointer; background:none; border:none;">영구 삭제</button>
+                </div>
+            `;
             container.appendChild(div);
         });
-
     </script>
 </body>
 
