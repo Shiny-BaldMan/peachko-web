@@ -288,6 +288,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelector('.reveal').classList.add('visible');
     });
+    // 각 페이지 로드 시 실행될 부분
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedLang = localStorage.getItem("peachko_lang") || "ko";
+      // 각 페이지별로 가지고 있는 translations 객체를 사용해 텍스트 변경
+      applyPageLanguage(savedLang);
+    });
   </script>
 </body>
 
