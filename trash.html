@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PEACHKO — 휴지통</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .trash-section {
+            padding: 80px 5%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .item-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px dashed var(--border);
+        }
+
+        .type-badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .type-booking {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .type-artist {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+    </style>
+</head>
+
+<body class="bg-silk">
+    <section class="trash-section">
+        <h2 class="fd" style="margin-bottom: 30px;">Trash Bin</h2>
+        <div id="trash-list">
+        </div>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+        const firebaseConfig = { /* 대표님의 설정값 */ };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === 'admin@admin.com') { loadTrash(); }
+            else { window.location.href = "login.html"; }
+        });
+
+        async function loadTrash() {
+            const container = document.getElementById('trash-list');
+            const snapshot = await getDocs(collection(db, "trash"));
+            container.innerHTML = snapshot.empty ? "<p>휴지통이 비어있습니다.</p>" : "";
+
+            snapshot.forEach(docSnap => {
+                const item = docSnap.data();
+                const id = docSnap.id;
+                const div = document.createElement('div');
+                div.className = "item-card";
+                div.innerHTML = `
+          <div>
+            <span class="type-badge type-${item.originalCollection.slice(0, -1)}">${item.originalCollection}</span>
+            <strong style="margin-left:10px;">${item.name || item.userEmail || "Unknown"}</strong>
+            <div style="font-size:12px; color:#999; margin-top:5px;">삭제일: ${item.trashedAt?.toDate().toLocaleString()}</div>
+          </div>
+          <div>
+            <button onclick="restoreItem('${id}')" style="margin-right:10px; cursor:pointer;">복구</button>
+            <button onclick="permanentDelete('${id}')" style="color:red; cursor:pointer;">영구 삭제</button>
+          </div>
+        `;
+                container.appendChild(div);
+            });
+        }
+
+        // 복구 로직: trash에서 지우고 원래 컬렉션으로 다시 insert
+        window.restoreItem = async (trashId) => {
+            const snap = await getDocs(collection(db, "trash"));
+            const target = snap.docs.find(d => d.id === trashId).data();
+            const { originalCollection, trashedAt, originalId, ...rest } = target;
+
+            await addDoc(collection(db, originalCollection), rest);
+            await deleteDoc(doc(db, "trash", trashId));
+            alert("복구되었습니다.");
+            location.reload();
+        }
+
+        // 영구 삭제
+        window.permanentDelete = async (trashId) => {
+            if (confirm("정말 영구히 삭제하시겠습니까? 복구할 수 없습니다.")) {
+                await deleteDoc(doc(db, "trash", trashId));
+                alert("완전 삭제되었습니다.");
+                location.reload();
+            }
+        }
+        snapshot.forEach(docSnap => {
+            const item = docSnap.data();
+            const id = docSnap.id;
+            const isArtist = item.originalCollection === 'artists';
+
+            const div = document.createElement('div');
+            div.className = "item-card";
+            div.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 15px;">
+      ${isArtist ? `<img src="${item.photoUrl}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">` : '📄'}
+      <div>
+        <span class="type-badge ${isArtist ? 'type-artist' : 'type-booking'}">${item.originalCollection}</span>
+        <strong style="display:block; margin-top:5px;">${item.name || item.userEmail}</strong>
+        <small style="color:#999;">삭제일: ${item.trashedAt?.toDate().toLocaleString() || '-'}</small>
+      </div>
+    </div>
+    <div>
+      <button onclick="restoreItem('${id}')" style="padding: 6px 12px; cursor:pointer;">복구</button>
+      <button onclick="permanentDelete('${id}', ${isArtist ? `'${item.photoUrl}'` : 'null'})" style="color:red; padding: 6px 12px; cursor:pointer; background:none; border:none;">영구 삭제</button>
+    </div>
+  `;
+            container.appendChild(div);
+        });
+
+    </script>
+</body>
+
+</html>
