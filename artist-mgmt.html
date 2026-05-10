@@ -3,98 +3,151 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>PEACHKO — Artist Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEACHKO — Artist Management (Admin)</title>
+
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
+
     <style>
         .mgmt-section {
-            padding: 100px 5%;
-            max-width: 1000px;
+            padding: 40px 5%;
+            max-width: 1100px;
             margin: 0 auto;
+        }
+
+        .mgmt-card {
+            background: var(--white);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid var(--border-lt);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-        }
-
-        th,
-        td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
             font-family: var(--fb);
-            font-size: 14px;
         }
 
         th {
             background: var(--silk);
-            color: var(--text);
-            font-weight: 600;
+            padding: 18px 15px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gold);
+            border-bottom: 2px solid var(--border-lt);
         }
 
-        .thumb {
-            width: 40px;
-            height: 40px;
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .artist-thumb {
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid var(--peach);
+        }
+
+        .badge-svc {
+            display: inline-block;
+            padding: 3px 8px;
+            background: var(--soft);
+            color: var(--accent);
+            border-radius: 4px;
+            font-size: 11px;
+            margin-right: 4px;
+            margin-bottom: 4px;
         }
 
         .btn-edit {
-            color: var(--accent);
-            cursor: pointer;
-            margin-right: 10px;
-            border: none;
+            color: #1976d2;
             background: none;
-            text-decoration: underline;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            margin-right: 12px;
         }
 
         .btn-del {
-            color: #ff4d4d;
-            cursor: pointer;
-            border: none;
+            color: #d32f2f;
             background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-edit:hover,
+        .btn-del:hover {
             text-decoration: underline;
+        }
+
+        .empty-state {
+            padding: 60px;
+            text-align: center;
+            color: var(--muted-lt);
         }
     </style>
 </head>
 
 <body class="bg-silk">
     <header id="header" class="scrolled">
-        <div class="logo" style="cursor:pointer;" onclick="location.href='admin.html'">PEACHKO ADMIN</div>
-        <nav><button class="btn-ghost" onclick="location.href='admin.html'">Back to Dashboard</button></nav>
+        <div class="logo">PEACHKO <span style="font-size:12px; opacity:0.6;">ADMIN</span></div>
+        <nav>
+            <button class="nav-link" onclick="location.href='admin.html'">Dashboard</button>
+            <button class="btn-accent" onclick="location.href='artist-reg.html'"
+                style="padding: 10px 20px; font-size: 11px;">+ New Artist</button>
+        </nav>
     </header>
 
-    <section class="mgmt-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <h2 class="fd" style="font-size:28px;">Artist Inventory</h2>
-            <button class="btn-accent" onclick="location.href='artist-reg.html'">+ Add New Artist</button>
+    <div style="height: 80px;"></div>
+    <main class="mgmt-section">
+        <div class="section-head" style="text-align: left; margin-bottom: 30px;">
+            <div class="label-sm">Directory</div>
+            <h2 class="fd">Artist Management</h2>
+            <p class="fb" style="color: var(--muted); font-size: 14px;">Manage profiles, portfolios, and active status
+                of your K-beauty experts.</p>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Photo</th>
-                    <th>Name</th>
-                    <th>Services</th>
-                    <th>Regions</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="artistTableBody">
-            </tbody>
-        </table>
-    </section>
+        <div class="mgmt-card reveal visible">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Artist</th>
+                            <th>Email / Contact</th>
+                            <th>Services</th>
+                            <th>Experience</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="artist-list">
+                        <tr>
+                            <td colspan="5" class="empty-state">Loading artist data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getStorage, ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
-        import { addDoc, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        import {
+            getFirestore, collection, onSnapshot, query, orderBy, doc, deleteDoc, addDoc, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
@@ -102,70 +155,83 @@
             projectId: "peachko-dev",
             storageBucket: "peachko-dev.firebasestorage.app",
             messagingSenderId: "561367230685",
-            appId: "1:561367230685:web:5576c1897b5989c243d334"
+            appId: "1:561367230685:web:5576c1897b598"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
-        const storage = getStorage(app);
 
-        // 보안 체크
-        document.body.style.display = "none";
-        onAuthStateChanged(auth, (user) => {
-            if (!user || user.email.toLowerCase() !== 'admin@admin.com') {
-                window.location.href = "login.html";
-            } else {
-                document.body.style.display = "block";
-                loadArtists();
-            }
-        });
+        // 실시간 아티스트 목록 로드
+        function initArtistMgmt() {
+            const q = query(collection(db, "artists"), orderBy("createdAt", "desc"));
 
-        async function loadArtists() {
-            const tbody = document.getElementById('artistTableBody');
-            const snapshot = await getDocs(collection(db, "artists"));
-            tbody.innerHTML = "";
+            onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById('artist-list');
+                tbody.innerHTML = "";
 
-            snapshot.forEach((docSnap) => {
-                const artist = docSnap.data();
-                const id = docSnap.id;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-          <td><img src="${artist.photoUrl}" class="thumb"></td>
-          <td><strong>${artist.name}</strong></td>
-          <td>${artist.services ? artist.services.join(', ') : '-'}</td>
-          <td>${artist.regions ? artist.regions.join(', ') : '-'}</td>
-          <td>
-            <button class="btn-edit" onclick="location.href='artist-edit.html?id=${id}'">Edit</button>
-            <button class="btn-del" onclick="moveToTrash('artists', '${id}', ${JSON.stringify(artist)})">Delete</button>
-          </td>
-        `;
-                tbody.appendChild(tr);
+                if (snapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No artists registered yet.</td></tr>`;
+                    return;
+                }
+
+                snapshot.forEach((docSnap) => {
+                    const artist = docSnap.data();
+                    const id = docSnap.id;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="${artist.photoUrl || 'https://via.placeholder.com/100'}" class="artist-thumb">
+                                <div>
+                                    <div style="font-weight: 600;">${artist.name}</div>
+                                    <div style="font-size: 11px; color: var(--gold);">#${artist.styleTags ? artist.styleTags[0] : 'Expert'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size: 13px;">${artist.email || 'No Email'}</div>
+                            <div style="font-size: 11px; color: var(--muted-lt);">${artist.phone || '-'}</div>
+                        </td>
+                        <td>
+                            ${(artist.services || []).map(s => `<span class="badge-svc">${s}</span>`).join('')}
+                        </td>
+                        <td style="font-size: 13px; color: var(--muted);">
+                            ${artist.regions ? artist.regions.join(', ') : 'Seoul'}
+                        </td>
+                        <td>
+                            <button class="btn-edit" onclick="location.href='artist-edit.html?id=${id}'">Edit</button>
+                            <button class="btn-del" onclick="moveToTrash('${id}', ${JSON.stringify(artist).replace(/"/g, '&quot;')})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             });
         }
 
-        window.moveToTrash = async (colName, docId, data) => {
-            if (!confirm("이 아티스트를 휴지통으로 보낼까요?")) return;
+        // 삭제 처리 (휴지통 이동)
+        window.moveToTrash = async (id, data) => {
+            if (!confirm(`Are you sure you want to move ${data.name} to trash?`)) return;
 
             try {
-                // 1. [trash] 컬렉션에 원본 데이터 + 메타데이터 저장
+                // 1. 휴지통 컬렉션에 데이터 저장
                 await addDoc(collection(db, "trash"), {
                     ...data,
-                    originalId: docId,
-                    originalCollection: colName,
+                    originalId: id,
+                    originalCollection: "artists",
                     trashedAt: serverTimestamp()
                 });
 
-                // 2. 원래 [artists] 컬렉션에서 삭제
-                await deleteDoc(doc(db, colName, docId));
-
-                alert("휴지통으로 이동되었습니다.");
-                location.reload(); // 목록 새로고침
+                // 2. 원본 컬렉션에서 삭제
+                await deleteDoc(doc(db, "artists", id));
+                alert("Artist moved to trash bin.");
             } catch (err) {
-                console.error("휴지통 이동 실패:", err);
-                alert("이동 실패: " + err.message);
+                console.error("Delete error:", err);
+                alert("Error moving to trash: " + err.message);
             }
         };
+
+        document.addEventListener('DOMContentLoaded', initArtistMgmt);
     </script>
 </body>
 

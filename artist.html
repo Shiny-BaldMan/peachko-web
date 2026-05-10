@@ -1,62 +1,193 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>peachko — Artist Profile</title>
+  <title>PEACHKO — Artist Profile</title>
+
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+
   <style>
-    .profile-section { padding: 120px 5% 60px; min-height: 100vh; }
-    .profile-header { text-align: center; margin-bottom: 50px; }
-    .profile-img { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 4px solid var(--peach-mid); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-    .artist-tags { display: flex; gap: 8px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
-    .badge-tag { padding: 4px 12px; border-radius: 20px; font-size: 11px; background: var(--white); border: 1px solid var(--peach-mid); color: var(--accent); font-family: var(--fb); }
-    .insta-link { display: inline-flex; align-items: center; gap: 8px; background: #E1306C; color: white; padding: 8px 18px; border-radius: 25px; text-decoration: none; font-family: var(--fb); font-size: 13px; margin-top: 10px; }
-    .bio-box { background: var(--white); padding: 30px; border-radius: 10px; max-width: 700px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,0.03); text-align: left; }
-    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; max-width: 900px; margin: 40px auto; }
-    .gallery img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; transition: transform 0.3s ease; }
-    .gallery img:hover { transform: scale(1.03); }
-    .service-list { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-    .svc-badge { padding: 5px 12px; background: var(--peach); color: var(--text); border-radius: 4px; font-size: 12px; font-family: var(--fb); }
+    .profile-section {
+      padding: 120px 5% 60px;
+      min-height: 100vh;
+      background: var(--bg);
+    }
+
+    .profile-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .profile-img {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid var(--white);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 24px;
+    }
+
+    .artist-meta {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--white);
+      padding: 40px;
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-md);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .info-block h3 {
+      font-family: var(--fd);
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: var(--accent);
+    }
+
+    .info-block p {
+      font-family: var(--fb);
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--muted);
+      white-space: pre-line;
+    }
+
+    .badge-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .badge-tag {
+      padding: 5px 12px;
+      background: var(--silk);
+      color: var(--accent-dk);
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: var(--fb);
+    }
+
+    /* Portfolio Gallery */
+    .gallery-section {
+      padding: 60px 5%;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .gallery-item {
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: var(--r-md);
+      cursor: zoom-in;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.1);
+    }
+
+    .booking-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      padding: 15px 5%;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      border-top: 1px solid var(--border-lt);
+    }
+
+    @media (max-width: 768px) {
+      .artist-meta {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+    }
   </style>
 </head>
-<body class="bg-peach">
 
+<body>
   <header id="header" class="scrolled">
-    <div class="logo" style="cursor:pointer;" onclick="location.href='index.html'">peachko</div>
-    <nav><button class="btn-ghost" onclick="history.back()">Back</button></nav>
+    <div class="logo" onclick="location.href='index.html'">PEACHKO</div>
+    <nav>
+      <button class="nav-link" onclick="location.href='index.html'">Home</button>
+      <button class="nav-link" onclick="location.href='index.html#artists'">All Artists</button>
+    </nav>
   </header>
 
   <section class="profile-section">
-    <div class="profile-header reveal visible">
-      <img id="p-photo" src="" class="profile-img" alt="Artist Profile">
-      <h1 id="p-name" class="fd" style="font-size: 40px;">Artist Name</h1>
-      <p id="p-intro" class="fb" style="color: var(--muted); margin-top: 8px;">One-line introduction...</p>
-      
-      <div id="p-tags" class="artist-tags"></div>
-      
-      <a id="p-sns" href="#" target="_blank" class="insta-link" style="display:none;">Instagram</a>
-    </div>
+    <div id="artistContent" class="reveal">
+      <div class="profile-header">
+        <img id="p-photo" src="https://via.placeholder.com/200" alt="Artist" class="profile-img" />
+        <h1 id="p-name" class="fd" style="font-size: 42px; margin-bottom: 5px;">Loading...</h1>
+        <div id="p-tags" class="badge-container" style="justify-content: center;"></div>
+      </div>
 
-    <div class="bio-box reveal visible">
-      <div class="label-sm">Career & Experience</div>
-      <p id="p-career" class="fb" style="line-height: 1.8; white-space: pre-wrap; margin-top: 10px;">Loading career details...</p>
-      
-      <div class="label-sm" style="margin-top: 30px;">Available Services</div>
-      <div id="p-services" class="service-list"></div>
-    </div>
-
-    <div class="section-head reveal visible" style="margin-top: 60px;">
-      <h2 class="fd">Portfolio Gallery</h2>
-    </div>
-    <div id="p-gallery" class="gallery"></div>
-
-    <div style="text-align: center; margin-top: 60px;">
-      <button class="btn-accent" style="padding: 20px 50px;" onclick="location.href='booking.html'">Book This Artist</button>
+      <div class="artist-meta">
+        <div class="info-block">
+          <h3>About Artist</h3>
+          <p id="p-intro">Fetching artist information...</p>
+        </div>
+        <div class="info-block">
+          <h3>Career & Education</h3>
+          <p id="p-career">Loading career details...</p>
+        </div>
+        <div class="info-block">
+          <h3>Services Provided</h3>
+          <div id="p-services" class="badge-container"></div>
+        </div>
+        <div class="info-block">
+          <h3>Social Media</h3>
+          <a id="p-sns" href="#" target="_blank" class="btn-ghost"
+            style="display: none; padding: 10px 20px; font-size: 12px; margin-top: 10px;">
+            Visit Instagram
+          </a>
+        </div>
+      </div>
     </div>
   </section>
+
+  <section class="gallery-section">
+    <div class="section-head reveal">
+      <div class="label-sm">Visuals</div>
+      <h2 class="fd">Work Portfolio</h2>
+    </div>
+    <div id="p-gallery" class="gallery-grid reveal delay1">
+    </div>
+  </section>
+
+  <div class="booking-bar">
+    <div>
+      <span class="fb" style="font-size: 12px; color: var(--muted); display: block;">Starting from</span>
+      <span class="fd" style="font-size: 24px; color: var(--accent); font-weight: 600;">$120.00</span>
+    </div>
+    <button class="btn-accent" id="bookThisArtist" style="padding: 15px 40px;">Book This Artist</button>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
@@ -68,53 +199,89 @@
       projectId: "peachko-dev",
       storageBucket: "peachko-dev.firebasestorage.app",
       messagingSenderId: "561367230685",
-      appId: "1:561367230685:web:5576c1897b5989c243d334"
+      appId: "1:561367230685:web:5576c1897b598"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // URL 파라미터에서 ID 가져오기
     const params = new URLSearchParams(window.location.search);
     const artistId = params.get("id");
 
-    async function loadArtist() {
-      if (!artistId) return;
-      const docRef = doc(db, "artists", artistId);
-      const snap = await getDoc(docRef);
+    async function loadArtistProfile() {
+      if (!artistId) {
+        alert("Artist not found.");
+        window.location.href = "index.html";
+        return;
+      }
 
-      if (snap.exists()) {
-        const data = snap.data();
-        document.getElementById("p-name").innerText = data.name;
-        document.getElementById("p-photo").src = data.photoUrl;
-        document.getElementById("p-intro").innerText = data.intro;
-        document.getElementById("p-career").innerText = data.career;
-        
-        if (data.snsLink) {
-          const sns = document.getElementById("p-sns");
-          sns.href = data.snsLink;
-          sns.style.display = "inline-flex";
+      try {
+        const docRef = doc(db, "artists", artistId);
+        const snap = await getDoc(docRef);
+
+        if (snap.exists()) {
+          const data = snap.data();
+
+          // 기본 정보 바인딩
+          document.getElementById("p-name").innerText = data.name;
+          document.getElementById("p-photo").src = data.photoUrl || 'https://via.placeholder.com/200';
+          document.getElementById("p-intro").innerText = data.intro || "No introduction provided.";
+          document.getElementById("p-career").innerText = data.career || "Career information is private.";
+
+          // SNS 링크
+          if (data.instagram) {
+            const snsBtn = document.getElementById("p-sns");
+            snsBtn.href = data.instagram.startsWith('http') ? data.instagram : `https://instagram.com/${data.instagram}`;
+            snsBtn.style.display = "inline-flex";
+          }
+
+          // 스타일 태그
+          const tagContainer = document.getElementById("p-tags");
+          data.styleTags?.forEach(tag => {
+            tagContainer.innerHTML += `<span class="badge-tag">#${tag}</span>`;
+          });
+
+          // 서비스 목록
+          const svcContainer = document.getElementById("p-services");
+          data.services?.forEach(svc => {
+            svcContainer.innerHTML += `<span class="badge-tag" style="background:var(--peach);">${svc}</span>`;
+          });
+
+          // 갤러리 이미지
+          const gallery = document.getElementById("p-gallery");
+          if (data.portfolioUrls && data.portfolioUrls.length > 0) {
+            data.portfolioUrls.forEach(url => {
+              gallery.innerHTML += `
+                <div class="gallery-item">
+                  <img src="${url}" alt="Portfolio work" loading="lazy">
+                </div>
+              `;
+            });
+          } else {
+            gallery.innerHTML = `<p class="fb" style="grid-column:1/-1; text-align:center; color:var(--muted-lt);">Portfolio images are coming soon.</p>`;
+          }
+
+          // 예약 버튼 연동
+          document.getElementById("bookThisArtist").onclick = () => {
+            window.location.href = `booking.html?artist=${encodeURIComponent(data.name)}`;
+          };
+
+          // 애니메이션 활성화
+          document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+
+        } else {
+          alert("Artist does not exist.");
+          window.location.href = "index.html";
         }
-
-        // 스타일 태그 렌더링
-        const tagContainer = document.getElementById("p-tags");
-        data.styleTags?.forEach(tag => {
-          tagContainer.innerHTML += `<span class="badge-tag">${tag}</span>`;
-        });
-
-        // 서비스 목록 렌더링
-        const svcContainer = document.getElementById("p-services");
-        data.services?.forEach(svc => {
-          svcContainer.innerHTML += `<span class="svc-badge">${svc}</span>`;
-        });
-
-        // 갤러리 렌더링
-        const gallery = document.getElementById("p-gallery");
-        data.portfolioUrls?.forEach(url => {
-          gallery.innerHTML += `<img src="${url}" alt="Portfolio Work">`;
-        });
+      } catch (err) {
+        console.error("Error fetching artist:", err);
+        alert("Failed to load profile.");
       }
     }
-    loadArtist();
+
+    document.addEventListener("DOMContentLoaded", loadArtistProfile);
   </script>
 </body>
+
 </html>

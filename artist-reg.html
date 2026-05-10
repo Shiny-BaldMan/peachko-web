@@ -3,11 +3,16 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>PEACHKO — 아티스트 등록 (Admin)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEACHKO — Register New Artist (Admin)</title>
+
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
+
     <style>
         .reg-section {
-            padding: 100px 5%;
+            padding: 100px 5% 60px;
             max-width: 900px;
             margin: 0 auto;
         }
@@ -15,16 +20,28 @@
         .reg-card {
             background: var(--white);
             padding: 40px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--r-lg);
+            border: 1px solid var(--border-lt);
+            box-shadow: var(--shadow-md);
+            position: relative;
+        }
+
+        .reg-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent);
+            border-radius: var(--r-lg) var(--r-lg) 0 0;
         }
 
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 25px;
+            gap: 24px;
+            margin-bottom: 30px;
         }
 
         .form-group {
@@ -39,117 +56,135 @@
 
         label {
             font-family: var(--fb);
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 600;
-            color: var(--text);
-        }
-
-        input,
-        select,
-        textarea {
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-family: var(--fb);
-            font-size: 14px;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
 
         .checkbox-group {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            padding: 10px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            background: var(--silk);
+            padding: 15px;
+            border-radius: var(--r-md);
         }
 
-        .check-item {
+        .checkbox-item {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            font-family: var(--fb);
             font-size: 13px;
             cursor: pointer;
         }
 
-        .check-item input {
+        .checkbox-item input {
             width: auto;
+        }
+
+        .helper-text {
+            font-size: 11px;
+            color: var(--muted-lt);
+            margin-top: 4px;
+        }
+
+        .admin-nav-back {
+            margin-bottom: 20px;
+            display: inline-block;
+            text-decoration: none;
+            color: var(--muted);
+            font-family: var(--fb);
+            font-size: 13px;
         }
     </style>
 </head>
 
 <body class="bg-silk">
+    <header id="header" class="scrolled">
+        <div class="logo">PEACHKO <span style="font-size:12px; opacity:0.6;">ADMIN</span></div>
+        <nav>
+            <button class="nav-link" onclick="location.href='admin.html'">Dashboard</button>
+            <button class="nav-link" onclick="location.href='artist-mgmt.html'">Artists</button>
+        </nav>
+    </header>
+
     <section class="reg-section">
-        <div class="reg-card">
-            <h2 class="fd" style="margin-bottom: 30px; font-size: 32px;">Register New Artist</h2>
+        <a href="artist-mgmt.html" class="admin-nav-back">← Back to Artist List</a>
+
+        <div class="reg-card reveal visible">
+            <div class="section-head" style="text-align: left; margin-bottom: 30px;">
+                <div class="label-sm">Onboarding</div>
+                <h2 class="fd">Register New Artist</h2>
+                <p class="fb" style="color: var(--muted); font-size: 14px;">Create a professional profile for a new
+                    K-beauty expert.</p>
+            </div>
 
             <form id="artistRegForm">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Artist Name (영문/한글)</label>
-                        <input type="text" id="a-name" placeholder="ex) Soyeon (소연)" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Profile Image (jpg, png)</label>
-                        <input type="file" id="a-photo" accept="image/jpeg, image/png" required>
+                        <label for="a-name">Full Name (English)</label>
+                        <input type="text" id="a-name" placeholder="e.g. Minji Kim" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Email Address</label>
+                        <label for="a-photo">Profile Photo URL</label>
+                        <input type="url" id="a-photo" placeholder="https://..." required>
+                        <span class="helper-text">Direct link to image (Firebase Storage or external)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="a-email">Contact Email</label>
                         <input type="email" id="a-email" placeholder="artist@example.com" required>
                     </div>
+
                     <div class="form-group">
-                        <label>Contact Number (WhatsApp/Phone)</label>
-                        <input type="tel" id="a-phone" placeholder="+82 10-0000-0000" required>
-                    </div>
-                    <div class="form-group full">
-                        <label>Instagram Link</label>
-                        <input type="url" id="a-insta" placeholder="https://www.instagram.com/username">
+                        <label for="a-insta">Instagram ID</label>
+                        <input type="text" id="a-insta" placeholder="@username">
                     </div>
 
                     <div class="form-group full">
-                        <label>Available Services</label>
-                        <div class="checkbox-group">
-                            <label class="check-item"><input type="checkbox" name="service" value="Makeup">
+                        <label>Provided Services</label>
+                        <div class="checkbox-group" id="svc-options">
+                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Makeup">
                                 Makeup</label>
-                            <label class="check-item"><input type="checkbox" name="service" value="Hair"> Hair</label>
-                            <label class="check-item"><input type="checkbox" name="service" value="Idol Makeup"> Idol
-                                Makeup</label>
-                            <label class="check-item"><input type="checkbox" name="service" value="Wedding">
-                                Wedding</label>
+                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Hair Styling"> Hair
+                                Styling</label>
+                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Personal Color">
+                                Personal Color</label>
+                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Wedding Care"> Wedding
+                                Care</label>
+                            <label class="checkbox-item"><input type="checkbox" name="svc" value="K-Pop Concept"> K-Pop
+                                Concept</label>
                         </div>
                     </div>
 
                     <div class="form-group full">
-                        <label>Available Days</label>
-                        <div class="checkbox-group">
-                            <label class="check-item"><input type="checkbox" name="day" value="Mon"> Mon</label>
-                            <label class="check-item"><input type="checkbox" name="day" value="Tue"> Tue</label>
-                            <label class="check-item"><input type="checkbox" name="day" value="Wed"> Wed</label>
-                            <label class="check-item"><input type="checkbox" name="day" value="Thu"> Thu</label>
-                            <label class="check-item"><input type="checkbox" name="day" value="Fri"> Fri</label>
-                            <label class="check-item"><input type="checkbox" name="day" value="Sat"> Sat</label>
-                            <label class="check-item"><input type="checkbox" name="day" value="Sun"> Sun</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Working Hours (Start)</label>
-                        <input type="time" id="a-time-start" value="10:00">
-                    </div>
-                    <div class="form-group">
-                        <label>Working Hours (End)</label>
-                        <input type="time" id="a-time-end" value="20:00">
+                        <label for="a-tags">Style Tags (Comma separated)</label>
+                        <input type="text" id="a-tags" placeholder="Glowy, Trendy, Natural, Elegant">
                     </div>
 
                     <div class="form-group full">
-                        <label>Service Regions (출장 가능 지역, 쉼표로 구분)</label>
-                        <input type="text" id="a-regions" placeholder="ex) Gangnam, Hongdae, Myeongdong">
+                        <label for="a-intro">Short Introduction</label>
+                        <textarea id="a-intro" rows="2" placeholder="One-line bio for the listing page..."
+                            required></textarea>
                     </div>
+
                     <div class="form-group full">
-                        <label>Career & Introduction</label>
-                        <textarea id="a-intro" rows="4" placeholder="아티스트의 경력과 스타일을 자유롭게 적어주세요."></textarea>
+                        <label for="a-career">Detailed Career & Education</label>
+                        <textarea id="a-career" rows="4"
+                            placeholder="List certifications, previous works, or studio experience..."></textarea>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="a-regions">Service Regions (Comma separated)</label>
+                        <input type="text" id="a-regions" placeholder="Gangnam, Hongdae, Myeongdong" required>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-accent full-btn" style="height: 50px; font-size: 16px;">Save Artist
-                    Profile</button>
+                <button type="submit" class="btn-accent full-btn" style="width: 100%;">Create Artist Profile</button>
             </form>
         </div>
     </section>
@@ -157,94 +192,55 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
-        // Firebase 설정
         const firebaseConfig = {
             apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
             authDomain: "peachko-dev.firebaseapp.com",
             projectId: "peachko-dev",
             storageBucket: "peachko-dev.firebasestorage.app",
             messagingSenderId: "561367230685",
-            appId: "1:561367230685:web:5576c1897b5989c243d334"
+            appId: "1:561367230685:web:5576c1897b598"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
-        const storage = getStorage(app);
 
-        // 보안: admin@admin.com 확인 로직
-        document.body.style.display = "none";
-        onAuthStateChanged(auth, (user) => {
-            if (!user || user.email.toLowerCase() !== 'admin@admin.com') {
-                alert("Access Denied.");
-                window.location.href = "login.html";
-            } else {
-                document.body.style.display = "block";
-            }
-        });
-
-        // 폼 제출 이벤트
-        // 폼 제출 이벤트
         document.getElementById('artistRegForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.textContent = "Registering...";
 
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Uploading Image & Saving..."; // 업로드 중 표시
+            // 선택된 서비스 추출
+            const selectedServices = Array.from(document.querySelectorAll('input[name="svc"]:checked')).map(cb => cb.value);
+
+            // 태그 및 지역 리스트화
+            const styleTags = document.getElementById('a-tags').value.split(',').map(t => t.trim()).filter(t => t !== "");
+            const regions = document.getElementById('a-regions').value.split(',').map(r => r.trim()).filter(r => r !== "");
+
+            const artistData = {
+                name: document.getElementById('a-name').value,
+                photoUrl: document.getElementById('a-photo').value,
+                email: document.getElementById('a-email').value,
+                instagram: document.getElementById('a-insta').value,
+                services: selectedServices,
+                styleTags: styleTags,
+                intro: document.getElementById('a-intro').value,
+                career: document.getElementById('a-career').value,
+                regions: regions,
+                rating: 5.0, // 초기 평점
+                reviewCount: 0,
+                createdAt: serverTimestamp()
+            };
 
             try {
-                // --- [1단계: 이미지 파일을 Storage에 업로드하기] ---
-                const fileInput = document.getElementById('a-photo');
-                const file = fileInput.files[0];
-                let uploadedPhotoUrl = "";
-
-                if (file) {
-                    // 파일 이름이 겹치지 않게 현재 시간(Date.now)을 파일명 앞에 붙임
-                    const uniqueFileName = Date.now() + '_' + file.name;
-                    const storageRef = ref(storage, 'artist_profiles/' + uniqueFileName);
-
-                    // 사진 업로드 실행!
-                    const snapshot = await uploadBytes(storageRef, file);
-                    // 업로드된 사진의 다운로드 URL(웹 주소) 가져오기
-                    uploadedPhotoUrl = await getDownloadURL(snapshot.ref);
-                } else {
-                    throw new Error("프로필 사진을 선택해주세요.");
-                }
-
-                // --- [2단계: 나머지 데이터 수집 및 DB 저장 (기존과 동일)] ---
-                const selectedServices = Array.from(document.querySelectorAll('input[name="service"]:checked')).map(el => el.value);
-                const selectedDays = Array.from(document.querySelectorAll('input[name="day"]:checked')).map(el => el.value);
-                const regionList = document.getElementById('a-regions').value.split(',').map(r => r.trim()).filter(r => r !== "");
-
-                const artistData = {
-                    name: document.getElementById('a-name').value,
-                    photoUrl: uploadedPhotoUrl, // 👈 텍스트가 아닌, 방금 업로드해서 받아온 URL을 넣음!
-                    email: document.getElementById('a-email').value,
-                    phone: document.getElementById('a-phone').value,
-                    instagram: document.getElementById('a-insta').value,
-                    services: selectedServices,
-                    availableDays: selectedDays,
-                    workHours: {
-                        start: document.getElementById('a-time-start').value,
-                        end: document.getElementById('a-time-end').value
-                    },
-                    regions: regionList,
-                    intro: document.getElementById('a-intro').value,
-                    createdAt: serverTimestamp()
-                };
-
                 await addDoc(collection(db, "artists"), artistData);
-                alert("Artist registered successfully!");
-                window.location.href = "admin.html";
-
+                alert("New artist has been registered successfully!");
+                window.location.href = "artist-mgmt.html";
             } catch (err) {
-                console.error("Error saving artist:", err);
-                alert("Failed to save data: " + err.message);
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Save Artist Profile";
+                alert("Failed to register artist: " + err.message);
+                btn.disabled = false;
+                btn.textContent = "Create Artist Profile";
             }
         });
     </script>

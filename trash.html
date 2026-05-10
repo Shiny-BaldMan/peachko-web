@@ -3,32 +3,56 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>PEACHKO — 휴지통</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEACHKO — Trash Bin (Admin)</title>
+
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
+
     <style>
         .trash-section {
-            padding: 80px 5%;
-            max-width: 1000px;
+            padding: 40px 5%;
+            max-width: 900px;
             margin: 0 auto;
         }
 
+        .trash-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
         .item-card {
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            background: var(--white);
+            padding: 20px;
+            border-radius: var(--r-md);
             display: flex;
             justify-content: space-between;
             align-items: center;
             border: 1px dashed var(--border);
+            transition: all 0.2s;
+        }
+
+        .item-card:hover {
+            border-style: solid;
+            border-color: var(--gold);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .type-badge {
             padding: 3px 8px;
             border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
+            font-family: var(--fb);
         }
 
         .type-booking {
@@ -40,21 +64,91 @@
             background: #f3e5f5;
             color: #7b1fa2;
         }
+
+        .item-details strong {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .item-details small {
+            color: var(--muted-lt);
+            font-size: 12px;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-restore {
+            padding: 8px 16px;
+            background: var(--soft);
+            color: var(--text);
+            border: 1px solid var(--border-lt);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: var(--fb);
+            transition: background 0.2s;
+        }
+
+        .btn-restore:hover {
+            background: var(--peach);
+        }
+
+        .btn-perm-del {
+            padding: 8px 16px;
+            background: transparent;
+            color: #d32f2f;
+            border: 1px solid #ffcdd2;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: var(--fb);
+        }
+
+        .btn-perm-del:hover {
+            background: #fff5f5;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            color: var(--muted-lt);
+            font-family: var(--fb);
+        }
     </style>
 </head>
 
 <body class="bg-silk">
-    <section class="trash-section">
-        <h2 class="fd" style="margin-bottom: 30px;">Trash Bin</h2>
-        <div id="trash-list">
+    <header id="header" class="scrolled">
+        <div class="logo">PEACHKO <span style="font-size:12px; opacity:0.6;">ADMIN</span></div>
+        <nav>
+            <button class="nav-link" onclick="location.href='admin.html'">Dashboard</button>
+        </nav>
+    </header>
+
+    <div style="height: 80px;"></div>
+
+    <main class="trash-section">
+        <div class="section-head" style="text-align: left; margin-bottom: 30px;">
+            <div class="label-sm">Recycle</div>
+            <h2 class="fd">Trash Bin</h2>
+            <p class="fb" style="color: var(--muted); font-size: 14px;">Restore items deleted within the last 30 days or
+                delete them permanently.</p>
         </div>
-    </section>
+
+        <div id="trash-list" class="trash-container reveal visible">
+            <div class="empty-state">Scanning for deleted items...</div>
+        </div>
+    </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, deleteDoc, doc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getStorage, ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
+        import {
+            getFirestore, collection, onSnapshot, query, orderBy, doc, deleteDoc, addDoc, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
@@ -62,107 +156,88 @@
             projectId: "peachko-dev",
             storageBucket: "peachko-dev.firebasestorage.app",
             messagingSenderId: "561367230685",
-            appId: "1:561367230685:web:5576c1897b5989c243d334"
+            appId: "1:561367230685:web:5576c1897b598"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
-        const storage = getStorage(app);
 
-        onAuthStateChanged(auth, (user) => {
-            if (user && user.email === 'admin@admin.com') { loadTrash(); }
-            else { window.location.href = "login.html"; }
-        });
+        // 1. 실시간 휴지통 목록 감시
+        function watchTrash() {
+            const q = query(collection(db, "trash"), orderBy("trashedAt", "desc"));
 
-        async function loadTrash() {
-            const container = document.getElementById('trash-list');
-            const snapshot = await getDocs(collection(db, "trash"));
-            container.innerHTML = snapshot.empty ? "<p>휴지통이 비어있습니다.</p>" : "";
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('trash-list');
+                container.innerHTML = "";
 
-            snapshot.forEach(docSnap => {
-                const item = docSnap.data();
-                const id = docSnap.id;
-                const div = document.createElement('div');
-                div.className = "item-card";
-                div.innerHTML = `
-          <div>
-            <span class="type-badge type-${item.originalCollection.slice(0, -1)}">${item.originalCollection}</span>
-            <strong style="margin-left:10px;">${item.name || item.userEmail || "Unknown"}</strong>
-            <div style="font-size:12px; color:#999; margin-top:5px;">삭제일: ${item.trashedAt?.toDate().toLocaleString()}</div>
-          </div>
-          <div>
-            <button onclick="restoreItem('${id}')" style="margin-right:10px; cursor:pointer;">복구</button>
-            <button onclick="permanentDelete('${id}')" style="color:red; cursor:pointer;">영구 삭제</button>
-          </div>
-        `;
-                container.appendChild(div);
+                if (snapshot.empty) {
+                    container.innerHTML = `<div class="empty-state">Your trash bin is empty.</div>`;
+                    return;
+                }
+
+                snapshot.forEach((docSnap) => {
+                    const item = docSnap.data();
+                    const id = docSnap.id;
+                    const isArtist = item.originalCollection === 'artists';
+                    const title = isArtist ? item.name : (item.userEmail || "Guest Reservation");
+                    const dateStr = item.trashedAt?.toDate().toLocaleString() || "Unknown time";
+
+                    const card = document.createElement('div');
+                    card.className = "item-card";
+                    card.innerHTML = `
+                        <div class="item-info">
+                            <span class="type-badge ${isArtist ? 'type-artist' : 'type-booking'}">${item.originalCollection}</span>
+                            <div class="item-details">
+                                <strong>${title}</strong>
+                                <small>Deleted at: ${dateStr}</small>
+                            </div>
+                        </div>
+                        <div class="action-group">
+                            <button class="btn-restore" onclick="restoreItem('${id}', ${JSON.stringify(item).replace(/"/g, '&quot;')})">Restore</button>
+                            <button class="btn-perm-del" onclick="permanentDelete('${id}')">Delete Permanently</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
             });
         }
 
-        // 복구 로직: trash에서 지우고 원래 컬렉션으로 다시 insert
-        window.restoreItem = async (trashId) => {
-            const snap = await getDocs(collection(db, "trash"));
-            const target = snap.docs.find(d => d.id === trashId).data();
-            const { originalCollection, trashedAt, originalId, ...rest } = target;
-
-            await addDoc(collection(db, originalCollection), rest);
-            await deleteDoc(doc(db, "trash", trashId));
-            alert("복구되었습니다.");
-            location.reload();
-        }
-
-        // 영구 삭제
-        window.permanentDelete = async (trashId) => {
-            if (confirm("정말 영구히 삭제하시겠습니까? 복구할 수 없습니다.")) {
-                await deleteDoc(doc(db, "trash", trashId));
-                alert("완전 삭제되었습니다.");
-                location.reload();
-            }
-        }
-
-        window.permanentDelete = async (trashId, photoUrl) => {
-            if (!confirm("정말 영구 삭제하시겠습니까? 사진 파일까지 모두 삭제되며 복구할 수 없습니다.")) return;
+        // 2. 데이터 복구 (원래 컬렉션으로 이동)
+        window.restoreItem = async (trashId, data) => {
+            if (!confirm("Do you want to restore this item?")) return;
 
             try {
-                // 1. 아티스트일 경우 Storage 사진 삭제
-                if (photoUrl && photoUrl.includes('firebasestorage')) {
-                    const storageRef = ref(storage, photoUrl);
-                    await deleteObject(storageRef);
-                }
+                // 원본 데이터에서 휴지통 관련 메타데이터 제거
+                const { trashedAt, originalId, originalCollection, ...originalData } = data;
 
-                // 2. 휴지통 문서 삭제
+                // 원래 컬렉션에 다시 저장 (ID 유지를 위해 doc(db, col, id)를 쓸 수도 있으나, 여기서는 새로 추가)
+                await addDoc(collection(db, originalCollection), {
+                    ...originalData,
+                    restoredAt: serverTimestamp()
+                });
+
+                // 휴지통에서 삭제
                 await deleteDoc(doc(db, "trash", trashId));
-                alert("영구 삭제 완료.");
-                location.reload();
+                alert("Successfully restored.");
             } catch (err) {
-                alert("삭제 실패: " + err.message);
+                console.error("Restore error:", err);
+                alert("Failed to restore: " + err.message);
             }
         };
 
-        snapshot.forEach(docSnap => {
-            const item = docSnap.data();
-            const id = docSnap.id;
-            const isArtist = item.originalCollection === 'artists';
+        // 3. 영구 삭제
+        window.permanentDelete = async (trashId) => {
+            if (!confirm("This action cannot be undone. Delete permanently?")) return;
 
-            const div = document.createElement('div');
-            div.className = "item-card";
-            div.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 15px;">
-                  ${isArtist ? `<img src="${item.photoUrl}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">` : '📄'}
-                  <div>
-                    <span class="type-badge ${isArtist ? 'type-artist' : 'type-booking'}">${item.originalCollection}</span>
-                    <strong style="display:block; margin-top:5px;">${item.name || item.userEmail}</strong>
-                    <small style="color:#999;">삭제일: ${item.trashedAt?.toDate().toLocaleString() || '-'}</small>
-                  </div>
-                </div>
-                <div>
-                  <button onclick="restoreItem('${id}')" style="padding: 6px 12px; cursor:pointer;">복구</button>
-                  <button onclick="permanentDelete('${id}', ${isArtist ? `'${item.photoUrl}'` : 'null'})" style="color:red; padding: 6px 12px; cursor:pointer; background:none; border:none;">영구 삭제</button>
-                </div>
-            `;
-            container.appendChild(div);
-        });
+            try {
+                await deleteDoc(doc(db, "trash", trashId));
+                alert("Permanently deleted.");
+            } catch (err) {
+                alert("Error: " + err.message);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', watchTrash);
     </script>
 </body>
 
