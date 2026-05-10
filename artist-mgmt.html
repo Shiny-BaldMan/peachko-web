@@ -93,6 +93,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getStorage, ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
@@ -106,6 +107,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const storage = getStorage(app);
 
         // 보안 체크
         document.body.style.display = "none";
@@ -134,18 +136,34 @@
           <td>${artist.regions ? artist.regions.join(', ') : '-'}</td>
           <td>
             <button class="btn-edit" onclick="location.href='artist-edit.html?id=${id}'">Edit</button>
-            <button class="btn-del" onclick="deleteArtist('${id}')">Delete</button>
+            <button class="btn-del" onclick="deleteArtist('${id}', '${artist.photoUrl}')">Delete</button>
           </td>
         `;
                 tbody.appendChild(tr);
             });
         }
 
-        window.deleteArtist = async (id) => {
-            if (confirm("이 아티스트를 정말 삭제할까요?")) {
+        window.deleteArtist = async (id, photoUrl) => {
+            if (!confirm("이 아티스트와 업로드된 사진을 모두 삭제할까요?")) return;
+
+            try {
+                // 1. [Storage 정리] 이미지 파일 삭제
+                if (photoUrl) {
+                    // 주소값에서 파일 경로만 추출하여 참조(Ref) 생성
+                    const storageRef = ref(storage, photoUrl);
+                    await deleteObject(storageRef);
+                    console.log("이미지 파일 삭제 완료");
+                }
+
+                // 2. [Firestore 정리] 아티스트 문서 삭제
                 await deleteDoc(doc(db, "artists", id));
-                alert("삭제되었습니다.");
-                loadArtists();
+                console.log("데이터베이스 정보 삭제 완료");
+
+                alert("아티스트의 모든 데이터가 깨끗하게 정리되었습니다.");
+                loadArtists(); // 목록 새로고침
+            } catch (err) {
+                console.error("삭제 중 오류 발생:", err);
+                alert("삭제 실패: " + err.message);
             }
         }
     </script>
