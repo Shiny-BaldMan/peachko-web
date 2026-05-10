@@ -199,26 +199,23 @@
     </div>
   </section>
 
-  <script type="module" src="script.js">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  <script type="module" src="script.js"></script>
+
+  <script type="module">
+    import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    // script.js와 동일한 Firebase 설정 사용
     const firebaseConfig = {
       apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
       authDomain: "peachko-dev.firebaseapp.com",
       projectId: "peachko-dev",
       storageBucket: "peachko-dev.firebasestorage.app",
       messagingSenderId: "561367230685",
-      appId: "1:561367230685:web:5576c1897b598"
+      appId: "1:561367230685:web:5576c1897b5989c243d334"
     };
 
-    const app = initializeApp(firebaseConfig);
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     const auth = getAuth(app);
     const db = getFirestore(app);
 
@@ -298,6 +295,8 @@
     });
 
   </script>
+  <button class="auth-tab active" id="tab-login" data-key="login_t">Login</button>
+  <label data-key="email_l">Email Address</label>
 </body>
 
 </html>
