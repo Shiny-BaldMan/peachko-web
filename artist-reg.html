@@ -87,8 +87,8 @@
                         <input type="text" id="a-name" placeholder="ex) Soyeon (소연)" required>
                     </div>
                     <div class="form-group">
-                        <label>Profile Image URL (jpg, png)</label>
-                        <input type="url" id="a-photo" placeholder="https://..." required>
+                        <label>Profile Image (jpg, png)</label>
+                        <input type="file" id="a-photo" accept="image/jpeg, image/png" required>
                     </div>
 
                     <div class="form-group">
@@ -158,6 +158,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
         // Firebase 설정
         const firebaseConfig = {
@@ -172,6 +173,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const storage = getStorage(app);
 
         // 보안: admin@admin.com 확인 로직
         document.body.style.display = "none";
@@ -185,38 +187,64 @@
         });
 
         // 폼 제출 이벤트
+        // 폼 제출 이벤트
         document.getElementById('artistRegForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // 체크박스 값 배열로 만들기
-            const selectedServices = Array.from(document.querySelectorAll('input[name="service"]:checked')).map(el => el.value);
-            const selectedDays = Array.from(document.querySelectorAll('input[name="day"]:checked')).map(el => el.value);
-            const regionList = document.getElementById('a-regions').value.split(',').map(r => r.trim()).filter(r => r !== "");
-
-            const artistData = {
-                name: document.getElementById('a-name').value,
-                photoUrl: document.getElementById('a-photo').value,
-                email: document.getElementById('a-email').value,
-                phone: document.getElementById('a-phone').value,
-                instagram: document.getElementById('a-insta').value,
-                services: selectedServices,
-                availableDays: selectedDays,
-                workHours: {
-                    start: document.getElementById('a-time-start').value,
-                    end: document.getElementById('a-time-end').value
-                },
-                regions: regionList,
-                intro: document.getElementById('a-intro').value,
-                createdAt: serverTimestamp()
-            };
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Uploading Image & Saving..."; // 업로드 중 표시
 
             try {
+                // --- [1단계: 이미지 파일을 Storage에 업로드하기] ---
+                const fileInput = document.getElementById('a-photo');
+                const file = fileInput.files[0];
+                let uploadedPhotoUrl = "";
+
+                if (file) {
+                    // 파일 이름이 겹치지 않게 현재 시간(Date.now)을 파일명 앞에 붙임
+                    const uniqueFileName = Date.now() + '_' + file.name;
+                    const storageRef = ref(storage, 'artist_profiles/' + uniqueFileName);
+
+                    // 사진 업로드 실행!
+                    const snapshot = await uploadBytes(storageRef, file);
+                    // 업로드된 사진의 다운로드 URL(웹 주소) 가져오기
+                    uploadedPhotoUrl = await getDownloadURL(snapshot.ref);
+                } else {
+                    throw new Error("프로필 사진을 선택해주세요.");
+                }
+
+                // --- [2단계: 나머지 데이터 수집 및 DB 저장 (기존과 동일)] ---
+                const selectedServices = Array.from(document.querySelectorAll('input[name="service"]:checked')).map(el => el.value);
+                const selectedDays = Array.from(document.querySelectorAll('input[name="day"]:checked')).map(el => el.value);
+                const regionList = document.getElementById('a-regions').value.split(',').map(r => r.trim()).filter(r => r !== "");
+
+                const artistData = {
+                    name: document.getElementById('a-name').value,
+                    photoUrl: uploadedPhotoUrl, // 👈 텍스트가 아닌, 방금 업로드해서 받아온 URL을 넣음!
+                    email: document.getElementById('a-email').value,
+                    phone: document.getElementById('a-phone').value,
+                    instagram: document.getElementById('a-insta').value,
+                    services: selectedServices,
+                    availableDays: selectedDays,
+                    workHours: {
+                        start: document.getElementById('a-time-start').value,
+                        end: document.getElementById('a-time-end').value
+                    },
+                    regions: regionList,
+                    intro: document.getElementById('a-intro').value,
+                    createdAt: serverTimestamp()
+                };
+
                 await addDoc(collection(db, "artists"), artistData);
                 alert("Artist registered successfully!");
                 window.location.href = "admin.html";
+
             } catch (err) {
                 console.error("Error saving artist:", err);
-                alert("Failed to save data.");
+                alert("Failed to save data: " + err.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Save Artist Profile";
             }
         });
     </script>
