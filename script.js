@@ -11,26 +11,16 @@ import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gsta
 // 1. Firebase Configuration (Local & Production Support)
 let firebaseConfig;
 
-if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-  console.log("🛠️ 로컬 테스트 모드입니다.");
-  firebaseConfig = {
-    apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
-    authDomain: "peachko-dev.firebaseapp.com",
-    projectId: "peachko-dev",
-    storageBucket: "peachko-dev.firebasestorage.app",
-    messagingSenderId: "561367230685",
-    appId: "1:561367230685:web:5576c1897b598"
-  };
-} else {
-  firebaseConfig = {
-    apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
-    authDomain: "peachko-dev.firebaseapp.com",
-    projectId: "peachko-dev",
-    storageBucket: "peachko-dev.firebasestorage.app",
-    messagingSenderId: "561367230685",
-    appId: "1:561367230685:web:5576c1897b598"
-  };
-}
+const firebaseConfig = {
+  apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+  authDomain: "peachko-dev.firebaseapp.com",
+  projectId: "peachko-dev",
+  storageBucket: "peachko-dev.firebasestorage.app",
+  messagingSenderId: "561367230685",
+  appId: "1:561367230685:web:5576c1897b5989c243d334" // 주신 값으로 수정
+};
+
+// 그 다음 바로 초기화
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
