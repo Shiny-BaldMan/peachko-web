@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEACHKO — Edit Artist (Admin)</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
+
+    <style>
+        .reg-section {
+            padding: 100px 5% 60px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .reg-card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: var(--r-lg);
+            border: 1px solid var(--border-lt);
+            box-shadow: var(--shadow-md);
+            position: relative;
+        }
+
+        .reg-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gold);
+            border-radius: var(--r-lg) var(--r-lg) 0 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full {
+            grid-column: span 2;
+        }
+
+        label {
+            font-family: var(--fb);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 12px;
+            border-radius: var(--r-md);
+            border: 1px solid var(--border-lt);
+            font-family: var(--fb);
+            font-size: 14px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--soft);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            background: var(--silk);
+            padding: 15px;
+            border-radius: var(--r-md);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--fb);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            width: auto;
+        }
+
+        .helper-text {
+            font-size: 11px;
+            color: var(--muted-lt);
+            margin-top: 4px;
+        }
+
+        .admin-nav-back {
+            margin-bottom: 20px;
+            display: inline-block;
+            text-decoration: none;
+            color: var(--muted);
+            font-family: var(--fb);
+            font-size: 13px;
+        }
+
+        .admin-nav-back:hover {
+            color: var(--accent);
+        }
+
+        /* 프로필 미리보기 */
+        .photo-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--peach);
+            margin-top: 10px;
+            display: none;
+        }
+
+        .photo-preview.show {
+            display: block;
+        }
+
+        /* 포트폴리오 URL 목록 */
+        .portfolio-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .portfolio-item {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .portfolio-item input {
+            flex: 1;
+        }
+
+        .btn-remove-url {
+            padding: 8px 12px;
+            background: #fff5f5;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+            border-radius: var(--r-md);
+            cursor: pointer;
+            font-size: 12px;
+            font-family: var(--fb);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .btn-add-url {
+            margin-top: 8px;
+            padding: 10px 16px;
+            background: var(--soft);
+            color: var(--accent);
+            border: 1px dashed var(--accent);
+            border-radius: var(--r-md);
+            cursor: pointer;
+            font-size: 12px;
+            font-family: var(--fb);
+            width: 100%;
+        }
+
+        .btn-add-url:hover {
+            background: var(--peach);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(253, 248, 243, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            font-family: var(--fb);
+            font-size: 16px;
+            color: var(--accent);
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="bg-silk">
+
+    <div id="loadingOverlay" class="loading-overlay">Loading artist data...</div>
+
+    <header id="header" class="scrolled">
+        <div class="logo">PEACHKO <span style="font-size:12px; opacity:0.6;">ADMIN</span></div>
+        <nav>
+            <button class="nav-link" onclick="location.href='admin.html'">Dashboard</button>
+            <button class="nav-link" onclick="location.href='artist-mgmt.html'">Artists</button>
+        </nav>
+    </header>
+
+    <section class="reg-section">
+        <a href="artist-mgmt.html" class="admin-nav-back">← Back to Artist List</a>
+
+        <div class="reg-card reveal visible">
+            <div class="section-head" style="text-align:left; margin-bottom:30px;">
+                <div class="label-sm">Edit Profile</div>
+                <h2 class="fd">Edit Artist</h2>
+                <p class="fb" style="color:var(--muted); font-size:14px;">
+                    Update the artist's profile information and portfolio.
+                </p>
+            </div>
+
+            <form id="artistEditForm">
+                <div class="form-grid">
+
+                    <!-- 이름 -->
+                    <div class="form-group">
+                        <label for="a-name">Full Name (English)</label>
+                        <input type="text" id="a-name" placeholder="e.g. Minji Kim" required>
+                    </div>
+
+                    <!-- 프로필 사진 URL -->
+                    <div class="form-group">
+                        <label for="a-photo">Profile Photo URL</label>
+                        <input type="url" id="a-photo" placeholder="https://..."
+                            oninput="updatePhotoPreview(this.value)">
+                        <span class="helper-text">Direct link to image (Firebase Storage or external)</span>
+                        <img id="photoPreview" class="photo-preview" alt="Profile preview">
+                    </div>
+
+                    <!-- 이메일 -->
+                    <div class="form-group">
+                        <label for="a-email">Contact Email</label>
+                        <input type="email" id="a-email" placeholder="artist@example.com" required>
+                    </div>
+
+                    <!-- 인스타그램 -->
+                    <div class="form-group">
+                        <label for="a-insta">Instagram ID</label>
+                        <input type="text" id="a-insta" placeholder="@username">
+                    </div>
+
+                    <!-- 전화번호 -->
+                    <div class="form-group">
+                        <label for="a-phone">Phone Number</label>
+                        <input type="tel" id="a-phone" placeholder="+82 10-0000-0000">
+                    </div>
+
+                    <!-- 평점 -->
+                    <div class="form-group">
+                        <label for="a-rating">Rating (0.0 – 5.0)</label>
+                        <input type="number" id="a-rating" min="0" max="5" step="0.1" placeholder="5.0">
+                    </div>
+
+                    <!-- 제공 서비스 -->
+                    <div class="form-group full">
+                        <label>Provided Services</label>
+                        <div class="checkbox-group" id="svc-options">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="svc" value="Makeup"> Makeup
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="svc" value="Hair Styling"> Hair Styling
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="svc" value="Personal Color"> Personal Color
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="svc" value="Wedding Care"> Wedding Care
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="svc" value="K-Pop Concept"> K-Pop Concept
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 스타일 태그 -->
+                    <div class="form-group full">
+                        <label for="a-tags">Style Tags (Comma separated)</label>
+                        <input type="text" id="a-tags" placeholder="Glowy, Trendy, Natural, Elegant">
+                    </div>
+
+                    <!-- 짧은 소개 -->
+                    <div class="form-group full">
+                        <label for="a-intro">Short Introduction</label>
+                        <textarea id="a-intro" rows="2" placeholder="One-line bio for the listing page..."
+                            required></textarea>
+                    </div>
+
+                    <!-- 경력 상세 -->
+                    <div class="form-group full">
+                        <label for="a-career">Detailed Career & Education</label>
+                        <textarea id="a-career" rows="4"
+                            placeholder="List certifications, previous works, or studio experience..."></textarea>
+                    </div>
+
+                    <!-- 서비스 지역 -->
+                    <div class="form-group full">
+                        <label for="a-regions">Service Regions (Comma separated)</label>
+                        <input type="text" id="a-regions" placeholder="Gangnam, Hongdae, Myeongdong" required>
+                    </div>
+
+                    <!-- 포트폴리오 이미지 URL -->
+                    <div class="form-group full">
+                        <label>Portfolio Image URLs</label>
+                        <div class="portfolio-list" id="portfolioList"></div>
+                        <button type="button" class="btn-add-url" onclick="addPortfolioUrl('')">
+                            + Add Image URL
+                        </button>
+                    </div>
+
+                </div>
+
+                <div style="display:flex; gap:12px; margin-top:10px;">
+                    <button type="submit" class="btn-accent" style="flex:1; padding:16px;">
+                        Save Changes
+                    </button>
+                    <button type="button" class="btn-ghost" style="padding:16px 24px;"
+                        onclick="location.href='artist-mgmt.html'">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <script type="module">
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import {
+            getFirestore, doc, getDoc, updateDoc, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+            authDomain: "peachko-dev.firebaseapp.com",
+            projectId: "peachko-dev",
+            storageBucket: "peachko-dev.firebasestorage.app",
+            messagingSenderId: "561367230685",
+            appId: "1:561367230685:web:5576c1897b5989c243d334"
+        };
+
+        const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+        const db = getFirestore(app);
+
+        // URL 파라미터에서 artist ID 추출
+        const params = new URLSearchParams(window.location.search);
+        const artistId = params.get("id");
+
+        if (!artistId) {
+            alert("No artist ID provided.");
+            location.href = "artist-mgmt.html";
+        }
+
+        // ── 포트폴리오 URL 행 추가 ──
+        window.addPortfolioUrl = function (url = '') {
+            const list = document.getElementById('portfolioList');
+            const item = document.createElement('div');
+            item.className = 'portfolio-item';
+            item.innerHTML = `
+        <input type="url" placeholder="https://..." value="${url}">
+        <button type="button" class="btn-remove-url" onclick="this.parentElement.remove()">Remove</button>
+      `;
+            list.appendChild(item);
+        };
+
+        // ── 프로필 사진 미리보기 ──
+        window.updatePhotoPreview = function (url) {
+            const preview = document.getElementById('photoPreview');
+            if (url) {
+                preview.src = url;
+                preview.classList.add('show');
+                preview.onerror = () => preview.classList.remove('show');
+            } else {
+                preview.classList.remove('show');
+            }
+        };
+
+        // ── 기존 데이터 불러오기 ──
+        async function loadArtist() {
+            try {
+                const snap = await getDoc(doc(db, "artists", artistId));
+                if (!snap.exists()) {
+                    alert("Artist not found.");
+                    location.href = "artist-mgmt.html";
+                    return;
+                }
+
+                const d = snap.data();
+
+                document.getElementById('a-name').value = d.name || '';
+                document.getElementById('a-photo').value = d.photoUrl || '';
+                document.getElementById('a-email').value = d.email || '';
+                document.getElementById('a-insta').value = d.instagram || '';
+                document.getElementById('a-phone').value = d.phone || '';
+                document.getElementById('a-rating').value = d.rating ?? 5.0;
+                document.getElementById('a-tags').value = (d.styleTags || []).join(', ');
+                document.getElementById('a-intro').value = d.intro || '';
+                document.getElementById('a-career').value = d.career || '';
+                document.getElementById('a-regions').value = (d.regions || []).join(', ');
+
+                // 서비스 체크박스
+                const selected = d.services || [];
+                document.querySelectorAll('input[name="svc"]').forEach(cb => {
+                    cb.checked = selected.includes(cb.value);
+                });
+
+                // 프로필 사진 미리보기
+                if (d.photoUrl) updatePhotoPreview(d.photoUrl);
+
+                // 포트폴리오 URL
+                (d.portfolioUrls || []).forEach(url => addPortfolioUrl(url));
+
+            } catch (err) {
+                alert("Failed to load artist: " + err.message);
+            } finally {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }
+        }
+
+        // ── 저장 처리 ──
+        document.getElementById('artistEditForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = "Saving...";
+
+            // 포트폴리오 URL 수집
+            const portfolioUrls = Array.from(
+                document.querySelectorAll('#portfolioList .portfolio-item input')
+            ).map(i => i.value.trim()).filter(v => v !== '');
+
+            // 서비스 수집
+            const selectedServices = Array.from(
+                document.querySelectorAll('input[name="svc"]:checked')
+            ).map(cb => cb.value);
+
+            const styleTags = document.getElementById('a-tags').value
+                .split(',').map(t => t.trim()).filter(t => t !== '');
+            const regions = document.getElementById('a-regions').value
+                .split(',').map(r => r.trim()).filter(r => r !== '');
+
+            const updatedData = {
+                name: document.getElementById('a-name').value,
+                photoUrl: document.getElementById('a-photo').value,
+                email: document.getElementById('a-email').value,
+                instagram: document.getElementById('a-insta').value,
+                phone: document.getElementById('a-phone').value,
+                rating: parseFloat(document.getElementById('a-rating').value) || 5.0,
+                services: selectedServices,
+                styleTags,
+                intro: document.getElementById('a-intro').value,
+                career: document.getElementById('a-career').value,
+                regions,
+                portfolioUrls,
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                await updateDoc(doc(db, "artists", artistId), updatedData);
+                alert("Artist profile updated successfully!");
+                location.href = "artist-mgmt.html";
+            } catch (err) {
+                alert("Failed to save: " + err.message);
+                btn.disabled = false;
+                btn.textContent = "Save Changes";
+            }
+        });
+
+        loadArtist();
+    </script>
+</body>
+
+</html>
