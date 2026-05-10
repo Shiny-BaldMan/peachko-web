@@ -262,17 +262,20 @@
       signupForm.classList.add('active'); loginForm.classList.remove('active');
     });
 
+    const ADMIN_EMAIL = "admin@admin.com";
+
     // 로그인
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = loginForm.querySelector('button[type="submit"]');
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
       try {
         btn.disabled = true; btn.textContent = "...";
-        await signInWithEmailAndPassword(auth,
-          document.getElementById('loginEmail').value,
+        await signInWithEmailAndPassword(auth, email,
           document.getElementById('loginPassword').value
         );
-        window.location.href = "index.html";
+        // admin 계정이면 대시보드로, 일반 유저면 메인으로
+        window.location.href = email === ADMIN_EMAIL ? "admin.html" : "index.html";
       } catch (err) {
         alert("Login failed: " + err.message);
         btn.disabled = false;

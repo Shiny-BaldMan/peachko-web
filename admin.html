@@ -170,123 +170,171 @@
       border-radius: 4px;
       border: 1px solid var(--border);
     }
+
+    /* 인증 확인 전 콘텐츠 숨김 — 깜빡임 방지 */
+    #adminContent {
+      display: none;
+    }
+
+    /* 접근 차단 오버레이 */
+    #accessDenied {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--dark);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    #accessDenied.show {
+      display: flex;
+    }
+
+    #accessDenied h2 {
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    #accessDenied p {
+      font-size: 14px;
+      opacity: 0.6;
+    }
   </style>
 </head>
 
 <body>
-  <header class="admin-header">
-    <div class="logo" style="color:white;">PEACHKO <span style="font-size:12px; opacity:0.7;">ADMIN</span></div>
-    <button class="btn-ghost" style="color:white; border-color:rgba(255,255,255,0.3); padding:8px 16px;"
-      onclick="handleLogout()">Logout</button>
-  </header>
+  <!-- 접근 차단 오버레이 (비admin 차단용) -->
+  <div id="accessDenied">
+    <h2>🔒 Access Denied</h2>
+    <p>Admin accounts only. Redirecting...</p>
+  </div>
 
-  <nav class="admin-nav">
-    <a href="admin.html" class="active">Bookings</a>
-    <a href="artist-mgmt.html">Artists</a>
-    <a href="admin-booking-reg.html">+ Manual Booking</a>
-    <a href="artist-reg.html">+ New Artist</a>
-    <a href="trash.html">Trash Bin</a>
-  </nav>
+  <div id="adminContent">
+    <header class="admin-header">
+      <div class="logo" style="color:white;">PEACHKO <span style="font-size:12px; opacity:0.7;">ADMIN</span></div>
+      <button class="btn-ghost" style="color:white; border-color:rgba(255,255,255,0.3); padding:8px 16px;"
+        onclick="handleLogout()">Logout</button>
+    </header>
 
-  <main class="dashboard-container">
-    <div class="stats-row">
-      <div class="stat-card">
-        <h4>Total Bookings</h4>
-        <p id="stat-total">0</p>
+    <nav class="admin-nav">
+      <a href="admin.html" class="active">Bookings</a>
+      <a href="artist-mgmt.html">Artists</a>
+      <a href="admin-booking-reg.html">+ Manual Booking</a>
+      <a href="artist-reg.html">+ New Artist</a>
+      <a href="trash.html">Trash Bin</a>
+    </nav>
+
+    <main class="dashboard-container">
+      <div class="stats-row">
+        <div class="stat-card">
+          <h4>Total Bookings</h4>
+          <p id="stat-total">0</p>
+        </div>
+        <div class="stat-card" style="border-left-color: #f57f17;">
+          <h4>Pending</h4>
+          <p id="stat-pending">0</p>
+        </div>
+        <div class="stat-card" style="border-left-color: #2e7d32;">
+          <h4>Confirmed</h4>
+          <p id="stat-confirmed">0</p>
+        </div>
       </div>
-      <div class="stat-card" style="border-left-color: #f57f17;">
-        <h4>Pending</h4>
-        <p id="stat-pending">0</p>
+
+      <div class="table-card">
+        <div class="table-header">
+          <h3 class="fd">Current Reservations</h3>
+          <button class="btn-accent" style="padding:10px 20px; font-size:11px;" onclick="location.reload()">Refresh
+            Data</button>
+        </div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Date / Time</th>
+                <th>Customer</th>
+                <th>Artist</th>
+                <th>Service</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="booking-list">
+              <tr>
+                <td colspan="7" style="text-align:center; padding:40px; color:var(--muted-lt);">Loading bookings...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="stat-card" style="border-left-color: #2e7d32;">
-        <h4>Confirmed</h4>
-        <p id="stat-confirmed">0</p>
-      </div>
-    </div>
+    </main>
 
-    <div class="table-card">
-      <div class="table-header">
-        <h3 class="fd">Current Reservations</h3>
-        <button class="btn-accent" style="padding:10px 20px; font-size:11px;" onclick="location.reload()">Refresh
-          Data</button>
-      </div>
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Date / Time</th>
-              <th>Customer</th>
-              <th>Artist</th>
-              <th>Service</th>
-              <th>Location</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="booking-list">
-            <tr>
-              <td colspan="7" style="text-align:center; padding:40px; color:var(--muted-lt);">Loading bookings...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </main>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+      import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+      import {
+        getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, addDoc, deleteDoc, serverTimestamp
+      } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import {
-      getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, addDoc, deleteDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+        authDomain: "peachko-dev.firebaseapp.com",
+        projectId: "peachko-dev",
+        storageBucket: "peachko-dev.firebasestorage.app",
+        messagingSenderId: "561367230685",
+        appId: "1:561367230685:web:5576c1897b5989c243d334"
+      };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
-      authDomain: "peachko-dev.firebaseapp.com",
-      projectId: "peachko-dev",
-      storageBucket: "peachko-dev.firebasestorage.app",
-      messagingSenderId: "561367230685",
-      appId: "1:561367230685:web:5576c1897b5989c243d334"
-    };
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+      // 로그아웃 처리
+      window.handleLogout = () => {
+        signOut(auth).then(() => {
+          window.location.href = "login.html";
+        });
+      };
 
-    // 로그아웃 처리
-    window.handleLogout = () => {
-      signOut(auth).then(() => {
-        window.location.href = "login.html";
+      const ADMIN_EMAIL = "admin@admin.com";
+
+      // 권한 체크: admin 이메일만 허용, 콘텐츠는 확인 후에만 표시
+      onAuthStateChanged(auth, (user) => {
+        if (!user || user.email.toLowerCase() !== ADMIN_EMAIL) {
+          // 비admin 또는 미로그인 → 오버레이 표시 후 리다이렉트
+          document.getElementById('accessDenied').classList.add('show');
+          setTimeout(() => { window.location.href = "login.html"; }, 1500);
+        } else {
+          // admin 확인 완료 → 콘텐츠 표시 + 데이터 로드
+          document.getElementById('adminContent').style.display = 'block';
+          loadBookings();
+        }
       });
-    };
 
-    // 권한 체크 (간단한 예시: 로그인이 되어있는지 확인)
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        alert("Admin access only.");
-        window.location.href = "login.html";
-      }
-    });
+      // 실시간 데이터 로드
+      function loadBookings() {
+        const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
 
-    // 실시간 데이터 로드
-    function loadBookings() {
-      const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+          const tbody = document.getElementById('booking-list');
+          tbody.innerHTML = "";
 
-      onSnapshot(q, (snapshot) => {
-        const tbody = document.getElementById('booking-list');
-        tbody.innerHTML = "";
+          let stats = { total: 0, pending: 0, confirmed: 0 };
 
-        let stats = { total: 0, pending: 0, confirmed: 0 };
+          snapshot.forEach((docSnap) => {
+            const booking = docSnap.data();
+            const id = docSnap.id;
+            stats.total++;
+            if (booking.status === "pending") stats.pending++;
+            if (booking.status === "confirmed") stats.confirmed++;
 
-        snapshot.forEach((docSnap) => {
-          const booking = docSnap.data();
-          const id = docSnap.id;
-          stats.total++;
-          if (booking.status === "pending") stats.pending++;
-          if (booking.status === "confirmed") stats.confirmed++;
-
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
             <td>
               <strong>${booking.reservationDate}</strong><br>
               <span style="color:var(--muted-lt); font-size:11px;">${booking.reservationTime}</span>
@@ -311,53 +359,52 @@
               <button class="action-btn btn-delete" onclick="moveToTrash('${id}', ${JSON.stringify(booking).replace(/"/g, '&quot;')})">Delete</button>
             </td>
           `;
-          tbody.appendChild(tr);
+            tbody.appendChild(tr);
+          });
+
+          // 통계 업데이트
+          document.getElementById('stat-total').textContent = stats.total;
+          document.getElementById('stat-pending').textContent = stats.pending;
+          document.getElementById('stat-confirmed').textContent = stats.confirmed;
+
+          if (stats.total === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px;">No reservations found.</td></tr>`;
+          }
         });
+      }
 
-        // 통계 업데이트
-        document.getElementById('stat-total').textContent = stats.total;
-        document.getElementById('stat-pending').textContent = stats.pending;
-        document.getElementById('stat-confirmed').textContent = stats.confirmed;
-
-        if (stats.total === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px;">No reservations found.</td></tr>`;
+      // 상태 업데이트
+      window.updateStatus = async (id, newStatus) => {
+        try {
+          await updateDoc(doc(db, "bookings", id), { status: newStatus });
+        } catch (err) {
+          alert("Failed to update status: " + err.message);
         }
-      });
-    }
+      };
 
-    // 상태 업데이트
-    window.updateStatus = async (id, newStatus) => {
-      try {
-        await updateDoc(doc(db, "bookings", id), { status: newStatus });
-      } catch (err) {
-        alert("Failed to update status: " + err.message);
-      }
-    };
+      // 삭제 처리 (휴지통으로 이동)
+      window.moveToTrash = async (id, data) => {
+        if (!confirm("Move this reservation to trash?")) return;
 
-    // 삭제 처리 (휴지통으로 이동)
-    window.moveToTrash = async (id, data) => {
-      if (!confirm("Move this reservation to trash?")) return;
+        try {
+          // 1. 휴지통 컬렉션에 복사본 생성
+          await addDoc(collection(db, "trash"), {
+            ...data,
+            originalId: id,
+            originalCollection: "bookings",
+            trashedAt: serverTimestamp()
+          });
 
-      try {
-        // 1. 휴지통 컬렉션에 복사본 생성
-        await addDoc(collection(db, "trash"), {
-          ...data,
-          originalId: id,
-          originalCollection: "bookings",
-          trashedAt: serverTimestamp()
-        });
+          // 2. 원본 데이터 삭제
+          await deleteDoc(doc(db, "bookings", id));
+          alert("Moved to trash.");
+        } catch (err) {
+          console.error(err);
+          alert("Error: " + err.message);
+        }
+      };
 
-        // 2. 원본 데이터 삭제
-        await deleteDoc(doc(db, "bookings", id));
-        alert("Moved to trash.");
-      } catch (err) {
-        console.error(err);
-        alert("Error: " + err.message);
-      }
-    };
-
-    loadBookings();
-  </script>
+    </script>
 </body>
 
 </html>
