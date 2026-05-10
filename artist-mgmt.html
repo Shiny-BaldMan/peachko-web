@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PEACHKO — Artist Management</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .mgmt-section {
+            padding: 100px 5%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-family: var(--fb);
+            font-size: 14px;
+        }
+
+        th {
+            background: var(--silk);
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .btn-edit {
+            color: var(--accent);
+            cursor: pointer;
+            margin-right: 10px;
+            border: none;
+            background: none;
+            text-decoration: underline;
+        }
+
+        .btn-del {
+            color: #ff4d4d;
+            cursor: pointer;
+            border: none;
+            background: none;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body class="bg-silk">
+    <header id="header" class="scrolled">
+        <div class="logo" style="cursor:pointer;" onclick="location.href='admin.html'">PEACHKO ADMIN</div>
+        <nav><button class="btn-ghost" onclick="location.href='admin.html'">Back to Dashboard</button></nav>
+    </header>
+
+    <section class="mgmt-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <h2 class="fd" style="font-size:28px;">Artist Inventory</h2>
+            <button class="btn-accent" onclick="location.href='artist-reg.html'">+ Add New Artist</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Services</th>
+                    <th>Regions</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="artistTableBody">
+            </tbody>
+        </table>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+            authDomain: "peachko-dev.firebaseapp.com",
+            projectId: "peachko-dev",
+            storageBucket: "peachko-dev.firebasestorage.app",
+            messagingSenderId: "561367230685",
+            appId: "1:561367230685:web:5576c1897b5989c243d334"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // 보안 체크
+        document.body.style.display = "none";
+        onAuthStateChanged(auth, (user) => {
+            if (!user || user.email.toLowerCase() !== 'admin@admin.com') {
+                window.location.href = "login.html";
+            } else {
+                document.body.style.display = "block";
+                loadArtists();
+            }
+        });
+
+        async function loadArtists() {
+            const tbody = document.getElementById('artistTableBody');
+            const snapshot = await getDocs(collection(db, "artists"));
+            tbody.innerHTML = "";
+
+            snapshot.forEach((docSnap) => {
+                const artist = docSnap.data();
+                const id = docSnap.id;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td><img src="${artist.photoUrl}" class="thumb"></td>
+          <td><strong>${artist.name}</strong></td>
+          <td>${artist.services ? artist.services.join(', ') : '-'}</td>
+          <td>${artist.regions ? artist.regions.join(', ') : '-'}</td>
+          <td>
+            <button class="btn-edit" onclick="location.href='artist-edit.html?id=${id}'">Edit</button>
+            <button class="btn-del" onclick="deleteArtist('${id}')">Delete</button>
+          </td>
+        `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.deleteArtist = async (id) => {
+            if (confirm("이 아티스트를 정말 삭제할까요?")) {
+                await deleteDoc(doc(db, "artists", id));
+                alert("삭제되었습니다.");
+                loadArtists();
+            }
+        }
+    </script>
+</body>
+
+</html>
