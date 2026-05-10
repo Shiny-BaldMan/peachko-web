@@ -23,12 +23,12 @@ if (window.location.hostname === "localhost" || window.location.hostname === "12
   };
 } else {
   firebaseConfig = {
-    apiKey: "AIzaSyBn3Y...", // 실제 배포용 키
-    authDomain: "peachko-web.firebaseapp.com",
-    projectId: "peachko-web",
-    storageBucket: "peachko-web.appspot.com",
-    messagingSenderId: "...",
-    appId: "..."
+    apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+    authDomain: "peachko-dev.firebaseapp.com",
+    projectId: "peachko-dev",
+    storageBucket: "peachko-dev.firebasestorage.app",
+    messagingSenderId: "561367230685",
+    appId: "1:561367230685:web:5576c1897b598"
   };
 }
 
