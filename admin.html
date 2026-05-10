@@ -223,13 +223,21 @@
 
       const ADMIN_EMAIL = "admin@admin.com";
 
+      // admin.html의 onAuthStateChanged 수정
       onAuthStateChanged(auth, (user) => {
-        // 대표님 이메일(ljy0971@naver.com)로 로그인한 경우에만 화면 켜기
-        if (user && user.email === 'ljy0971@naver.com') {
-          document.getElementById('admin-content').style.display = 'block';
-          loadBookings();
+        if (user) {
+          // 1. 관리자 계정일 때 (대소문자 상관없이 확실하게 검사)
+          if (user.email.toLowerCase() === 'admin@admin.com') {
+            document.getElementById('admin-content').style.display = 'block';
+            loadBookings();
+          } else {
+            // 2. 일반(test) 계정일 때 -> 경고 띄우고 메인(index.html)으로 보냄!
+            alert("관리자 전용 페이지입니다. 일반 사용자는 메인 홈으로 이동합니다.");
+            window.location.href = 'index.html';
+          }
         } else {
-          // 아니면 즉시 로그인 페이지로 쫓아내기
+          // 3. 아예 로그인을 안 한 상태 -> 경고 띄우고 로그인 창으로 보냄!
+          alert("로그인이 필요한 페이지입니다.");
           window.location.href = 'login.html';
         }
       });

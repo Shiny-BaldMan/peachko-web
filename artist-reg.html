@@ -76,12 +76,18 @@
         document.body.style.display = "none";
 
         // 4. 권한 체크 (0.1초 만에 실행됨)
+        // artist-reg.html의 onAuthStateChanged 수정
         onAuthStateChanged(auth, (user) => {
-            if (!user || user.email !== 'ljy0971@naver.com') {
-                alert("관리자 전용 페이지입니다. 접근 권한이 없습니다.");
-                window.location.href = "login.html";
+            if (user) {
+                if (user.email.toLowerCase() === 'admin@admin.com') {
+                    document.body.style.display = "block"; // 권한 확인되면 화면 켜기
+                } else {
+                    alert("관리자 권한이 없습니다. 메인 홈으로 이동합니다.");
+                    window.location.href = "index.html"; // Test 계정은 index로!
+                }
             } else {
-                document.body.style.display = "block"; // 권한 확인되면 화면 켜기
+                alert("로그인이 필요합니다.");
+                window.location.href = "login.html";
             }
         });
 
