@@ -147,7 +147,12 @@
             <textarea id="bookRequests" rows="3" placeholder="Any allergies, specific styles, or questions?"></textarea>
           </div>
 
-          <button type="submit" id="submitBtn" class="btn-accent full-btn" disabled>Confirm Reservation</button>
+          <h1 class="fd" data-key="book_title">Book Your Look</h1>
+          <p class="fb" data-key="book_desc">Please select...</p>
+
+          <label data-key="svc_label">Select Service</label>
+          <label data-key="art_label">Artist</label>
+          <button type="submit" class="btn-accent full-btn" data-key="btn_confirm">Confirm Reservation</button>
         </form>
       </div>
 
@@ -310,6 +315,11 @@
         submitBtn.disabled = false;
         submitBtn.textContent = "Confirm Reservation";
       }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedLang = localStorage.getItem("peachko_lang") || "ko";
+      if (window.applyLanguage) window.applyLanguage(savedLang);
     });
 
     initPage();

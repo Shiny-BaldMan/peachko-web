@@ -289,13 +289,22 @@
       }
     });
 
-    // 스크롤 애니메이션 초기화 (style.css/script.js 연동)
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelector('.reveal').classList.add('visible');
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedLang = localStorage.getItem("peachko_lang") || "ko";
+      if (window.applyLanguage) window.applyLanguage(savedLang); // 이름 변경 및 체크
     });
 
   </script>
-  <button class="auth-tab active" id="tab-login" data-key="login_t">Login</button>
+  <button class="auth-tab active" id="tab-login" data-key="login_tab">Login</button>
+  <button class="auth-tab" id="tab-signup" data-key="signup_tab">Sign Up</button>
+
+  <div id="login-form-wrap">
+    <h2 data-key="login_h2">Welcome Back</h2>
+    <p data-key="login_p">Access your account...</p>
+    <label data-key="email_label">Email Address</label>
+    <label data-key="pass_label">Password</label>
+    <button type="submit" class="btn-accent full-btn" data-key="btn_login">Login</button>
+  </div>
   <label data-key="email_l">Email Address</label>
 </body>
 
