@@ -71,6 +71,14 @@
   <header id="header" class="scrolled">
     <div class="logo" onclick="location.href='index.html'">PEACHKO</div>
     <nav>
+      <div class="lang-wrap">
+        <button class="lang-toggle" id="langToggle">KO</button>
+        <div class="lang-dropdown" id="langDropdown">
+          <button class="lang-opt" data-lang="ko">한국어 (KO)</button>
+          <button class="lang-opt" data-lang="en">English (EN)</button>
+          <button class="lang-opt" data-lang="zh">中文 (ZH)</button>
+        </div>
+      </div>
       <button class="nav-link" onclick="location.href='index.html'">Home</button>
       <button class="nav-link" onclick="location.href='index.html#artists'">Artists</button>
     </nav>
@@ -303,7 +311,12 @@
         submitBtn.textContent = "Confirm Reservation";
       }
     });
-
+    // 각 페이지 로드 시 실행될 부분
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedLang = localStorage.getItem("peachko_lang") || "ko";
+      // 각 페이지별로 가지고 있는 translations 객체를 사용해 텍스트 변경
+      applyPageLanguage(savedLang);
+    });
     initPage();
   </script>
 </body>
