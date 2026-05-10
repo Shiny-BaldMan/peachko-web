@@ -308,7 +308,7 @@
         if (!user || user.email.toLowerCase() !== ADMIN_EMAIL) {
           // 비admin 또는 미로그인 → 오버레이 표시 후 리다이렉트
           document.getElementById('accessDenied').classList.add('show');
-          setTimeout(() => { window.location.href = "login.html"; }, 1500);
+          setTimeout(() => { window.location.href = "index.html"; }, 1500);
         } else {
           // admin 확인 완료 → 콘텐츠 표시 + 데이터 로드
           document.getElementById('adminContent').style.display = 'block';
