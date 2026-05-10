@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>peachko - 관리자 대시보드</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
-  
+
   <style>
     body {
       font-family: 'DM Sans', sans-serif;
@@ -16,6 +17,7 @@
       margin: 0;
       padding: 0;
     }
+
     header {
       background-color: #E8704A;
       color: white;
@@ -24,17 +26,28 @@
       justify-content: space-between;
       align-items: center;
     }
-    header h1 { margin: 0; font-size: 20px; }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
     .btn-logout {
-      background: white; color: #E8704A; border: none;
-      padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;
+      background: white;
+      color: #E8704A;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
     }
-    .container { 
-      padding: 30px; 
-      max-width: 1200px; 
-      margin: 0 auto; 
+
+    .container {
+      padding: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
-    
+
     /* 통계 카드 스타일 추가 */
     .stats-grid {
       display: grid;
@@ -42,263 +55,292 @@
       gap: 20px;
       margin-bottom: 30px;
     }
+
     .card {
       background: white;
       padding: 25px;
       border-radius: 12px;
       text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
-    .card-label { font-size: 14px; color: #666; margin-bottom: 10px; }
-    .card-value { font-size: 28px; font-weight: bold; }
+
+    .card-label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .card-value {
+      font-size: 28px;
+      font-weight: bold;
+    }
 
     /* 테이블 스타일 */
     .table-wrapper {
-      background: white; border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
     }
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th, td { padding: 18px; border-bottom: 1px solid #eee; }
-    th { background-color: #fafbfc; color: #666; font-size: 13px; text-transform: uppercase; }
-    td { font-size: 14px; }
-    tr:hover { background-color: #fcfcfc; }
-    
-    .status { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-    .status.pending { background-color: #fff3cd; color: #856404; }
-    .status.confirmed { background-color: #d4edda; color: #155724; }
-    .status.canceled { background-color: #f8d7da; color: #721c24; }
-    
-    select { padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-family: inherit; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th,
+    td {
+      padding: 18px;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #fafbfc;
+      color: #666;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    td {
+      font-size: 14px;
+    }
+
+    tr:hover {
+      background-color: #fcfcfc;
+    }
+
+    .status {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .status.pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .status.confirmed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status.canceled {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    select {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      font-family: inherit;
+    }
+
+    #admin-content {
+      display: none;
+    }
   </style>
 </head>
+
 <body>
+  <div id="admin-content">
+    <header>
+      <h1>🍑 peachko Admin Dashboard</h1>
+      <button class="btn-logout" id="logoutBtn">로그아웃</button>
+    </header>
 
-  <header>
-    <h1>🍑 peachko Admin Dashboard</h1>
-    <button class="btn-logout" id="logoutBtn">로그아웃</button>
-  </header>
-
-  <div class="container">
-    <h2 style="margin-bottom: 25px;">실시간 현황 대시보드</h2>
-    <!-- admin.html의 container 내부, stats-grid 위쪽에 추가 -->
-    <div class="card" style="margin-bottom: 30px; text-align: left;">
-      <h3 style="margin-bottom: 20px;">🎨 새 아티스트 등록</h3>
-      <form id="artistForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-       <input type="text" id="a-name" placeholder="아티스트 이름" required style="padding: 10px;">
-       <input type="text" id="a-photo" placeholder="프로필 사진 URL" required style="padding: 10px;">
-       <input type="text" id="a-sns" placeholder="인스타그램 링크" style="padding: 10px;">
-       <input type="text" id="a-area" placeholder="활동 지역 (예: 강남, 홍대)" style="padding: 10px;">
-       <div style="grid-column: 1 / -1;">
-         <textarea id="a-intro" placeholder="한 줄 소개" style="width: 100%; padding: 10px;"></textarea>
-       </div>
-    
-        <!-- 스타일 태그 선택 (On/Off) -->
-        <div style="grid-column: 1 / -1;">
-          <p style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">스타일 태그 선택</p>
-          <label><input type="checkbox" name="styleTag" value="Glass Skin"> Glass Skin</label>
-         <label><input type="checkbox" name="styleTag" value="K-Pop Idol"> K-Pop Idol</label>
-          <label><input type="checkbox" name="styleTag" value="Bridal"> Bridal</label>
-          <label><input type="checkbox" name="styleTag" value="Editorial"> Editorial</label>
-       </div>
-
-       <!-- 가능 서비스 선택 (On/Off) -->
-       <div style="grid-column: 1 / -1;">
-         <p style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">가능 서비스 선택</p>
-         <label><input type="checkbox" name="service" value="Face"> Face</label>
-         <label><input type="checkbox" name="service" value="Hair"> Hair</label>
-         <label><input type="checkbox" name="service" value="Full Glam"> Full Glam</label>
-       </div>
-
-        <button type="submit" class="btn-accent" style="grid-column: 1 / -1; padding: 15px;">아티스트 등록하기</button>
-     </form>
-    </div>
-    <!-- 1. 통계 대시보드 섹션 (ID는 여기에만 존재해야 함) -->
-    <div class="stats-grid">
-      <div class="card">
-        <div class="card-label">이번 달 총 예약</div>
-        <div id="totalBookings" class="card-value" style="color: #E8704A;">0</div>
+    <div class="container">
+      <h2 style="margin-bottom: 25px;">실시간 현황 대시보드</h2>
+      <!-- admin.html의 container 내부, stats-grid 위쪽에 추가 -->
+      <div class="card" style="margin-bottom: 30px; text-align: left;">
+        <h3 style="margin-bottom: 20px;">🎨 새 아티스트 등록</h3>
+        <div style="text-align: right; margin-bottom: 20px;">
+          <button class="btn-accent" onclick="location.href='artist-reg.html'" style="padding: 10px 20px;">+ 새 아티스트 등록하러
+            가기</button>
+        </div>
       </div>
-      <div class="card">
-        <div class="card-label">인기 아티스트</div>
-        <div id="topArtist" class="card-value" style="color: #333;">-</div>
+      <!-- 1. 통계 대시보드 섹션 (ID는 여기에만 존재해야 함) -->
+      <div class="stats-grid">
+        <div class="card">
+          <div class="card-label">이번 달 총 예약</div>
+          <div id="totalBookings" class="card-value" style="color: #E8704A;">0</div>
+        </div>
+        <div class="card">
+          <div class="card-label">인기 아티스트</div>
+          <div id="topArtist" class="card-value" style="color: #333;">-</div>
+        </div>
+        <div class="card">
+          <div class="card-label">예약 확정 건수</div>
+          <div id="confirmedCount" class="card-value" style="color: #28a745;">0</div>
+        </div>
       </div>
-      <div class="card">
-        <div class="card-label">예약 확정 건수</div>
-        <div id="confirmedCount" class="card-value" style="color: #28a745;">0</div>
+
+      <!-- 2. 예약 목록 테이블 섹션 -->
+      <h2 style="margin: 40px 0 20px 0;">예약 상세 내역</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>예약 일시</th>
+              <th>고객 이메일</th>
+              <th>아티스트</th>
+              <th>서비스</th>
+              <th>숙소 및 요청사항</th>
+              <th>진행 상태</th>
+              <th>상태 관리</th>
+            </tr>
+          </thead>
+          <tbody id="bookingList">
+            <tr>
+              <td colspan="7" style="text-align:center; padding: 40px;">데이터를 불러오는 중입니다...</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- 2. 예약 목록 테이블 섹션 -->
-    <h2 style="margin: 40px 0 20px 0;">예약 상세 내역</h2>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>예약 일시</th>
-            <th>고객 이메일</th>
-            <th>아티스트</th>
-            <th>서비스</th>
-            <th>숙소 및 요청사항</th>
-            <th>진행 상태</th>
-            <th>상태 관리</th>
-          </tr>
-        </thead>
-        <tbody id="bookingList">
-          <tr><td colspan="7" style="text-align:center; padding: 40px;">데이터를 불러오는 중입니다...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+      import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+      import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+      // ✅ 다른 파일들과 100% 일치하는 새 프로젝트 설정값입니다.
+      const firebaseConfig = {
+        apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+        authDomain: "peachko-dev.firebaseapp.com",
+        projectId: "peachko-dev",
+        storageBucket: "peachko-dev.firebasestorage.app",
+        messagingSenderId: "561367230685",
+        appId: "1:561367230685:web:5576c1897b5989c243d334"
+      };
 
-    // ✅ 다른 파일들과 100% 일치하는 새 프로젝트 설정값입니다.
-    const firebaseConfig = {
-      apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
-      authDomain: "peachko-dev.firebaseapp.com",
-      projectId: "peachko-dev",
-      storageBucket: "peachko-dev.firebasestorage.app",
-      messagingSenderId: "561367230685",
-      appId: "1:561367230685:web:5576c1897b5989c243d334"
-    };
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+      const ADMIN_EMAIL = "admin@admin.com";
 
-    const ADMIN_EMAIL = "admin@admin.com"; 
-
-    onAuthStateChanged(auth, (user) => {
-      // 0. 로그로 현재 상태 확인 (F12 콘솔창에서 확인 가능)
-      console.log("검사 중인 유저:", user ? user.email : "로그아웃 상태");
-
-      if (!user) {
-        // 1. 로그인이 안 되어 있으면 즉시 로그인 페이지로 이동
-        window.location.href = "login.html";
-      } else {
-        // 2. 로그인은 되어 있는 경우, 이메일 일치 여부 확인
-        // .toLowerCase()를 붙여 대소문자 실수를 방지합니다.
-        if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-          console.log("✅ 관리자 로그인 성공!");
-          loadBookings(); 
+      onAuthStateChanged(auth, (user) => {
+        // 대표님 이메일(ljy0971@naver.com)로 로그인한 경우에만 화면 켜기
+        if (user && user.email === 'ljy0971@naver.com') {
+          document.getElementById('admin-content').style.display = 'block';
+          loadBookings();
         } else {
-          // 3. 관리자가 아니면 경고창을 띄우고 메인으로 이동
-          alert("관리자 권한이 없는 계정입니다: " + user.email);
-          window.location.href = "index.html";
+          // 아니면 즉시 로그인 페이지로 쫓아내기
+          window.location.href = 'login.html';
         }
-      }
-    });
-
-    // 로그아웃 버튼 이벤트
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      signOut(auth).then(() => {
-        window.location.href = "login.html";
       });
-    });
 
-    // 아티스트 등록 폼 이벤트 처리
-    const artistForm = document.getElementById('artistForm');
-    if (artistForm) {
-      artistForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        // 버튼 상태 변경
-        const submitBtn = e.target.querySelector('button');
-        submitBtn.disabled = true;
-        submitBtn.innerText = "등록 중...";
+      // 로그아웃 버튼 이벤트
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        signOut(auth).then(() => {
+          window.location.href = "login.html";
+        });
+      });
+
+      // 아티스트 등록 폼 이벤트 처리
+      const artistForm = document.getElementById('artistForm');
+      if (artistForm) {
+        artistForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          // 버튼 상태 변경
+          const submitBtn = e.target.querySelector('button');
+          submitBtn.disabled = true;
+          submitBtn.innerText = "등록 중...";
+
+          try {
+            // 체크박스 값 가져오기
+            const styleTags = Array.from(document.querySelectorAll('input[name="styleTag"]:checked')).map(cb => cb.value);
+            const services = Array.from(document.querySelectorAll('input[name="service"]:checked')).map(cb => cb.value);
+
+            // 포트폴리오 URL 쉼표로 분리하여 배열 만들기
+            const portfolioUrls = document.getElementById('a-portfolio').value.split(',').map(url => url.trim());
+
+            // Firestore에 데이터 저장
+            await addDoc(collection(db, "artists"), {
+              name: document.getElementById('a-name').value,
+              photoUrl: document.getElementById('a-photo').value,
+              snsLink: document.getElementById('a-sns').value,
+              area: document.getElementById('a-area').value,
+              intro: document.getElementById('a-intro').value,
+              career: document.getElementById('a-career').value,
+              styleTags: styleTags,
+              services: services,
+              portfolioUrls: portfolioUrls,
+              createdAt: new Date()
+            });
+
+            alert("아티스트가 성공적으로 등록되었습니다!");
+            artistForm.reset(); // 폼 초기화
+          } catch (error) {
+            console.error("아티스트 등록 오류:", error);
+            alert("등록에 실패했습니다: " + error.message);
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "아티스트 등록 완료";
+          }
+        });
+      }
+
+      // 3. Firestore에서 예약 데이터 불러오기 및 통계 계산
+      async function loadBookings() {
+        const tbody = document.getElementById('bookingList');
+        // 통계 표시용 엘리먼트들
+        const totalEl = document.getElementById('totalBookings');
+        const artistEl = document.getElementById('topArtist');
+        const confirmedEl = document.getElementById('confirmedCount');
+
+        tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>데이터를 불러오는 중입니다...</td></tr>";
 
         try {
-          // 체크박스 값 가져오기
-          const styleTags = Array.from(document.querySelectorAll('input[name="styleTag"]:checked')).map(cb => cb.value);
-          const services = Array.from(document.querySelectorAll('input[name="service"]:checked')).map(cb => cb.value);
-          
-          // 포트폴리오 URL 쉼표로 분리하여 배열 만들기
-          const portfolioUrls = document.getElementById('a-portfolio').value.split(',').map(url => url.trim());
+          // 예약 날짜 최신순으로 정렬하여 가져오기
+          const q = query(collection(db, "bookings"), orderBy("reservationDate", "desc"));
+          const querySnapshot = await getDocs(q);
 
-          // Firestore에 데이터 저장
-          await addDoc(collection(db, "artists"), {
-            name: document.getElementById('a-name').value,
-            photoUrl: document.getElementById('a-photo').value,
-            snsLink: document.getElementById('a-sns').value,
-            area: document.getElementById('a-area').value,
-            intro: document.getElementById('a-intro').value,
-            career: document.getElementById('a-career').value,
-            styleTags: styleTags,
-            services: services,
-            portfolioUrls: portfolioUrls,
-            createdAt: new Date()
-          });
+          // 통계용 변수 초기화
+          let totalThisMonth = 0;
+          let confirmedTotal = 0;
+          const artistStats = {}; // { "Soyeon": 5, "Minjae": 3 } 형태
+          const currentMonth = new Date().toISOString().substring(0, 7); // 현재 월 (예: "2026-05")
 
-          alert("아티스트가 성공적으로 등록되었습니다!");
-          artistForm.reset(); // 폼 초기화
-        } catch (error) {
-          console.error("아티스트 등록 오류:", error);
-          alert("등록에 실패했습니다: " + error.message);
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.innerText = "아티스트 등록 완료";
-        }
-      });
-    }
-
-    // 3. Firestore에서 예약 데이터 불러오기 및 통계 계산
-    async function loadBookings() {
-      const tbody = document.getElementById('bookingList');
-      // 통계 표시용 엘리먼트들
-      const totalEl = document.getElementById('totalBookings');
-      const artistEl = document.getElementById('topArtist');
-      const confirmedEl = document.getElementById('confirmedCount');
-
-      tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>데이터를 불러오는 중입니다...</td></tr>"; 
-
-      try {
-        // 예약 날짜 최신순으로 정렬하여 가져오기
-        const q = query(collection(db, "bookings"), orderBy("reservationDate", "desc"));
-        const querySnapshot = await getDocs(q);
-
-        // 통계용 변수 초기화
-        let totalThisMonth = 0;
-        let confirmedTotal = 0;
-        const artistStats = {}; // { "Soyeon": 5, "Minjae": 3 } 형태
-        const currentMonth = new Date().toISOString().substring(0, 7); // 현재 월 (예: "2026-05")
-
-        if (querySnapshot.empty) {
-          tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>접수된 예약이 없습니다.</td></tr>";
-          totalEl.textContent = "0";
-          confirmedEl.textContent = "0";
-          artistEl.textContent = "-";
-          return;
-        }
-
-        tbody.innerHTML = ""; // 기존 문구 지우기
-        querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          const id = docSnap.id;
-
-          // --- [통계 계산 로직] ---
-          // 1. 이번 달 총 예약 건수 (YYYY-MM 비교)
-          if (data.reservationDate && data.reservationDate.startsWith(currentMonth)) {
-            totalThisMonth++;
-          }
-          // 2. 확정된 예약 건수
-          if (data.status === "confirmed") {
-            confirmedTotal++;
-          }
-          // 3. 아티스트별 예약 카운트
-          if (data.artist) {
-            artistStats[data.artist] = (artistStats[data.artist] || 0) + 1;
+          if (querySnapshot.empty) {
+            tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>접수된 예약이 없습니다.</td></tr>";
+            totalEl.textContent = "0";
+            confirmedEl.textContent = "0";
+            artistEl.textContent = "-";
+            return;
           }
 
-          // --- [테이블 행 생성] ---
-          let statusText = "대기중";
-          if(data.status === "confirmed") statusText = "예약 확정";
-          if(data.status === "canceled") statusText = "취소됨";
+          tbody.innerHTML = ""; // 기존 문구 지우기
+          querySnapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            const id = docSnap.id;
 
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
+            // --- [통계 계산 로직] ---
+            // 1. 이번 달 총 예약 건수 (YYYY-MM 비교)
+            if (data.reservationDate && data.reservationDate.startsWith(currentMonth)) {
+              totalThisMonth++;
+            }
+            // 2. 확정된 예약 건수
+            if (data.status === "confirmed") {
+              confirmedTotal++;
+            }
+            // 3. 아티스트별 예약 카운트
+            if (data.artist) {
+              artistStats[data.artist] = (artistStats[data.artist] || 0) + 1;
+            }
+
+            // --- [테이블 행 생성] ---
+            let statusText = "대기중";
+            if (data.status === "confirmed") statusText = "예약 확정";
+            if (data.status === "canceled") statusText = "취소됨";
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
             <td><strong>${data.reservationDate || '-'}</strong><br><small>${data.reservationTime || ''}</small></td>
             <td>${data.userEmail || '-'}</td>
             <td><strong>${data.artist || '-'}</strong></td>
@@ -316,47 +358,49 @@
               </select>
             </td>
           `;
-          tbody.appendChild(tr);
-        });
+            tbody.appendChild(tr);
+          });
 
-        // --- [통계 화면 업데이트] ---
-        totalEl.textContent = totalThisMonth;
-        confirmedEl.textContent = confirmedTotal;
+          // --- [통계 화면 업데이트] ---
+          totalEl.textContent = totalThisMonth;
+          confirmedEl.textContent = confirmedTotal;
 
-        // 가장 인기 있는 아티스트 계산
-        let topArtistName = "-";
-        let maxCount = 0;
-        for (const [name, count] of Object.entries(artistStats)) {
-          if (count > maxCount) {
-            maxCount = count;
-            topArtistName = name;
+          // 가장 인기 있는 아티스트 계산
+          let topArtistName = "-";
+          let maxCount = 0;
+          for (const [name, count] of Object.entries(artistStats)) {
+            if (count > maxCount) {
+              maxCount = count;
+              topArtistName = name;
+            }
           }
+          artistEl.textContent = topArtistName !== "-" ? `${topArtistName} (${maxCount}건)` : "-";
+
+        } catch (error) {
+          console.error("데이터 로딩 실패:", error);
+          tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center;">오류 발생: ${error.message}</td></tr>`;
         }
-        artistEl.textContent = topArtistName !== "-" ? `${topArtistName} (${maxCount}건)` : "-";
-        
-      } catch (error) {
-        console.error("데이터 로딩 실패:", error);
-        tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center;">오류 발생: ${error.message}</td></tr>`;
       }
-    }
 
-    // 4. 예약 상태 업데이트 기능 (셀렉트 박스에서 값을 바꿀 때 실행됨)
-    window.updateStatus = async function(docId, newStatus) {
-      // 실수로 누를 수도 있으니 확인창 띄우기
-      if(!confirm("이 예약의 상태를 변경하시겠습니까?")) return;
+      // 4. 예약 상태 업데이트 기능 (셀렉트 박스에서 값을 바꿀 때 실행됨)
+      window.updateStatus = async function (docId, newStatus) {
+        // 실수로 누를 수도 있으니 확인창 띄우기
+        if (!confirm("이 예약의 상태를 변경하시겠습니까?")) return;
 
-      try {
-        const bookingRef = doc(db, "bookings", docId);
-        await updateDoc(bookingRef, {
-          status: newStatus
-        });
-        alert("상태가 성공적으로 변경되었습니다.");
-        loadBookings(); // 변경된 데이터로 표 다시 그리기
-      } catch (error) {
-        console.error("업데이트 실패:", error);
-        alert("상태 변경에 실패했습니다.");
-      }
-    };
-  </script>
+        try {
+          const bookingRef = doc(db, "bookings", docId);
+          await updateDoc(bookingRef, {
+            status: newStatus
+          });
+          alert("상태가 성공적으로 변경되었습니다.");
+          loadBookings(); // 변경된 데이터로 표 다시 그리기
+        } catch (error) {
+          console.error("업데이트 실패:", error);
+          alert("상태 변경에 실패했습니다.");
+        }
+      };
+    </script>
+  </div>
 </body>
+
 </html>

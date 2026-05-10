@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>peachko — 아티스트 등록</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .reg-section {
+            padding: 100px 5%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: var(--fb);
+        }
+    </style>
+</head>
+
+<body class="bg-peach">
+    <section class="reg-section">
+        <h2 class="fd">New Artist Registration</h2>
+        <form id="artistRegForm" class="booking-form" style="display: grid; gap: 20px; margin-top: 30px;">
+            <div class="form-group">
+                <label>아티스트 이름 (영문)</label>
+                <input type="text" id="a-name" placeholder="ex) Soyeon" required>
+            </div>
+            <div class="form-group">
+                <label>프로필 사진 URL</label>
+                <input type="url" id="a-photo" placeholder="https://..." required>
+            </div>
+            <div class="form-group">
+                <label>한 줄 소개</label>
+                <input type="text" id="a-intro" placeholder="ex) Natural & Glow Look Expert" required>
+            </div>
+            <div class="form-group">
+                <label>경력 사항 (Career)</label>
+                <textarea id="a-career" rows="4" placeholder="경력을 입력하세요..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>스타일 태그 (쉼표로 구분)</label>
+                <input type="text" id="a-tags" placeholder="ex) K-Pop, Natural, Wedding">
+            </div>
+            <button type="submit" class="btn-accent">Save Artist</button>
+        </form>
+    </section>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        // 1. Auth(인증) 도구 추가 불러오기
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+        // script.js에 있는 firebaseConfig와 동일하게 설정
+        const firebaseConfig = { /* ... 대표님의 설정값 ... */ };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app); // 2. 인증 도구 실행
+
+        // 3. 페이지 열리자마자 화면 숨기기
+        document.body.style.display = "none";
+
+        // 4. 권한 체크 (0.1초 만에 실행됨)
+        onAuthStateChanged(auth, (user) => {
+            if (!user || user.email !== 'ljy0971@naver.com') {
+                alert("관리자 전용 페이지입니다. 접근 권한이 없습니다.");
+                window.location.href = "login.html";
+            } else {
+                document.body.style.display = "block"; // 권한 확인되면 화면 켜기
+            }
+        });
+
+        // --- (이 아래부터는 기존에 작성하신 document.getElementById('artistRegForm')... 코드가 그대로 이어집니다) ---
+
+        document.getElementById('artistRegForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const tags = document.getElementById('a-tags').value.split(',').map(t => t.trim());
+
+            try {
+                await addDoc(collection(db, "artists"), {
+                    name: document.getElementById('a-name').value,
+                    photoUrl: document.getElementById('a-photo').value,
+                    intro: document.getElementById('a-intro').value,
+                    career: document.getElementById('a-career').value,
+                    styleTags: tags,
+                    createdAt: serverTimestamp()
+                });
+                alert("아티스트가 등록되었습니다!");
+                location.href = 'admin.html'; // 등록 후 관리자 페이지로 이동
+            } catch (err) {
+                console.error(err);
+                alert("등록 실패");
+            }
+        });
+    </script>
+</body>
+
+</html>
