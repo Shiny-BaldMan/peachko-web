@@ -4,121 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PEACHKO — Artist Management (Admin)</title>
+    <title>PEACHKO — 아티스트 관리</title>
 
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
 
-    <style>
-        .mgmt-section {
-            padding: 40px 5%;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
 
-        .mgmt-card {
-            background: var(--white);
-            border-radius: var(--r-lg);
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            border: 1px solid var(--border-lt);
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: var(--fb);
-        }
-
-        th {
-            background: var(--silk);
-            padding: 18px 15px;
-            text-align: left;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--gold);
-            border-bottom: 2px solid var(--border-lt);
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
-        .artist-thumb {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--peach);
-        }
-
-        .badge-svc {
-            display: inline-block;
-            padding: 3px 8px;
-            background: var(--soft);
-            color: var(--accent);
-            border-radius: 4px;
-            font-size: 11px;
-            margin-right: 4px;
-            margin-bottom: 4px;
-        }
-
-        .btn-edit {
-            color: #1976d2;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            margin-right: 12px;
-        }
-
-        .btn-del {
-            color: #d32f2f;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .btn-edit:hover,
-        .btn-del:hover {
-            text-decoration: underline;
-        }
-
-        .empty-state {
-            padding: 60px;
-            text-align: center;
-            color: var(--muted-lt);
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/600.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/700.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="bg-silk">
     <header id="header" class="scrolled">
         <div class="logo">PEACHKO <span style="font-size:12px; opacity:0.6;">ADMIN</span></div>
         <nav>
-            <button class="nav-link" onclick="location.href='admin.html'">Dashboard</button>
-            <button class="btn-accent" onclick="location.href='artist-reg.html'"
-                style="padding: 10px 20px; font-size: 11px;">+ New Artist</button>
+            <button class="nav-link" onclick="location.href='admin.html'">대시보드</button>
+            <button class="btn-primary" onclick="location.href='artist-reg.html'">+ 아티스트 등록</button>
         </nav>
     </header>
 
     <div style="height: 80px;"></div>
     <main class="mgmt-section">
         <div class="section-head" style="text-align: left; margin-bottom: 30px;">
-            <div class="label-sm">Directory</div>
-            <h2 class="fd">Artist Management</h2>
-            <p class="fb" style="color: var(--muted); font-size: 14px;">Manage profiles, portfolios, and active status
-                of your K-beauty experts.</p>
+            <div class="eyebrow">디렉토리</div>
+            <h2>아티스트 관리</h2>
+            <p>K-뷰티 전문가들의 프로필, 포트폴리오, 상태를 관리하세요.</p>
         </div>
 
         <div class="mgmt-card reveal visible">
@@ -126,16 +41,16 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Artist</th>
-                            <th>Email / Contact</th>
-                            <th>Services</th>
-                            <th>Experience</th>
-                            <th>Actions</th>
+                            <th>아티스트</th>
+                            <th>이메일 / 연락처</th>
+                            <th>서비스</th>
+                            <th>활동 지역</th>
+                            <th>관리</th>
                         </tr>
                     </thead>
                     <tbody id="artist-list">
                         <tr>
-                            <td colspan="5" class="empty-state">Loading artist data...</td>
+                            <td colspan="5" class="empty-state">아티스트 데이터 불러오는 중...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -170,7 +85,7 @@
                 tbody.innerHTML = "";
 
                 if (snapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No artists registered yet.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">등록된 아티스트가 없습니다.</td></tr>`;
                     return;
                 }
 
@@ -190,7 +105,7 @@
                             </div>
                         </td>
                         <td>
-                            <div style="font-size: 13px;">${artist.email || 'No Email'}</div>
+                            <div style="font-size: 13px;">${artist.email || '이메일 없음'}</div>
                             <div style="font-size: 11px; color: var(--muted-lt);">${artist.phone || '-'}</div>
                         </td>
                         <td>
@@ -224,10 +139,10 @@
 
                 // 2. 원본 컬렉션에서 삭제
                 await deleteDoc(doc(db, "artists", id));
-                alert("Artist moved to trash bin.");
+                alert("아티스트가 휴지통으로 이동됐습니다.");
             } catch (err) {
-                console.error("Delete error:", err);
-                alert("Error moving to trash: " + err.message);
+                console.error("삭제 오류:", err);
+                alert("휴지통 이동 오류: " + err.message);
             }
         };
 

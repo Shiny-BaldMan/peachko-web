@@ -4,187 +4,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PEACHKO — Register New Artist (Admin)</title>
+    <title>PEACHKO — 아티스트 등록</title>
 
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
 
-    <style>
-        .reg-section {
-            padding: 100px 5% 60px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
 
-        .reg-card {
-            background: var(--white);
-            padding: 40px;
-            border-radius: var(--r-lg);
-            border: 1px solid var(--border-lt);
-            box-shadow: var(--shadow-md);
-            position: relative;
-        }
-
-        .reg-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--accent);
-            border-radius: var(--r-lg) var(--r-lg) 0 0;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-group.full {
-            grid-column: span 2;
-        }
-
-        label {
-            font-family: var(--fb);
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        .checkbox-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 10px;
-            background: var(--silk);
-            padding: 15px;
-            border-radius: var(--r-md);
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: var(--fb);
-            font-size: 13px;
-            cursor: pointer;
-        }
-
-        .checkbox-item input {
-            width: auto;
-        }
-
-        .helper-text {
-            font-size: 11px;
-            color: var(--muted-lt);
-            margin-top: 4px;
-        }
-
-        .admin-nav-back {
-            margin-bottom: 20px;
-            display: inline-block;
-            text-decoration: none;
-            color: var(--muted);
-            font-family: var(--fb);
-            font-size: 13px;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/600.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/700.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="bg-silk">
     <header id="header" class="scrolled">
         <div class="logo">PEACHKO <span style="font-size:12px; opacity:0.6;">ADMIN</span></div>
         <nav>
-            <button class="nav-link" onclick="location.href='admin.html'">Dashboard</button>
-            <button class="nav-link" onclick="location.href='artist-mgmt.html'">Artists</button>
+            <button class="nav-link" onclick="location.href='admin.html'">대시보드</button>
+            <button class="nav-link" onclick="location.href='artist-mgmt.html'">아티스트 목록</button>
         </nav>
     </header>
 
     <section class="reg-section">
-        <a href="artist-mgmt.html" class="admin-nav-back">← Back to Artist List</a>
+        <a href="artist-mgmt.html" class="nav-back">← 아티스트 목록으로 돌아가기</a>
 
         <div class="reg-card reveal visible">
             <div class="section-head" style="text-align: left; margin-bottom: 30px;">
-                <div class="label-sm">Onboarding</div>
-                <h2 class="fd">Register New Artist</h2>
-                <p class="fb" style="color: var(--muted); font-size: 14px;">Create a professional profile for a new
-                    K-beauty expert.</p>
+                <div class="eyebrow">신규 등록</div>
+                <h2>새 아티스트 등록</h2>
+                <p class="fb" style="color: var(--muted); font-size: 14px;">새로운 K-뷰티 전문가의 프로필을 등록하세요.</p>
             </div>
 
             <form id="artistRegForm">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="a-name">Full Name (English)</label>
-                        <input type="text" id="a-name" placeholder="e.g. Minji Kim" required>
+                        <label for="a-name">이름 (영문)</label>
+                        <input type="text" id="a-name" placeholder="예: Minji Kim" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="a-photo">Profile Photo URL</label>
+                        <label for="a-photo">프로필 사진 URL</label>
                         <input type="url" id="a-photo" placeholder="https://..." required>
-                        <span class="helper-text">Direct link to image (Firebase Storage or external)</span>
+                        <span class="helper-text">이미지 직접 링크 (Firebase Storage 또는 외부)</span>
                     </div>
 
                     <div class="form-group">
-                        <label for="a-email">Contact Email</label>
+                        <label for="a-email">연락처 이메일</label>
                         <input type="email" id="a-email" placeholder="artist@example.com" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="a-insta">Instagram ID</label>
+                        <label for="a-insta">인스타그램 ID</label>
                         <input type="text" id="a-insta" placeholder="@username">
                     </div>
 
                     <div class="form-group full">
-                        <label>Provided Services</label>
+                        <label>제공 서비스</label>
                         <div class="checkbox-group" id="svc-options">
                             <label class="checkbox-item"><input type="checkbox" name="svc" value="Makeup">
                                 Makeup</label>
-                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Hair Styling"> Hair
-                                Styling</label>
+                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Hair Styling"> 헤어
+                                스타일링</label>
                             <label class="checkbox-item"><input type="checkbox" name="svc" value="Personal Color">
                                 Personal Color</label>
-                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Wedding Care"> Wedding
-                                Care</label>
-                            <label class="checkbox-item"><input type="checkbox" name="svc" value="K-Pop Concept"> K-Pop
-                                Concept</label>
+                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Wedding Care"> 웨딩
+                                케어</label>
+                            <label class="checkbox-item"><input type="checkbox" name="svc" value="K-Pop Concept"> K-팝
+                                콘셉트</label>
                         </div>
                     </div>
 
                     <div class="form-group full">
-                        <label for="a-tags">Style Tags (Comma separated)</label>
-                        <input type="text" id="a-tags" placeholder="Glowy, Trendy, Natural, Elegant">
+                        <label for="a-tags">스타일 태그 (쉼표로 구분)</label>
+                        <input type="text" id="a-tags" placeholder="글로이, 트렌디, 내추럴, 엘레강스">
                     </div>
 
                     <div class="form-group full">
-                        <label for="a-intro">Short Introduction</label>
-                        <textarea id="a-intro" rows="2" placeholder="One-line bio for the listing page..."
-                            required></textarea>
+                        <label for="a-intro">짧은 소개</label>
+                        <textarea id="a-intro" rows="2" placeholder="목록 페이지에 표시될 한 줄 소개..." required></textarea>
                     </div>
 
                     <div class="form-group full">
-                        <label for="a-career">Detailed Career & Education</label>
-                        <textarea id="a-career" rows="4"
-                            placeholder="List certifications, previous works, or studio experience..."></textarea>
+                        <label for="a-career">경력 및 학력 상세</label>
+                        <textarea id="a-career" rows="4" placeholder="자격증, 경력, 스튜디오 경험 등을 입력하세요..."></textarea>
                     </div>
 
                     <div class="form-group full">
-                        <label for="a-regions">Service Regions (Comma separated)</label>
-                        <input type="text" id="a-regions" placeholder="Gangnam, Hongdae, Myeongdong" required>
+                        <label for="a-regions">활동 지역 (쉼표로 구분)</label>
+                        <input type="text" id="a-regions" placeholder="강남, 홍대, 명동" required>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-accent full-btn" style="width: 100%;">Create Artist Profile</button>
+                <button type="submit" class="btn-primary" style="width:100%; padding:14px;">아티스트 프로필 생성</button>
             </form>
         </div>
     </section>
@@ -199,7 +113,7 @@
             projectId: "peachko-dev",
             storageBucket: "peachko-dev.firebasestorage.app",
             messagingSenderId: "561367230685",
-            appId: "1:561367230685:web:5576c1897b598"
+            appId: "1:561367230685:web:5576c1897b5989c243d334"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -209,7 +123,7 @@
             e.preventDefault();
             const btn = e.target.querySelector('button');
             btn.disabled = true;
-            btn.textContent = "Registering...";
+            btn.textContent = "등록 중...";
 
             // 선택된 서비스 추출
             const selectedServices = Array.from(document.querySelectorAll('input[name="svc"]:checked')).map(cb => cb.value);
@@ -235,12 +149,12 @@
 
             try {
                 await addDoc(collection(db, "artists"), artistData);
-                alert("New artist has been registered successfully!");
+                alert("새 아티스트가 성공적으로 등록됐습니다!");
                 window.location.href = "artist-mgmt.html";
             } catch (err) {
-                alert("Failed to register artist: " + err.message);
+                alert("아티스트 등록 실패: " + err.message);
                 btn.disabled = false;
-                btn.textContent = "Create Artist Profile";
+                btn.textContent = "아티스트 프로필 생성";
             }
         });
     </script>

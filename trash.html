@@ -4,128 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PEACHKO — Trash Bin (Admin)</title>
+    <title>PEACHKO — 휴지통</title>
 
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
 
-    <style>
-        .trash-section {
-            padding: 40px 5%;
-            max-width: 900px;
-            margin: 0 auto;
-        }
 
-        .trash-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .item-card {
-            background: var(--white);
-            padding: 20px;
-            border-radius: var(--r-md);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px dashed var(--border);
-            transition: all 0.2s;
-        }
-
-        .item-card:hover {
-            border-style: solid;
-            border-color: var(--gold);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .item-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .type-badge {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-family: var(--fb);
-        }
-
-        .type-booking {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .type-artist {
-            background: #f3e5f5;
-            color: #7b1fa2;
-        }
-
-        .item-details strong {
-            display: block;
-            font-size: 15px;
-            margin-bottom: 4px;
-        }
-
-        .item-details small {
-            color: var(--muted-lt);
-            font-size: 12px;
-        }
-
-        .action-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-restore {
-            padding: 8px 16px;
-            background: var(--soft);
-            color: var(--text);
-            border: 1px solid var(--border-lt);
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-family: var(--fb);
-            transition: background 0.2s;
-        }
-
-        .btn-restore:hover {
-            background: var(--peach);
-        }
-
-        .btn-perm-del {
-            padding: 8px 16px;
-            background: transparent;
-            color: #d32f2f;
-            border: 1px solid #ffcdd2;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-family: var(--fb);
-        }
-
-        .btn-perm-del:hover {
-            background: #fff5f5;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 100px 20px;
-            color: var(--muted-lt);
-            font-family: var(--fb);
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/600.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/700.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="bg-silk">
     <header id="header" class="scrolled">
         <div class="logo">PEACHKO <span style="font-size:12px; opacity:0.6;">ADMIN</span></div>
         <nav>
-            <button class="nav-link" onclick="location.href='admin.html'">Dashboard</button>
+            <button class="nav-link" onclick="location.href='admin.html'">대시보드</button>
         </nav>
     </header>
 
@@ -133,14 +31,13 @@
 
     <main class="trash-section">
         <div class="section-head" style="text-align: left; margin-bottom: 30px;">
-            <div class="label-sm">Recycle</div>
-            <h2 class="fd">Trash Bin</h2>
-            <p class="fb" style="color: var(--muted); font-size: 14px;">Restore items deleted within the last 30 days or
-                delete them permanently.</p>
+            <div class="eyebrow">복구 센터</div>
+            <h2>휴지통</h2>
+            <p class="fb" style="color: var(--muted); font-size: 14px;">최근 30일 이내 삭제된 항목을 복구하거나 영구 삭제하세요.</p>
         </div>
 
         <div id="trash-list" class="trash-container reveal visible">
-            <div class="empty-state">Scanning for deleted items...</div>
+            <div class="empty-state">삭제된 항목 검색 중...</div>
         </div>
     </main>
 
@@ -171,7 +68,7 @@
                 container.innerHTML = "";
 
                 if (snapshot.empty) {
-                    container.innerHTML = `<div class="empty-state">Your trash bin is empty.</div>`;
+                    container.innerHTML = `<div class="empty-state">휴지통이 비어있습니다.</div>`;
                     return;
                 }
 
@@ -193,8 +90,8 @@
                             </div>
                         </div>
                         <div class="action-group">
-                            <button class="btn-restore" onclick="restoreItem('${id}', ${JSON.stringify(item).replace(/"/g, '&quot;')})">Restore</button>
-                            <button class="btn-perm-del" onclick="permanentDelete('${id}')">Delete Permanently</button>
+                            <button class="btn-restore" onclick="restoreItem('${id}', ${JSON.stringify(item).replace(/"/g, '&quot;')})">복구</button>
+                            <button class="btn-perm-del" onclick="permanentDelete('${id}')">영구 삭제</button>
                         </div>
                     `;
                     container.appendChild(card);
@@ -204,7 +101,7 @@
 
         // 2. 데이터 복구 (원래 컬렉션으로 이동)
         window.restoreItem = async (trashId, data) => {
-            if (!confirm("Do you want to restore this item?")) return;
+            if (!confirm("이 항목을 복구할까요?")) return;
 
             try {
                 // 원본 데이터에서 휴지통 관련 메타데이터 제거
@@ -218,22 +115,22 @@
 
                 // 휴지통에서 삭제
                 await deleteDoc(doc(db, "trash", trashId));
-                alert("Successfully restored.");
+                alert("성공적으로 복구됐습니다.");
             } catch (err) {
-                console.error("Restore error:", err);
-                alert("Failed to restore: " + err.message);
+                console.error("복구 오류:", err);
+                alert("복구 실패: " + err.message);
             }
         };
 
         // 3. 영구 삭제
         window.permanentDelete = async (trashId) => {
-            if (!confirm("This action cannot be undone. Delete permanently?")) return;
+            if (!confirm("이 작업은 되돌릴 수 없습니다. 영구 삭제할까요?")) return;
 
             try {
                 await deleteDoc(doc(db, "trash", trashId));
-                alert("Permanently deleted.");
+                alert("영구 삭제됐습니다.");
             } catch (err) {
-                alert("Error: " + err.message);
+                alert("오류: " + err.message);
             }
         };
 
