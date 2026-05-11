@@ -10,13 +10,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
 
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/600.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/700.css">
-    <link rel="stylesheet" href="style.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/600.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/700.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="bg-silk">
@@ -61,7 +61,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import {
-            getFirestore, collection, onSnapshot, query, orderBy, doc, deleteDoc, addDoc, serverTimestamp
+            getFirestore, collection, onSnapshot, query, orderBy, doc, deleteDoc, getDoc, addDoc, serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -115,8 +115,8 @@
                             ${artist.regions ? artist.regions.join(', ') : 'Seoul'}
                         </td>
                         <td>
-                            <button class="btn-edit" onclick="location.href='artist-edit.html?id=${id}'">Edit</button>
-                            <button class="btn-del" onclick="moveToTrash('${id}', ${JSON.stringify(artist).replace(/"/g, '&quot;')})">Delete</button>
+                            <button class="action-btn" onclick="location.href='artist-edit.html?id=${id}'">수정</button>
+                            <button class="action-btn btn-delete" onclick="moveToTrash('${id}')">삭제</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -124,25 +124,29 @@
             });
         }
 
-        // 삭제 처리 (휴지통 이동)
-        window.moveToTrash = async (id, data) => {
-            if (!confirm(`Are you sure you want to move ${data.name} to trash?`)) return;
+        // 아티스트 휴지통으로 이동 — ID만 받아 Firestore에서 직접 조회
+        window.moveToTrash = async (id) => {
+            const snap = await getDoc(doc(db, "artists", id));
+            if (!snap.exists()) { alert("이미 삭제된 아티스트입니다."); return; }
+            const artist = snap.data();
+
+            if (!confirm(`"${artist.name}" 아티스트를 휴지통으로 이동할까요?`)) return;
 
             try {
-                // 1. 휴지통 컬렉션에 데이터 저장
+                // 1. 휴지통에 저장
                 await addDoc(collection(db, "trash"), {
-                    ...data,
+                    ...snap.data(),
                     originalId: id,
                     originalCollection: "artists",
                     trashedAt: serverTimestamp()
                 });
 
-                // 2. 원본 컬렉션에서 삭제
+                // 2. 원본 삭제
                 await deleteDoc(doc(db, "artists", id));
-                alert("아티스트가 휴지통으로 이동됐습니다.");
+                alert(`"${artist.name}" 아티스트가 휴지통으로 이동됐습니다.`);
             } catch (err) {
                 console.error("삭제 오류:", err);
-                alert("휴지통 이동 오류: " + err.message);
+                alert("삭제 오류: " + err.message);
             }
         };
 

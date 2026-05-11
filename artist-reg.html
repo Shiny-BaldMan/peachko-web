@@ -2,162 +2,380 @@
 <html lang="ko">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PEACHKO — 아티스트 등록</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PEACHKO — 아티스트 등록</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/600.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/700.css">
+  <link rel="stylesheet" href="style.css">
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
-
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/600.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/500.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/700.css">
-    <link rel="stylesheet" href="style.css">
+  <style>
+    /* 이미지 업로드 전용 스타일 */
+    .upload-box {
+      border: 2px dashed #E8D0C0;
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+      background: #FFF8F4;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      position: relative;
+    }
+    .upload-box:hover, .upload-box.drag-over {
+      border-color: #FFAF8A;
+      background: #FFF0E8;
+    }
+    .upload-box input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: none;
+      background: transparent;
+    }
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .upload-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: #BC9464;
+      display: block;
+      pointer-events: none;
+    }
+    .upload-label strong { color: #D4533A; }
+    .upload-hint {
+      font-size: 11px;
+      color: #C0A090;
+      margin-top: 4px;
+      display: block;
+      pointer-events: none;
+    }
+    .preview-wrap {
+      display: none;
+      align-items: center;
+      gap: 16px;
+      padding: 14px;
+      background: #FFF0E8;
+      border-radius: 8px;
+      border: 1.5px solid #FFAF8A;
+      margin-top: 10px;
+    }
+    .preview-wrap.show { display: flex; }
+    .preview-img {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #FFAF8A;
+      flex-shrink: 0;
+    }
+    .preview-info { flex: 1; text-align: left; }
+    .preview-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #5C3D2E;
+      display: block;
+    }
+    .preview-size {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      color: #BC9464;
+    }
+    .btn-remove-img {
+      font-size: 11px;
+      font-family: 'DM Sans', sans-serif;
+      padding: 5px 10px;
+      background: transparent;
+      color: #D4533A;
+      border: 1px solid #FFE4D2;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-remove-img:hover { background: #FFF4EE; }
+    .upload-progress {
+      height: 4px;
+      background: #F0DDD0;
+      border-radius: 2px;
+      margin-top: 8px;
+      display: none;
+      overflow: hidden;
+    }
+    .upload-progress.show { display: block; }
+    .upload-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #D4533A, #FFAF8A);
+      border-radius: 2px;
+      width: 0%;
+      transition: width .3s ease;
+    }
+  </style>
 </head>
 
 <body class="bg-silk">
-    <header id="header" class="scrolled">
-        <div class="logo">PEACHKO <span style="font-size:12px; opacity:0.6;">ADMIN</span></div>
-        <nav>
-            <button class="nav-link" onclick="location.href='admin.html'">대시보드</button>
-            <button class="nav-link" onclick="location.href='artist-mgmt.html'">아티스트 목록</button>
-        </nav>
-    </header>
+  <header id="header" class="scrolled">
+    <div class="logo">PEACHKO <span>ADMIN</span></div>
+    <nav>
+      <button class="nav-link" onclick="location.href='admin.html'">대시보드</button>
+      <button class="nav-link" onclick="location.href='artist-mgmt.html'">아티스트 목록</button>
+    </nav>
+  </header>
 
-    <section class="reg-section">
-        <a href="artist-mgmt.html" class="nav-back">← 아티스트 목록으로 돌아가기</a>
+  <section class="reg-section">
+    <a href="artist-mgmt.html" class="nav-back">← 아티스트 목록으로 돌아가기</a>
 
-        <div class="reg-card reveal visible">
-            <div class="section-head" style="text-align: left; margin-bottom: 30px;">
-                <div class="eyebrow">신규 등록</div>
-                <h2>새 아티스트 등록</h2>
-                <p class="fb" style="color: var(--muted); font-size: 14px;">새로운 K-뷰티 전문가의 프로필을 등록하세요.</p>
+    <div class="reg-card reveal visible">
+      <div class="section-head-admin">
+        <div class="eyebrow">신규 등록</div>
+        <h2>새 아티스트 등록</h2>
+        <p>새로운 K-뷰티 전문가의 프로필을 등록하세요.</p>
+      </div>
+
+      <form id="artistRegForm">
+        <div class="form-grid">
+
+          <!-- 이름 -->
+          <div class="form-group">
+            <label for="a-name">이름 (영문)</label>
+            <input type="text" id="a-name" placeholder="예: Minji Kim" required>
+          </div>
+
+          <!-- 이메일 -->
+          <div class="form-group">
+            <label for="a-email">연락처 이메일</label>
+            <input type="email" id="a-email" placeholder="artist@example.com" required>
+          </div>
+
+          <!-- 인스타그램 -->
+          <div class="form-group">
+            <label for="a-insta">인스타그램 ID</label>
+            <input type="text" id="a-insta" placeholder="@username">
+          </div>
+
+          <!-- 전화번호 -->
+          <div class="form-group">
+            <label for="a-phone">전화번호</label>
+            <input type="tel" id="a-phone" placeholder="+82 10-0000-0000">
+          </div>
+
+          <!-- 프로필 사진 업로드 -->
+          <div class="form-group full">
+            <label>프로필 사진 <span style="color:#D4533A;">*</span></label>
+            <div class="upload-box" id="uploadBox">
+              <input type="file" id="photoFile" accept="image/png, image/jpeg" required>
+              <div class="upload-icon">🖼️</div>
+              <span class="upload-label"><strong>클릭</strong>하거나 파일을 끌어다 놓으세요</span>
+              <span class="upload-hint">PNG, JPG 지원 · 최대 5MB</span>
             </div>
+            <div class="upload-progress" id="uploadProgress">
+              <div class="upload-progress-bar" id="uploadProgressBar"></div>
+            </div>
+            <div class="preview-wrap" id="previewWrap">
+              <img id="previewImg" class="preview-img" src="" alt="">
+              <div class="preview-info">
+                <span class="preview-name" id="previewName"></span>
+                <span class="preview-size" id="previewSize"></span>
+              </div>
+              <button type="button" class="btn-remove-img" onclick="removePhoto()">✕ 제거</button>
+            </div>
+          </div>
 
-            <form id="artistRegForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="a-name">이름 (영문)</label>
-                        <input type="text" id="a-name" placeholder="예: Minji Kim" required>
-                    </div>
+          <!-- 제공 서비스 -->
+          <div class="form-group full">
+            <label>제공 서비스</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Makeup"> 메이크업</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Hair Styling"> 헤어 스타일링</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Personal Color"> 퍼스널 컬러</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Wedding Care"> 웨딩 케어</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="K-Pop Concept"> K-팝 콘셉트</label>
+            </div>
+          </div>
 
-                    <div class="form-group">
-                        <label for="a-photo">프로필 사진 URL</label>
-                        <input type="url" id="a-photo" placeholder="https://..." required>
-                        <span class="helper-text">이미지 직접 링크 (Firebase Storage 또는 외부)</span>
-                    </div>
+          <!-- 스타일 태그 -->
+          <div class="form-group full">
+            <label for="a-tags">스타일 태그 (쉼표로 구분)</label>
+            <input type="text" id="a-tags" placeholder="글로이, 트렌디, 내추럴, 엘레강스">
+          </div>
 
-                    <div class="form-group">
-                        <label for="a-email">연락처 이메일</label>
-                        <input type="email" id="a-email" placeholder="artist@example.com" required>
-                    </div>
+          <!-- 짧은 소개 -->
+          <div class="form-group full">
+            <label for="a-intro">짧은 소개</label>
+            <textarea id="a-intro" rows="2" placeholder="목록 페이지에 표시될 한 줄 소개..." required></textarea>
+          </div>
 
-                    <div class="form-group">
-                        <label for="a-insta">인스타그램 ID</label>
-                        <input type="text" id="a-insta" placeholder="@username">
-                    </div>
+          <!-- 경력 상세 -->
+          <div class="form-group full">
+            <label for="a-career">경력 및 학력 상세</label>
+            <textarea id="a-career" rows="4" placeholder="자격증, 경력, 스튜디오 경험 등을 입력하세요..."></textarea>
+          </div>
 
-                    <div class="form-group full">
-                        <label>제공 서비스</label>
-                        <div class="checkbox-group" id="svc-options">
-                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Makeup">
-                                Makeup</label>
-                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Hair Styling"> 헤어
-                                스타일링</label>
-                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Personal Color">
-                                Personal Color</label>
-                            <label class="checkbox-item"><input type="checkbox" name="svc" value="Wedding Care"> 웨딩
-                                케어</label>
-                            <label class="checkbox-item"><input type="checkbox" name="svc" value="K-Pop Concept"> K-팝
-                                콘셉트</label>
-                        </div>
-                    </div>
+          <!-- 활동 지역 -->
+          <div class="form-group full">
+            <label for="a-regions">활동 지역 (쉼표로 구분)</label>
+            <input type="text" id="a-regions" placeholder="강남, 홍대, 명동" required>
+          </div>
 
-                    <div class="form-group full">
-                        <label for="a-tags">스타일 태그 (쉼표로 구분)</label>
-                        <input type="text" id="a-tags" placeholder="글로이, 트렌디, 내추럴, 엘레강스">
-                    </div>
-
-                    <div class="form-group full">
-                        <label for="a-intro">짧은 소개</label>
-                        <textarea id="a-intro" rows="2" placeholder="목록 페이지에 표시될 한 줄 소개..." required></textarea>
-                    </div>
-
-                    <div class="form-group full">
-                        <label for="a-career">경력 및 학력 상세</label>
-                        <textarea id="a-career" rows="4" placeholder="자격증, 경력, 스튜디오 경험 등을 입력하세요..."></textarea>
-                    </div>
-
-                    <div class="form-group full">
-                        <label for="a-regions">활동 지역 (쉼표로 구분)</label>
-                        <input type="text" id="a-regions" placeholder="강남, 홍대, 명동" required>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-primary" style="width:100%; padding:14px;">아티스트 프로필 생성</button>
-            </form>
         </div>
-    </section>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        <button type="submit" class="btn-primary" style="width:100%; padding:15px;" id="submitBtn">
+          아티스트 프로필 생성
+        </button>
+      </form>
+    </div>
+  </section>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
-            authDomain: "peachko-dev.firebaseapp.com",
-            projectId: "peachko-dev",
-            storageBucket: "peachko-dev.firebasestorage.app",
-            messagingSenderId: "561367230685",
-            appId: "1:561367230685:web:5576c1897b5989c243d334"
-        };
+  <script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyy0UF4jFUotKJubr5QcErYilCvaNn-PY",
+      authDomain: "peachko-dev.firebaseapp.com",
+      projectId: "peachko-dev",
+      storageBucket: "peachko-dev.firebasestorage.app",
+      messagingSenderId: "561367230685",
+      appId: "1:561367230685:web:5576c1897b5989c243d334"
+    };
 
-        document.getElementById('artistRegForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button');
-            btn.disabled = true;
-            btn.textContent = "등록 중...";
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    const db      = getFirestore(app);
+    const storage = getStorage(app);
 
-            // 선택된 서비스 추출
-            const selectedServices = Array.from(document.querySelectorAll('input[name="svc"]:checked')).map(cb => cb.value);
+    let selectedFile = null;
 
-            // 태그 및 지역 리스트화
-            const styleTags = document.getElementById('a-tags').value.split(',').map(t => t.trim()).filter(t => t !== "");
-            const regions = document.getElementById('a-regions').value.split(',').map(r => r.trim()).filter(r => r !== "");
+    // ── 파일 선택 이벤트 ──
+    const fileInput  = document.getElementById('photoFile');
+    const uploadBox  = document.getElementById('uploadBox');
+    const previewWrap = document.getElementById('previewWrap');
 
-            const artistData = {
-                name: document.getElementById('a-name').value,
-                photoUrl: document.getElementById('a-photo').value,
-                email: document.getElementById('a-email').value,
-                instagram: document.getElementById('a-insta').value,
-                services: selectedServices,
-                styleTags: styleTags,
-                intro: document.getElementById('a-intro').value,
-                career: document.getElementById('a-career').value,
-                regions: regions,
-                rating: 5.0, // 초기 평점
-                reviewCount: 0,
-                createdAt: serverTimestamp()
-            };
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleFileSelect(file);
+    });
 
-            try {
-                await addDoc(collection(db, "artists"), artistData);
-                alert("새 아티스트가 성공적으로 등록됐습니다!");
-                window.location.href = "artist-mgmt.html";
-            } catch (err) {
-                alert("아티스트 등록 실패: " + err.message);
-                btn.disabled = false;
-                btn.textContent = "아티스트 프로필 생성";
-            }
+    // 드래그앤드롭
+    uploadBox.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadBox.classList.add('drag-over');
+    });
+    uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('drag-over'));
+    uploadBox.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadBox.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && (file.type === 'image/png' || file.type === 'image/jpeg')) {
+        handleFileSelect(file);
+      } else {
+        alert('PNG 또는 JPG 파일만 업로드할 수 있습니다.');
+      }
+    });
+
+    function handleFileSelect(file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('파일 크기는 5MB 이하여야 합니다.');
+        return;
+      }
+      selectedFile = file;
+
+      // 미리보기
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('previewImg').src = e.target.result;
+        document.getElementById('previewName').textContent = file.name;
+        document.getElementById('previewSize').textContent =
+          (file.size / 1024).toFixed(1) + ' KB';
+        previewWrap.classList.add('show');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    window.removePhoto = () => {
+      selectedFile = null;
+      fileInput.value = '';
+      previewWrap.classList.remove('show');
+      document.getElementById('previewImg').src = '';
+    };
+
+    // ── 업로드 함수 ──
+    function uploadImage(file) {
+      return new Promise((resolve, reject) => {
+        const ext      = file.name.split('.').pop();
+        const fileName = `artists/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        const storageRef = ref(storage, fileName);
+        const task = uploadBytesResumable(storageRef, file);
+
+        const progressBar = document.getElementById('uploadProgressBar');
+        const progressWrap = document.getElementById('uploadProgress');
+        progressWrap.classList.add('show');
+
+        task.on('state_changed',
+          (snap) => {
+            const pct = (snap.bytesTransferred / snap.totalBytes) * 100;
+            progressBar.style.width = pct + '%';
+          },
+          (err) => reject(err),
+          async () => {
+            const url = await getDownloadURL(task.snapshot.ref);
+            progressWrap.classList.remove('show');
+            resolve(url);
+          }
+        );
+      });
+    }
+
+    // ── 폼 제출 ──
+    document.getElementById('artistRegForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!selectedFile) {
+        alert('프로필 사진을 업로드해주세요.');
+        return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = '사진 업로드 중...';
+
+      try {
+        // 1. Storage 업로드
+        const photoUrl = await uploadImage(selectedFile);
+
+        btn.textContent = '등록 중...';
+
+        // 2. Firestore 저장
+        const services  = Array.from(document.querySelectorAll('input[name="svc"]:checked')).map(cb => cb.value);
+        const styleTags = document.getElementById('a-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+        const regions   = document.getElementById('a-regions').value.split(',').map(r => r.trim()).filter(Boolean);
+
+        await addDoc(collection(db, "artists"), {
+          name:       document.getElementById('a-name').value,
+          photoUrl,
+          email:      document.getElementById('a-email').value,
+          phone:      document.getElementById('a-phone').value,
+          instagram:  document.getElementById('a-insta').value,
+          services, styleTags, regions,
+          intro:      document.getElementById('a-intro').value,
+          career:     document.getElementById('a-career').value,
+          rating:     5.0,
+          reviewCount: 0,
+          createdAt:  serverTimestamp()
         });
-    </script>
+
+        alert('새 아티스트가 성공적으로 등록됐습니다!');
+        location.href = 'artist-mgmt.html';
+
+      } catch (err) {
+        alert('등록 실패: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = '아티스트 프로필 생성';
+      }
+    });
+  </script>
 </body>
 
 </html>
