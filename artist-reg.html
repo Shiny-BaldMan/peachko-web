@@ -220,6 +220,29 @@
             <input type="text" id="a-regions" placeholder="강남, 홍대, 명동" required>
           </div>
 
+          <!-- 포트폴리오 이미지 업로드 -->
+          <div class="form-group full">
+            <label>포트폴리오 이미지 <span style="color:#BC9464;font-weight:400;">(최대 10장 · PNG, JPG)</span></label>
+            <div id="portfolioDropZone" style="border:2px dashed #E8D0C0;border-radius:10px;padding:24px;text-align:center;background:#FFF8F4;cursor:pointer;position:relative;transition:all .2s;">
+              <input type="file" id="portfolioFiles" accept="image/png,image/jpeg" multiple
+                style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:none;">
+              <div style="font-size:28px;margin-bottom:8px;">🖼️</div>
+              <span style="font-family:'DM Sans',sans-serif;font-size:13px;color:#BC9464;display:block;">
+                <strong style="color:#D4533A;">클릭</strong>하거나 이미지를 끌어다 놓으세요
+              </span>
+              <span style="font-size:11px;color:#C0A090;margin-top:4px;display:block;">여러 파일 동시 선택 가능 · 파일당 최대 5MB</span>
+            </div>
+            <!-- 업로드 진행 상황 -->
+            <div id="portfolioProgress" style="display:none;margin-top:12px;">
+              <div style="font-family:'DM Sans',sans-serif;font-size:12px;color:#BC9464;margin-bottom:6px;" id="portfolioProgressText">업로드 중...</div>
+              <div style="height:4px;background:#F0DDD0;border-radius:2px;overflow:hidden;">
+                <div id="portfolioProgressBar" style="height:100%;background:linear-gradient(90deg,#D4533A,#FFAF8A);width:0%;transition:width .3s;"></div>
+              </div>
+            </div>
+            <!-- 미리보기 그리드 -->
+            <div id="portfolioPreviewGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px;margin-top:12px;"></div>
+          </div>
+
         </div>
 
         <button type="submit" class="btn-primary" style="width:100%; padding:15px;" id="submitBtn">
@@ -339,6 +362,95 @@
       });
     }
 
+    // ── 포트폴리오 이미지 관리 ──
+    let portfolioFiles = []; // 선택된 File 객체 배열
+
+    const portfolioInput = document.getElementById('portfolioFiles');
+    const portfolioZone  = document.getElementById('portfolioDropZone');
+    const previewGrid    = document.getElementById('portfolioPreviewGrid');
+
+    portfolioInput.addEventListener('change', (e) => {
+      addPortfolioFiles(Array.from(e.target.files));
+      portfolioInput.value = ''; // 같은 파일 재선택 허용
+    });
+
+    portfolioZone.addEventListener('dragover', (e) => { e.preventDefault(); portfolioZone.style.borderColor = '#FFAF8A'; portfolioZone.style.background = '#FFF0E8'; });
+    portfolioZone.addEventListener('dragleave', () => { portfolioZone.style.borderColor = '#E8D0C0'; portfolioZone.style.background = '#FFF8F4'; });
+    portfolioZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      portfolioZone.style.borderColor = '#E8D0C0';
+      portfolioZone.style.background = '#FFF8F4';
+      const files = Array.from(e.dataTransfer.files).filter(f => f.type === 'image/png' || f.type === 'image/jpeg');
+      if (files.length) addPortfolioFiles(files);
+      else alert('PNG 또는 JPG 파일만 가능합니다.');
+    });
+
+    function addPortfolioFiles(newFiles) {
+      const remaining = 10 - portfolioFiles.length;
+      if (remaining <= 0) { alert('포트폴리오 이미지는 최대 10장까지 가능합니다.'); return; }
+      const toAdd = newFiles.slice(0, remaining);
+      const oversized = toAdd.filter(f => f.size > 5 * 1024 * 1024);
+      if (oversized.length) { alert(`${oversized.map(f=>f.name).join(', ')} 파일이 5MB를 초과합니다.`); return; }
+
+      toAdd.forEach(file => {
+        portfolioFiles.push(file);
+        const reader = new FileReader();
+        const idx = portfolioFiles.length - 1;
+        reader.onload = (e) => {
+          const wrap = document.createElement('div');
+          wrap.style.cssText = 'position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:2px solid #F0DDD0;';
+          wrap.dataset.idx = idx;
+          wrap.innerHTML = `
+            <img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">
+            <button type="button" onclick="removePortfolioFile(${idx})"
+              style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(212,83,58,.85);color:white;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">✕</button>
+          `;
+          previewGrid.appendChild(wrap);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    window.removePortfolioFile = (idx) => {
+      portfolioFiles[idx] = null; // null로 표시 (인덱스 유지)
+      const wrap = previewGrid.querySelector(`[data-idx="${idx}"]`);
+      if (wrap) wrap.remove();
+    };
+
+    async function uploadPortfolioImages() {
+      const valid = portfolioFiles.filter(Boolean);
+      if (!valid.length) return [];
+
+      const progressWrap = document.getElementById('portfolioProgress');
+      const progressBar  = document.getElementById('portfolioProgressBar');
+      const progressText = document.getElementById('portfolioProgressText');
+      progressWrap.style.display = 'block';
+
+      const urls = [];
+      for (let i = 0; i < valid.length; i++) {
+        const file = valid[i];
+        progressText.textContent = `업로드 중 ${i + 1} / ${valid.length}...`;
+        progressBar.style.width = (i / valid.length * 100) + '%';
+
+        const ext = file.name.split('.').pop();
+        const url = await new Promise((resolve, reject) => {
+          const task = uploadBytesResumable(
+            ref(storage, `portfolio/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`),
+            file
+          );
+          task.on('state_changed', null, reject,
+            async () => resolve(await getDownloadURL(task.snapshot.ref))
+          );
+        });
+        urls.push(url);
+      }
+
+      progressBar.style.width = '100%';
+      progressText.textContent = '업로드 완료!';
+      setTimeout(() => { progressWrap.style.display = 'none'; }, 800);
+      return urls;
+    }
+
     // ── 폼 제출 ──
     document.getElementById('artistRegForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -362,6 +474,10 @@
         const styleTags = document.getElementById('a-tags').value.split(',').map(t => t.trim()).filter(Boolean);
         const regions   = document.getElementById('a-regions').value.split(',').map(r => r.trim()).filter(Boolean);
 
+        btn.textContent = '포트폴리오 업로드 중...';
+        const portfolioUrls = await uploadPortfolioImages();
+
+        btn.textContent = '등록 중...';
         await addDoc(collection(db, "artists"), {
           name:       document.getElementById('a-name').value,
           photoUrl,
@@ -371,6 +487,7 @@
           services, styleTags, regions,
           intro:      document.getElementById('a-intro').value,
           career:     document.getElementById('a-career').value,
+          portfolioUrls,
           rating:     5.0,
           reviewCount: 0,
           createdAt:  serverTimestamp()
