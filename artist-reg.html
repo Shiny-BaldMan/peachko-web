@@ -231,6 +231,7 @@
 
   <script type="module">
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
@@ -246,6 +247,15 @@
     const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     const db      = getFirestore(app);
     const storage = getStorage(app);
+    const auth    = getAuth(app);
+
+    // 로그인 상태 확인 — 미로그인 시 차단
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        alert("관리자 로그인이 필요합니다.");
+        location.href = "login.html";
+      }
+    });
 
     let selectedFile = null;
 
