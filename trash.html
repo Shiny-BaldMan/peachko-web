@@ -44,7 +44,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import {
-            getFirestore, collection, onSnapshot, query, orderBy, doc, deleteDoc, addDoc, serverTimestamp
+            getFirestore, collection, onSnapshot, doc, deleteDoc, addDoc, getDoc, serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -59,61 +59,70 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 1. 실시간 휴지통 목록 감시
+        // 1. 실시간 휴지통 목록 감시 (orderBy 없이 — 인덱스 불필요)
         function watchTrash() {
-            const q = query(collection(db, "trash"), orderBy("trashedAt", "desc"));
+            const container = document.getElementById('trash-list');
 
-            onSnapshot(q, (snapshot) => {
-                const container = document.getElementById('trash-list');
-                container.innerHTML = "";
+            onSnapshot(
+                collection(db, "trash"),
+                (snapshot) => {
+                    container.innerHTML = "";
+                    if (snapshot.empty) {
+                        container.innerHTML = `<div class="empty-state">휴지통이 비어있습니다.</div>`;
+                        return;
+                    }
 
-                if (snapshot.empty) {
-                    container.innerHTML = `<div class="empty-state">휴지통이 비어있습니다.</div>`;
-                    return;
-                }
+                    // 클라이언트 측 최신순 정렬
+                    const docs = [];
+                    snapshot.forEach(d => docs.push(d));
+                    docs.sort((a, b) => (b.data().trashedAt?.seconds ?? 0) - (a.data().trashedAt?.seconds ?? 0));
 
-                snapshot.forEach((docSnap) => {
-                    const item = docSnap.data();
-                    const id = docSnap.id;
-                    const isArtist = item.originalCollection === 'artists';
-                    const title = isArtist ? item.name : (item.userEmail || "Guest Reservation");
-                    const dateStr = item.trashedAt?.toDate().toLocaleString() || "Unknown time";
+                    docs.forEach((docSnap) => {
+                        const item = docSnap.data();
+                        const id = docSnap.id;
+                        const isArtist = item.originalCollection === 'artists';
+                        const title = isArtist ? item.name : (item.userEmail || "게스트 예약");
+                        const dateStr = item.trashedAt?.toDate().toLocaleString('ko-KR') || "시간 불명";
 
-                    const card = document.createElement('div');
-                    card.className = "item-card";
-                    card.innerHTML = `
-                        <div class="item-info">
-                            <span class="type-badge ${isArtist ? 'type-artist' : 'type-booking'}">${item.originalCollection}</span>
-                            <div class="item-details">
-                                <strong>${title}</strong>
-                                <small>Deleted at: ${dateStr}</small>
+                        const card = document.createElement('div');
+                        card.className = "item-card";
+                        card.innerHTML = `
+                            <div class="item-info" style="display:flex;align-items:center;gap:15px;">
+                                <span class="type-badge ${isArtist ? 'type-artist' : 'type-booking'}">${isArtist ? '아티스트' : '예약'}</span>
+                                <div class="item-details">
+                                    <strong>${title}</strong>
+                                    <small>삭제일시: ${dateStr}</small>
+                                </div>
                             </div>
-                        </div>
-                        <div class="action-group">
-                            <button class="btn-restore" onclick="restoreItem('${id}', ${JSON.stringify(item).replace(/"/g, '&quot;')})">복구</button>
-                            <button class="btn-perm-del" onclick="permanentDelete('${id}')">영구 삭제</button>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            });
+                            <div class="action-group" style="display:flex;gap:10px;">
+                                <button class="btn-restore" onclick="restoreItem('${id}')">복구</button>
+                                <button class="btn-perm-del" onclick="permanentDelete('${id}')">영구 삭제</button>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                },
+                (err) => {
+                    console.error("휴지통 로드 오류:", err);
+                    container.innerHTML = `<div class="empty-state" style="color:#D4533A;">불러오기 실패: ${err.message}</div>`;
+                }
+            );
         }
 
-        // 2. 데이터 복구 (원래 컬렉션으로 이동)
-        window.restoreItem = async (trashId, data) => {
+        // 2. 데이터 복구 — ID만 받아 Firestore에서 직접 조회
+        window.restoreItem = async (trashId) => {
             if (!confirm("이 항목을 복구할까요?")) return;
 
             try {
-                // 원본 데이터에서 휴지통 관련 메타데이터 제거
-                const { trashedAt, originalId, originalCollection, ...originalData } = data;
+                const snap = await getDoc(doc(db, "trash", trashId));
+                if (!snap.exists()) { alert("항목을 찾을 수 없습니다."); return; }
 
-                // 원래 컬렉션에 다시 저장 (ID 유지를 위해 doc(db, col, id)를 쓸 수도 있으나, 여기서는 새로 추가)
+                const { trashedAt, originalId, originalCollection, ...originalData } = snap.data();
+
                 await addDoc(collection(db, originalCollection), {
                     ...originalData,
                     restoredAt: serverTimestamp()
                 });
-
-                // 휴지통에서 삭제
                 await deleteDoc(doc(db, "trash", trashId));
                 alert("성공적으로 복구됐습니다.");
             } catch (err) {

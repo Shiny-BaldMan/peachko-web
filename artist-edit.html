@@ -1,12 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PEACHKO — 아티스트 수정</title>
-
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/600.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
@@ -16,11 +13,10 @@
 </head>
 
 <body class="bg-silk">
-
   <div id="loadingOverlay" class="loading-overlay">아티스트 정보 불러오는 중...</div>
 
   <header id="header" class="scrolled">
-    <div class="logo">PEACHKO <span style="font-size:12px; opacity:0.6;">ADMIN</span></div>
+    <div class="logo">PEACHKO <span style="font-size:12px;opacity:.6;">ADMIN</span></div>
     <nav>
       <button class="nav-link" onclick="location.href='admin.html'">대시보드</button>
       <button class="nav-link" onclick="location.href='artist-mgmt.html'">아티스트 목록</button>
@@ -31,140 +27,107 @@
     <a href="artist-mgmt.html" class="nav-back">← 아티스트 목록으로 돌아가기</a>
 
     <div class="reg-card reveal visible">
-      <div class="section-head" style="text-align:left; margin-bottom:30px;">
+      <div class="section-head-admin">
         <div class="eyebrow">프로필 수정</div>
         <h2>아티스트 수정</h2>
-        <p class="fb" style="color:var(--muted); font-size:14px;">
-          아티스트의 프로필 정보와 포트폴리오를 수정하세요.
-        </p>
+        <p>아티스트의 프로필 정보와 포트폴리오를 수정하세요.</p>
       </div>
 
       <form id="artistEditForm">
         <div class="form-grid">
 
-          <!-- 이름 -->
           <div class="form-group">
             <label for="a-name">이름 (영문)</label>
             <input type="text" id="a-name" placeholder="예: Minji Kim" required>
           </div>
 
-          <!-- 프로필 사진 업로드 -->
           <div class="form-group">
             <label>프로필 사진</label>
             <div id="currentPhotoWrap" style="display:none; margin-bottom:10px;">
               <img id="photoPreview" class="photo-preview show" alt="현재 프로필">
-              <p style="font-size:11px; color:#BC9464; margin-top:6px;">현재 등록된 사진. 새 파일을 선택하면 교체됩니다.</p>
+              <p style="font-size:11px;color:#BC9464;margin-top:6px;">현재 사진. 새 파일 선택 시 교체됩니다.</p>
             </div>
-            <div style="border:2px dashed #E8D0C0; border-radius:10px; padding:20px; text-align:center; background:#FFF8F4; position:relative; cursor:pointer;" id="editUploadBox">
-              <input type="file" id="photoFile" accept="image/png, image/jpeg"
-                style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; padding:0; border:none; background:transparent;">
-              <div style="font-size:24px; margin-bottom:6px;">🖼️</div>
-              <span style="font-family:'DM Sans',sans-serif; font-size:12px; color:#BC9464;">새 사진 <strong style="color:#D4533A;">선택</strong>하기 · PNG, JPG · 최대 5MB</span>
+            <div id="editUploadBox" style="border:2px dashed #E8D0C0;border-radius:10px;padding:20px;text-align:center;background:#FFF8F4;position:relative;cursor:pointer;">
+              <input type="file" id="photoFile" accept="image/png,image/jpeg"
+                style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:none;background:transparent;">
+              <div style="font-size:24px;margin-bottom:6px;">🖼️</div>
+              <span style="font-family:'DM Sans',sans-serif;font-size:12px;color:#BC9464;">새 사진 <strong style="color:#D4533A;">선택</strong>하기 · PNG, JPG · 최대 5MB</span>
             </div>
-            <div id="editPreviewWrap" style="display:none; align-items:center; gap:12px; padding:12px; background:#FFF0E8; border-radius:8px; border:1.5px solid #FFAF8A; margin-top:8px;">
-              <img id="editPreviewImg" style="width:52px; height:52px; border-radius:50%; object-fit:cover; border:3px solid #FFAF8A;" src="" alt="">
+            <div id="editPreviewWrap" style="display:none;align-items:center;gap:12px;padding:12px;background:#FFF0E8;border-radius:8px;border:1.5px solid #FFAF8A;margin-top:8px;">
+              <img id="editPreviewImg" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:3px solid #FFAF8A;" src="" alt="">
               <div>
-                <span id="editPreviewName" style="font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:#5C3D2E; display:block;"></span>
-                <span id="editPreviewSize" style="font-size:11px; color:#BC9464;"></span>
+                <span id="editPreviewName" style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:#5C3D2E;display:block;"></span>
+                <span id="editPreviewSize" style="font-size:11px;color:#BC9464;"></span>
               </div>
-              <button type="button" onclick="removeNewPhoto()" style="margin-left:auto; font-size:11px; padding:4px 10px; background:transparent; color:#D4533A; border:1px solid #FFE4D2; border-radius:4px; cursor:pointer;">✕</button>
+              <button type="button" onclick="removeNewPhoto()" style="margin-left:auto;font-size:11px;padding:4px 10px;background:transparent;color:#D4533A;border:1px solid #FFE4D2;border-radius:4px;cursor:pointer;">✕</button>
             </div>
-            <div class="upload-progress" id="uploadProgress" style="height:4px; background:#F0DDD0; border-radius:2px; margin-top:8px; display:none; overflow:hidden;">
-              <div id="uploadProgressBar" style="height:100%; background:linear-gradient(90deg,#D4533A,#FFAF8A); width:0%; transition:width .3s;"></div>
+            <div id="uploadProgress" style="height:4px;background:#F0DDD0;border-radius:2px;margin-top:8px;display:none;overflow:hidden;">
+              <div id="uploadProgressBar" style="height:100%;background:linear-gradient(90deg,#D4533A,#FFAF8A);width:0%;transition:width .3s;"></div>
             </div>
           </div>
 
-          <!-- 이메일 -->
           <div class="form-group">
             <label for="a-email">연락처 이메일</label>
             <input type="email" id="a-email" placeholder="artist@example.com" required>
           </div>
 
-          <!-- 인스타그램 -->
           <div class="form-group">
             <label for="a-insta">인스타그램 ID</label>
             <input type="text" id="a-insta" placeholder="@username">
           </div>
 
-          <!-- 전화번호 -->
           <div class="form-group">
             <label for="a-phone">전화번호</label>
             <input type="tel" id="a-phone" placeholder="+82 10-0000-0000">
           </div>
 
-          <!-- 평점 -->
           <div class="form-group">
             <label for="a-rating">평점 (0.0 – 5.0)</label>
             <input type="number" id="a-rating" min="0" max="5" step="0.1" placeholder="5.0">
           </div>
 
-          <!-- 제공 서비스 -->
           <div class="form-group full">
             <label>제공 서비스</label>
-            <div class="checkbox-group" id="svc-options">
-              <label class="checkbox-item">
-                <input type="checkbox" name="svc" value="Makeup"> 메이크업
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" name="svc" value="Hair Styling"> 헤어 스타일링
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" name="svc" value="Personal Color"> 퍼스널 컬러
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" name="svc" value="Wedding Care"> 웨딩 케어
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" name="svc" value="K-Pop Concept"> K-팝 콘셉트
-              </label>
+            <div class="checkbox-group">
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Makeup"> 메이크업</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Hair Styling"> 헤어 스타일링</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Personal Color"> 퍼스널 컬러</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Wedding Care"> 웨딩 케어</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="K-Pop Concept"> K-팝 콘셉트</label>
             </div>
           </div>
 
-          <!-- 스타일 태그 -->
           <div class="form-group full">
             <label for="a-tags">스타일 태그 (쉼표로 구분)</label>
             <input type="text" id="a-tags" placeholder="글로이, 트렌디, 내추럴, 엘레강스">
           </div>
 
-          <!-- 짧은 소개 -->
           <div class="form-group full">
             <label for="a-intro">짧은 소개</label>
-            <textarea id="a-intro" rows="2"
-              placeholder="목록 페이지에 표시될 한 줄 소개..." required></textarea>
+            <textarea id="a-intro" rows="2" placeholder="목록 페이지에 표시될 한 줄 소개..." required></textarea>
           </div>
 
-          <!-- 경력 상세 -->
           <div class="form-group full">
             <label for="a-career">경력 및 학력 상세</label>
-            <textarea id="a-career" rows="4"
-              placeholder="자격증, 경력, 스튜디오 경험 등을 입력하세요..."></textarea>
+            <textarea id="a-career" rows="4" placeholder="자격증, 경력, 스튜디오 경험 등을 입력하세요..."></textarea>
           </div>
 
-          <!-- 서비스 지역 -->
           <div class="form-group full">
             <label for="a-regions">활동 지역 (쉼표로 구분)</label>
             <input type="text" id="a-regions" placeholder="강남, 홍대, 명동" required>
           </div>
 
-          <!-- 포트폴리오 이미지 URL -->
           <div class="form-group full">
             <label>포트폴리오 이미지 URL</label>
             <div class="portfolio-list" id="portfolioList"></div>
-            <button type="button" class="btn-add-url" onclick="addPortfolioUrl('')">
-              + 이미지 URL 추가
-            </button>
+            <button type="button" class="btn-add-url" onclick="addPortfolioUrl('')">+ 이미지 URL 추가</button>
           </div>
 
         </div>
 
-        <div style="display:flex; gap:12px; margin-top:10px;">
-          <button type="submit" class="btn-primary" style="flex:1; padding:14px;">
-            Save Changes
-          </button>
-          <button type="button" class="btn-secondary" style="padding:14px 22px;"
-            onclick="location.href='artist-mgmt.html'">
-            Cancel
-          </button>
+        <div style="display:flex;gap:12px;margin-top:10px;">
+          <button type="submit" class="btn-primary" id="submitBtn" style="flex:1;padding:14px;">변경사항 저장</button>
+          <button type="button" class="btn-secondary" style="padding:14px 22px;" onclick="location.href='artist-mgmt.html'">취소</button>
         </div>
       </form>
     </div>
@@ -173,9 +136,7 @@
   <script type="module">
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, updateDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
     const firebaseConfig = {
@@ -187,58 +148,43 @@
       appId: "1:561367230685:web:5576c1897b5989c243d334"
     };
 
-    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    const app     = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     const db      = getFirestore(app);
     const storage = getStorage(app);
     const auth    = getAuth(app);
 
-    // URL 파라미터에서 artist ID 추출 (인증 체크 전에 먼저)
-    const params   = new URLSearchParams(window.location.search);
-    const artistId = params.get("id");
+    // ── 1단계: ID 체크 — 없으면 즉시 이동 (뒤 코드 실행 안 됨)
+    const artistId = new URLSearchParams(window.location.search).get("id");
+    if (!artistId) { location.replace("artist-mgmt.html"); throw new Error("no id"); }
 
-    if (!artistId) {
-      // alert 없이 즉시 리다이렉트
-      location.replace("artist-mgmt.html");
-    }
-
-    // 인증 확인 → 완료 후 데이터 로드
+    // ── 2단계: 인증 확인 후 로드
     onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        location.replace("login.html");
-        return;
-      }
-      // artistId가 있고 로그인된 경우에만 로드
-      if (artistId) loadArtist();
+      if (!user) { location.replace("login.html"); return; }
+      loadArtist();
     });
 
-    // ── 포트폴리오 URL 행 추가 ──
-    window.addPortfolioUrl = function(url = '') {
-      const list = document.getElementById('portfolioList');
+    // ── 포트폴리오 URL 행 추가
+    window.addPortfolioUrl = (url = '') => {
       const item = document.createElement('div');
       item.className = 'portfolio-item';
       item.innerHTML = `
         <input type="url" placeholder="https://..." value="${url}">
         <button type="button" class="btn-remove-url" onclick="this.parentElement.remove()">삭제</button>
       `;
-      list.appendChild(item);
+      document.getElementById('portfolioList').appendChild(item);
     };
 
-    // ── 프로필 사진 미리보기 ──
-    window.updatePhotoPreview = function(url) {
-      const preview = document.getElementById('photoPreview');
-      if (url) {
-        preview.src = url;
-        preview.classList.add('show');
-        preview.onerror = () => preview.classList.remove('show');
-      } else {
-        preview.classList.remove('show');
-      }
+    // ── 새 사진 제거
+    window.removeNewPhoto = () => {
+      newPhotoFile = null;
+      document.getElementById('photoFile').value = '';
+      document.getElementById('editPreviewWrap').style.display = 'none';
     };
 
     let newPhotoFile = null;
     let currentPhotoUrl = '';
 
-    // 파일 선택
+    // 파일 선택 이벤트
     document.getElementById('photoFile').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -248,27 +194,24 @@
       reader.onload = (ev) => {
         document.getElementById('editPreviewImg').src = ev.target.result;
         document.getElementById('editPreviewName').textContent = file.name;
-        document.getElementById('editPreviewSize').textContent = (file.size/1024).toFixed(1) + ' KB';
+        document.getElementById('editPreviewSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
         document.getElementById('editPreviewWrap').style.display = 'flex';
       };
       reader.readAsDataURL(file);
     });
 
-    window.removeNewPhoto = () => {
-      newPhotoFile = null;
-      document.getElementById('photoFile').value = '';
-      document.getElementById('editPreviewWrap').style.display = 'none';
-    };
-
+    // 이미지 업로드
     function uploadImage(file) {
       return new Promise((resolve, reject) => {
         const ext = file.name.split('.').pop();
-        const storageRef = ref(storage, `artists/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`);
-        const task = uploadBytesResumable(storageRef, file);
+        const task = uploadBytesResumable(
+          ref(storage, `artists/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`),
+          file
+        );
         const bar = document.getElementById('uploadProgressBar');
         document.getElementById('uploadProgress').style.display = 'block';
         task.on('state_changed',
-          (snap) => { bar.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + '%'; },
+          (s) => { bar.style.width = (s.bytesTransferred / s.totalBytes * 100) + '%'; },
           reject,
           async () => {
             document.getElementById('uploadProgress').style.display = 'none';
@@ -278,43 +221,38 @@
       });
     }
 
-        // ── 기존 데이터 불러오기 ──
+    // 기존 데이터 불러오기
     async function loadArtist() {
       try {
         const snap = await getDoc(doc(db, "artists", artistId));
         if (!snap.exists()) {
           alert("아티스트를 찾을 수 없습니다.");
-          location.href = "artist-mgmt.html";
+          location.replace("artist-mgmt.html");
           return;
         }
-
         const d = snap.data();
 
-        document.getElementById('a-name').value    = d.name    || '';
+        document.getElementById('a-name').value    = d.name       || '';
+        document.getElementById('a-email').value   = d.email      || '';
+        document.getElementById('a-insta').value   = d.instagram  || '';
+        document.getElementById('a-phone').value   = d.phone      || '';
+        document.getElementById('a-rating').value  = d.rating     ?? 5.0;
+        document.getElementById('a-tags').value    = (d.styleTags || []).join(', ');
+        document.getElementById('a-intro').value   = d.intro      || '';
+        document.getElementById('a-career').value  = d.career     || '';
+        document.getElementById('a-regions').value = (d.regions   || []).join(', ');
+
         currentPhotoUrl = d.photoUrl || '';
         if (d.photoUrl) {
           document.getElementById('photoPreview').src = d.photoUrl;
           document.getElementById('currentPhotoWrap').style.display = 'block';
         }
-        document.getElementById('a-email').value   = d.email   || '';
-        document.getElementById('a-insta').value   = d.instagram || '';
-        document.getElementById('a-phone').value   = d.phone   || '';
-        document.getElementById('a-rating').value  = d.rating  ?? 5.0;
-        document.getElementById('a-tags').value    = (d.styleTags  || []).join(', ');
-        document.getElementById('a-intro').value   = d.intro   || '';
-        document.getElementById('a-career').value  = d.career  || '';
-        document.getElementById('a-regions').value = (d.regions || []).join(', ');
 
-        // 서비스 체크박스
-        const selected = d.services || [];
-        document.querySelectorAll('input[name="svc"]').forEach(cb => {
-          cb.checked = selected.includes(cb.value);
+        (d.services || []).forEach(svc => {
+          const cb = document.querySelector(`input[name="svc"][value="${svc}"]`);
+          if (cb) cb.checked = true;
         });
 
-        // 프로필 사진 미리보기
-        if (d.photoUrl) updatePhotoPreview(d.photoUrl);
-
-        // 포트폴리오 URL
         (d.portfolioUrls || []).forEach(url => addPortfolioUrl(url));
 
       } catch (err) {
@@ -324,46 +262,34 @@
       }
     }
 
-    // ── 저장 처리 ──
+    // 저장
     document.getElementById('artistEditForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
+      const btn = document.getElementById('submitBtn');
       btn.disabled = true;
-      btn.textContent = "저장 중...";
-
-      // 포트폴리오 URL 수집
-      const portfolioUrls = Array.from(
-        document.querySelectorAll('#portfolioList .portfolio-item input')
-      ).map(i => i.value.trim()).filter(v => v !== '');
-
-      // 서비스 수집
-      const selectedServices = Array.from(
-        document.querySelectorAll('input[name="svc"]:checked')
-      ).map(cb => cb.value);
-
-      const styleTags = document.getElementById('a-tags').value
-        .split(',').map(t => t.trim()).filter(t => t !== '');
-      const regions = document.getElementById('a-regions').value
-        .split(',').map(r => r.trim()).filter(r => r !== '');
-
-      const updatedData = {
-        name:         document.getElementById('a-name').value,
-        photoUrl: newPhotoFile ? await uploadImage(newPhotoFile) : currentPhotoUrl,
-        email:        document.getElementById('a-email').value,
-        instagram:    document.getElementById('a-insta').value,
-        phone:        document.getElementById('a-phone').value,
-        rating:       parseFloat(document.getElementById('a-rating').value) || 5.0,
-        services:     selectedServices,
-        styleTags,
-        intro:        document.getElementById('a-intro').value,
-        career:       document.getElementById('a-career').value,
-        regions,
-        portfolioUrls,
-        updatedAt:    serverTimestamp()
-      };
+      btn.textContent = newPhotoFile ? '사진 업로드 중...' : '저장 중...';
 
       try {
-        await updateDoc(doc(db, "artists", artistId), updatedData);
+        const photoUrl     = newPhotoFile ? await uploadImage(newPhotoFile) : currentPhotoUrl;
+        const services     = Array.from(document.querySelectorAll('input[name="svc"]:checked')).map(c => c.value);
+        const styleTags    = document.getElementById('a-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+        const regions      = document.getElementById('a-regions').value.split(',').map(r => r.trim()).filter(Boolean);
+        const portfolioUrls = Array.from(document.querySelectorAll('#portfolioList .portfolio-item input'))
+          .map(i => i.value.trim()).filter(Boolean);
+
+        await updateDoc(doc(db, "artists", artistId), {
+          name:      document.getElementById('a-name').value,
+          photoUrl,
+          email:     document.getElementById('a-email').value,
+          instagram: document.getElementById('a-insta').value,
+          phone:     document.getElementById('a-phone').value,
+          rating:    parseFloat(document.getElementById('a-rating').value) || 5.0,
+          services, styleTags, regions, portfolioUrls,
+          intro:     document.getElementById('a-intro').value,
+          career:    document.getElementById('a-career').value,
+          updatedAt: serverTimestamp()
+        });
+
         alert("아티스트 프로필이 성공적으로 수정됐습니다!");
         location.href = "artist-mgmt.html";
       } catch (err) {
@@ -372,8 +298,6 @@
         btn.textContent = "변경사항 저장";
       }
     });
-
   </script>
 </body>
-
 </html>

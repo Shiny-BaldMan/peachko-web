@@ -85,7 +85,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     import {
-      getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, addDoc, deleteDoc, getDoc, serverTimestamp
+      getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, deleteDoc, getDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -123,17 +123,21 @@
       }
     });
 
-    // 실시간 데이터 로드
+    // 실시간 데이터 로드 (orderBy 없이 — 인덱스 불필요)
     function loadBookings() {
-      const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
+      const tbody = document.getElementById('booking-list');
 
-      onSnapshot(q, (snapshot) => {
-        const tbody = document.getElementById('booking-list');
+      onSnapshot(collection(db, "bookings"), (snapshot) => {
         tbody.innerHTML = "";
+
+        // 클라이언트 측 최신순 정렬
+        const docs = [];
+        snapshot.forEach(d => docs.push(d));
+        docs.sort((a, b) => (b.data().createdAt?.seconds ?? 0) - (a.data().createdAt?.seconds ?? 0));
 
         let stats = { total: 0, pending: 0, confirmed: 0 };
 
-        snapshot.forEach((docSnap) => {
+        docs.forEach((docSnap) => {
           const booking = docSnap.data();
           const id = docSnap.id;
           stats.total++;
