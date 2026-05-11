@@ -326,28 +326,35 @@
     async function uploadNewPortfolios() {
       const valid = newPortfolioFiles.filter(Boolean);
       if (!valid.length) return [];
-      const text = document.getElementById('portfolioProgressText');
+
+      const progressWrap = document.getElementById('portfolioProgress');
       const bar  = document.getElementById('portfolioProgressBar');
-      document.getElementById('portfolioProgress').style.display = 'block';
-      const urls = [];
-      for (let i = 0; i < valid.length; i++) {
-        text.textContent = `포트폴리오 업로드 ${i+1}/${valid.length}...`;
-        bar.style.width = (i / valid.length * 100) + '%';
-        const ext = valid[i].name.split('.').pop();
-        const url = await new Promise((resolve, reject) => {
+      const text = document.getElementById('portfolioProgressText');
+      progressWrap.style.display = 'block';
+      bar.style.width = '0%';
+      text.textContent = `0 / ${valid.length} 업로드 중...`;
+
+      let done = 0;
+
+      const urls = await Promise.all(valid.map((file) => {
+        return new Promise((resolve, reject) => {
+          const ext = file.name.split('.').pop();
           const task = uploadBytesResumable(
             ref(storage, `portfolio/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`),
-            valid[i]
+            file
           );
-          task.on('state_changed', null, reject,
-            async () => resolve(await getDownloadURL(task.snapshot.ref))
+          task.on('state_changed', null, (err) => reject(err),
+            async () => {
+              done++;
+              bar.style.width = (done / valid.length * 100) + '%';
+              text.textContent = `${done} / ${valid.length} 완료`;
+              resolve(await getDownloadURL(task.snapshot.ref));
+            }
           );
         });
-        urls.push(url);
-      }
-      bar.style.width = '100%';
-      text.textContent = '완료!';
-      setTimeout(() => { document.getElementById('portfolioProgress').style.display = 'none'; }, 600);
+      }));
+
+      setTimeout(() => { progressWrap.style.display = 'none'; }, 600);
       return urls;
     }
 

@@ -422,32 +422,33 @@
       if (!valid.length) return [];
 
       const progressWrap = document.getElementById('portfolioProgress');
-      const progressBar  = document.getElementById('portfolioProgressBar');
-      const progressText = document.getElementById('portfolioProgressText');
+      const bar  = document.getElementById('portfolioProgressBar');
+      const text = document.getElementById('portfolioProgressText');
       progressWrap.style.display = 'block';
+      bar.style.width = '0%';
+      text.textContent = `0 / ${valid.length} 업로드 중...`;
 
-      const urls = [];
-      for (let i = 0; i < valid.length; i++) {
-        const file = valid[i];
-        progressText.textContent = `업로드 중 ${i + 1} / ${valid.length}...`;
-        progressBar.style.width = (i / valid.length * 100) + '%';
+      let done = 0;
 
-        const ext = file.name.split('.').pop();
-        const url = await new Promise((resolve, reject) => {
+      const urls = await Promise.all(valid.map((file) => {
+        return new Promise((resolve, reject) => {
+          const ext = file.name.split('.').pop();
           const task = uploadBytesResumable(
             ref(storage, `portfolio/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`),
             file
           );
-          task.on('state_changed', null, reject,
-            async () => resolve(await getDownloadURL(task.snapshot.ref))
+          task.on('state_changed', null, (err) => reject(err),
+            async () => {
+              done++;
+              bar.style.width = (done / valid.length * 100) + '%';
+              text.textContent = `${done} / ${valid.length} 완료`;
+              resolve(await getDownloadURL(task.snapshot.ref));
+            }
           );
         });
-        urls.push(url);
-      }
+      }));
 
-      progressBar.style.width = '100%';
-      progressText.textContent = '업로드 완료!';
-      setTimeout(() => { progressWrap.style.display = 'none'; }, 800);
+      setTimeout(() => { progressWrap.style.display = 'none'; }, 600);
       return urls;
     }
 
@@ -475,7 +476,7 @@
         const regions   = document.getElementById('a-regions').value.split(',').map(r => r.trim()).filter(Boolean);
 
         btn.textContent = '포트폴리오 업로드 중...';
-        const portfolioUrls = await uploadPortfolioImages();
+        const portfolioUrls = await uploadPortfolioImages(portfolioFiles);
 
         btn.textContent = '등록 중...';
         await addDoc(collection(db, "artists"), {
