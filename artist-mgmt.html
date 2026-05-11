@@ -52,6 +52,7 @@
 
   <script type="module">
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
     import {
       getFirestore, collection, onSnapshot, doc, deleteDoc, getDoc, addDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -65,8 +66,9 @@
       appId: "1:561367230685:web:5576c1897b5989c243d334"
     };
 
-    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    const db  = getFirestore(app);
+    const app  = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    const db   = getFirestore(app);
+    const auth = getAuth(app);
 
     // 테이블 행 생성
     function renderRow(docSnap) {
@@ -145,7 +147,11 @@
       }
     };
 
-    document.addEventListener('DOMContentLoaded', initArtistMgmt);
+    // Auth 복원 확인 후 데이터 로드
+    onAuthStateChanged(auth, (user) => {
+      if (!user) { location.replace("login.html"); return; }
+      initArtistMgmt();
+    });
   </script>
 </body>
 </html>

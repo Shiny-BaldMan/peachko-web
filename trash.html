@@ -42,7 +42,8 @@
     </main>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import {
             getFirestore, collection, onSnapshot, doc, deleteDoc, addDoc, getDoc, serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -56,8 +57,9 @@
             appId: "1:561367230685:web:5576c1897b5989c243d334"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const app  = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+        const db   = getFirestore(app);
+        const auth = getAuth(app);
 
         // 1. 실시간 휴지통 목록 감시 (orderBy 없이 — 인덱스 불필요)
         function watchTrash() {
@@ -143,7 +145,11 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', watchTrash);
+        // Auth 복원 확인 후 데이터 로드
+        onAuthStateChanged(auth, (user) => {
+          if (!user) { location.replace("login.html"); return; }
+          watchTrash();
+        });
     </script>
 </body>
 
