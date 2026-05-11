@@ -1,12 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PEACHKO — 아티스트 수정</title>
-
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/400.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@4/600.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/dm-sans@4/400.css">
@@ -16,11 +13,10 @@
 </head>
 
 <body class="bg-silk">
-
   <div id="loadingOverlay" class="loading-overlay">아티스트 정보 불러오는 중...</div>
 
   <header id="header" class="scrolled">
-    <div class="logo">PEACHKO <span style="font-size:12px; opacity:0.6;">ADMIN</span></div>
+    <div class="logo">PEACHKO <span style="font-size:12px;opacity:.6;">ADMIN</span></div>
     <nav>
       <button class="nav-link" onclick="location.href='admin.html'">대시보드</button>
       <button class="nav-link" onclick="location.href='artist-mgmt.html'">아티스트 목록</button>
@@ -31,12 +27,10 @@
     <a href="artist-mgmt.html" class="nav-back">← 아티스트 목록으로 돌아가기</a>
 
     <div class="reg-card reveal visible">
-      <div class="section-head" style="text-align:left; margin-bottom:30px;">
+      <div class="section-head-admin">
         <div class="eyebrow">프로필 수정</div>
         <h2>아티스트 수정</h2>
-        <p class="fb" style="color:var(--muted); font-size:14px;">
-          아티스트의 프로필 정보와 포트폴리오를 수정하세요.
-        </p>
+        <p>아티스트의 프로필 정보와 포트폴리오를 수정하세요.</p>
       </div>
 
       <form id="artistEditForm">
@@ -48,29 +42,26 @@
             <input type="text" id="a-name" placeholder="예: Minji Kim" required>
           </div>
 
-          <!-- 프로필 사진 업로드 -->
+          <!-- 프로필 사진 -->
           <div class="form-group">
             <label>프로필 사진</label>
-            <div id="currentPhotoWrap" style="display:none; margin-bottom:10px;">
-              <img id="photoPreview" class="photo-preview show" alt="현재 프로필">
-              <p style="font-size:11px; color:#BC9464; margin-top:6px;">현재 등록된 사진. 새 파일을 선택하면 교체됩니다.</p>
+            <div id="currentPhotoWrap" style="display:none;margin-bottom:10px;">
+              <img id="photoPreview" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #FFAF8A;" alt="현재 프로필">
+              <p style="font-size:11px;color:#BC9464;margin-top:6px;">현재 사진. 새 파일 선택 시 교체됩니다.</p>
             </div>
-            <div style="border:2px dashed #E8D0C0; border-radius:10px; padding:20px; text-align:center; background:#FFF8F4; position:relative; cursor:pointer;" id="editUploadBox">
-              <input type="file" id="photoFile" accept="image/png, image/jpeg"
-                style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; padding:0; border:none; background:transparent;">
-              <div style="font-size:24px; margin-bottom:6px;">🖼️</div>
-              <span style="font-family:'DM Sans',sans-serif; font-size:12px; color:#BC9464;">새 사진 <strong style="color:#D4533A;">선택</strong>하기 · PNG, JPG · 최대 5MB</span>
+            <div id="photoUploadBox" style="border:2px dashed #E8D0C0;border-radius:10px;padding:20px;text-align:center;background:#FFF8F4;position:relative;cursor:pointer;">
+              <input type="file" id="photoFile" accept="image/png,image/jpeg"
+                style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:none;">
+              <div style="font-size:24px;margin-bottom:6px;">🖼️</div>
+              <span style="font-family:'DM Sans',sans-serif;font-size:12px;color:#BC9464;">새 사진 <strong style="color:#D4533A;">선택</strong>하기 · PNG, JPG · 최대 5MB</span>
             </div>
-            <div id="editPreviewWrap" style="display:none; align-items:center; gap:12px; padding:12px; background:#FFF0E8; border-radius:8px; border:1.5px solid #FFAF8A; margin-top:8px;">
-              <img id="editPreviewImg" style="width:52px; height:52px; border-radius:50%; object-fit:cover; border:3px solid #FFAF8A;" src="" alt="">
-              <div>
-                <span id="editPreviewName" style="font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:#5C3D2E; display:block;"></span>
-                <span id="editPreviewSize" style="font-size:11px; color:#BC9464;"></span>
-              </div>
-              <button type="button" onclick="removeNewPhoto()" style="margin-left:auto; font-size:11px; padding:4px 10px; background:transparent; color:#D4533A; border:1px solid #FFE4D2; border-radius:4px; cursor:pointer;">✕</button>
+            <div id="photoNewPreview" style="display:none;align-items:center;gap:10px;padding:10px;background:#FFF0E8;border-radius:8px;border:1.5px solid #FFAF8A;margin-top:8px;">
+              <img id="photoNewImg" style="width:48px;height:48px;border-radius:50%;object-fit:cover;" src="" alt="">
+              <span id="photoNewName" style="font-size:12px;color:#5C3D2E;flex:1;"></span>
+              <button type="button" onclick="clearNewPhoto()" style="font-size:11px;padding:4px 8px;background:transparent;color:#D4533A;border:1px solid #FFE4D2;border-radius:4px;cursor:pointer;">✕</button>
             </div>
-            <div class="upload-progress" id="uploadProgress" style="height:4px; background:#F0DDD0; border-radius:2px; margin-top:8px; display:none; overflow:hidden;">
-              <div id="uploadProgressBar" style="height:100%; background:linear-gradient(90deg,#D4533A,#FFAF8A); width:0%; transition:width .3s;"></div>
+            <div id="photoUploadBar" style="height:4px;background:#F0DDD0;border-radius:2px;margin-top:6px;display:none;overflow:hidden;">
+              <div id="photoUploadBarFill" style="height:100%;background:linear-gradient(90deg,#D4533A,#FFAF8A);width:0%;transition:width .3s;"></div>
             </div>
           </div>
 
@@ -101,22 +92,12 @@
           <!-- 제공 서비스 -->
           <div class="form-group full">
             <label>제공 서비스</label>
-            <div class="checkbox-group" id="svc-options">
-              <label class="checkbox-item">
-                <input type="checkbox" name="svc" value="Makeup"> 메이크업
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" name="svc" value="Hair Styling"> 헤어 스타일링
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" name="svc" value="Personal Color"> 퍼스널 컬러
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" name="svc" value="Wedding Care"> 웨딩 케어
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" name="svc" value="K-Pop Concept"> K-팝 콘셉트
-              </label>
+            <div class="checkbox-group">
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Makeup"> 메이크업</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Hair Styling"> 헤어 스타일링</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Personal Color"> 퍼스널 컬러</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="Wedding Care"> 웨딩 케어</label>
+              <label class="checkbox-item"><input type="checkbox" name="svc" value="K-Pop Concept"> K-팝 콘셉트</label>
             </div>
           </div>
 
@@ -129,29 +110,27 @@
           <!-- 짧은 소개 -->
           <div class="form-group full">
             <label for="a-intro">짧은 소개</label>
-            <textarea id="a-intro" rows="2"
-              placeholder="목록 페이지에 표시될 한 줄 소개..." required></textarea>
+            <textarea id="a-intro" rows="2" placeholder="목록 페이지에 표시될 한 줄 소개..." required></textarea>
           </div>
 
           <!-- 경력 상세 -->
           <div class="form-group full">
             <label for="a-career">경력 및 학력 상세</label>
-            <textarea id="a-career" rows="4"
-              placeholder="자격증, 경력, 스튜디오 경험 등을 입력하세요..."></textarea>
+            <textarea id="a-career" rows="4" placeholder="자격증, 경력, 스튜디오 경험 등을 입력하세요..."></textarea>
           </div>
 
-          <!-- 서비스 지역 -->
+          <!-- 활동 지역 -->
           <div class="form-group full">
             <label for="a-regions">활동 지역 (쉼표로 구분)</label>
             <input type="text" id="a-regions" placeholder="강남, 홍대, 명동" required>
           </div>
 
-          <!-- 포트폴리오 이미지 업로드 -->
+          <!-- 포트폴리오 이미지 -->
           <div class="form-group full">
             <label>포트폴리오 이미지 <span style="color:#BC9464;font-weight:400;">(최대 10장 · PNG, JPG)</span></label>
 
-            <!-- 기존 이미지 미리보기 -->
-            <div id="existingPortfolioGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px;margin-bottom:10px;"></div>
+            <!-- 기존 이미지 -->
+            <div id="existingGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px;margin-bottom:10px;"></div>
 
             <!-- 새 이미지 업로드 존 -->
             <div id="portfolioDropZone" style="border:2px dashed #E8D0C0;border-radius:10px;padding:20px;text-align:center;background:#FFF8F4;cursor:pointer;position:relative;transition:all .2s;">
@@ -159,30 +138,27 @@
                 style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:none;">
               <div style="font-size:24px;margin-bottom:6px;">🖼️</div>
               <span style="font-family:'DM Sans',sans-serif;font-size:12px;color:#BC9464;">
-                <strong style="color:#D4533A;">클릭</strong>하거나 새 이미지를 끌어다 놓으세요 · PNG, JPG · 파일당 최대 5MB
+                <strong style="color:#D4533A;">클릭</strong>하거나 새 이미지를 끌어다 놓으세요 · 여러 파일 동시 선택 가능
               </span>
             </div>
-            <!-- 새 파일 진행 -->
+
+            <!-- 포트폴리오 업로드 진행 -->
             <div id="portfolioProgress" style="display:none;margin-top:10px;">
-              <div style="font-family:'DM Sans',sans-serif;font-size:12px;color:#BC9464;margin-bottom:5px;" id="portfolioProgressText"></div>
+              <div id="portfolioProgressText" style="font-family:'DM Sans',sans-serif;font-size:12px;color:#BC9464;margin-bottom:5px;"></div>
               <div style="height:4px;background:#F0DDD0;border-radius:2px;overflow:hidden;">
                 <div id="portfolioProgressBar" style="height:100%;background:linear-gradient(90deg,#D4533A,#FFAF8A);width:0%;transition:width .3s;"></div>
               </div>
             </div>
+
             <!-- 새 파일 미리보기 -->
             <div id="newPortfolioGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px;margin-top:10px;"></div>
           </div>
 
         </div>
 
-        <div style="display:flex; gap:12px; margin-top:10px;">
-          <button type="submit" class="btn-primary" style="flex:1; padding:14px;">
-            Save Changes
-          </button>
-          <button type="button" class="btn-secondary" style="padding:14px 22px;"
-            onclick="location.href='artist-mgmt.html'">
-            Cancel
-          </button>
+        <div style="display:flex;gap:12px;margin-top:10px;">
+          <button type="submit" id="submitBtn" class="btn-primary" style="flex:1;padding:14px;">변경사항 저장</button>
+          <button type="button" class="btn-secondary" style="padding:14px 22px;" onclick="location.href='artist-mgmt.html'">취소</button>
         </div>
       </form>
     </div>
@@ -191,9 +167,7 @@
   <script type="module">
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, updateDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
     import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
     const firebaseConfig = {
@@ -205,63 +179,108 @@
       appId: "1:561367230685:web:5576c1897b5989c243d334"
     };
 
-    const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    const app     = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     const db      = getFirestore(app);
     const storage = getStorage(app);
     const auth    = getAuth(app);
 
-    // URL 파라미터에서 artist ID 추출 (인증 체크 전에 먼저)
-    const params   = new URLSearchParams(window.location.search);
-    const artistId = params.get("id");
-
+    // ══════════════════════════════════════════
+    // 1단계: ID 체크 — 없으면 즉시 중단
+    // ══════════════════════════════════════════
+    const artistId = new URLSearchParams(window.location.search).get("id");
     if (!artistId) {
-      // alert 없이 즉시 리다이렉트
       location.replace("artist-mgmt.html");
+      throw new Error("artistId missing");  // JS 실행 완전 중단
     }
 
-    // 인증 확인 → 완료 후 데이터 로드
+    // ══════════════════════════════════════════
+    // 2단계: 인증 확인 후 데이터 로드
+    // ══════════════════════════════════════════
     onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        location.replace("login.html");
-        return;
-      }
-      // artistId가 있고 로그인된 경우에만 로드
-      if (artistId) loadArtist();
+      if (!user) { location.replace("login.html"); return; }
+      loadArtist();  // 로그인 확인 후에만 실행
     });
 
-    // ── 포트폴리오 이미지 관리 ──
-    let newPortfolioFiles = [];   // 새로 추가할 File 객체
-    let keptPortfolioUrls = [];   // 유지할 기존 URL
+    // ══════════════════════════════════════════
+    // 프로필 사진
+    // ══════════════════════════════════════════
+    let newPhotoFile = null;
+    let currentPhotoUrl = '';
 
-    // 기존 이미지 렌더링
+    document.getElementById('photoFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { alert('5MB 이하 파일만 가능합니다.'); return; }
+      newPhotoFile = file;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('photoNewImg').src = ev.target.result;
+        document.getElementById('photoNewName').textContent = file.name;
+        document.getElementById('photoNewPreview').style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    window.clearNewPhoto = () => {
+      newPhotoFile = null;
+      document.getElementById('photoFile').value = '';
+      document.getElementById('photoNewPreview').style.display = 'none';
+    };
+
+    async function uploadProfilePhoto(file) {
+      return new Promise((resolve, reject) => {
+        const ext  = file.name.split('.').pop();
+        const task = uploadBytesResumable(
+          ref(storage, `artists/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`),
+          file
+        );
+        const bar = document.getElementById('photoUploadBarFill');
+        document.getElementById('photoUploadBar').style.display = 'block';
+        task.on('state_changed',
+          (s) => { bar.style.width = (s.bytesTransferred / s.totalBytes * 100) + '%'; },
+          reject,
+          async () => {
+            document.getElementById('photoUploadBar').style.display = 'none';
+            resolve(await getDownloadURL(task.snapshot.ref));
+          }
+        );
+      });
+    }
+
+    // ══════════════════════════════════════════
+    // 포트폴리오 이미지
+    // ══════════════════════════════════════════
+    let keptUrls = [];        // 유지할 기존 URL
+    let newPortfolioFiles = []; // 새로 추가할 File
+
     function renderExistingPortfolio(urls) {
-      keptPortfolioUrls = [...urls];
-      const grid = document.getElementById('existingPortfolioGrid');
+      keptUrls = [...urls];
+      const grid = document.getElementById('existingGrid');
       grid.innerHTML = '';
-      urls.forEach((url, i) => {
+      urls.forEach((url) => {
         const wrap = document.createElement('div');
         wrap.style.cssText = 'position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:2px solid #F0DDD0;';
         wrap.dataset.url = url;
         wrap.innerHTML = `
           <img src="${url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.style.display='none'">
-          <button type="button" onclick="removeExistingPortfolio('${url}')"
-            style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(212,83,58,.85);color:white;border:none;cursor:pointer;font-size:12px;">✕</button>
+          <button type="button" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(212,83,58,.85);color:white;border:none;cursor:pointer;font-size:12px;"
+            onclick="removeExisting(this)">✕</button>
         `;
         grid.appendChild(wrap);
       });
     }
 
-    window.removeExistingPortfolio = (url) => {
-      keptPortfolioUrls = keptPortfolioUrls.filter(u => u !== url);
-      document.querySelector(`[data-url="${CSS.escape(url)}"]`)?.remove();
+    window.removeExisting = (btn) => {
+      const wrap = btn.parentElement;
+      keptUrls = keptUrls.filter(u => u !== wrap.dataset.url);
+      wrap.remove();
     };
 
-    // 새 파일 추가
     const portfolioInput = document.getElementById('portfolioFiles');
     const portfolioZone  = document.getElementById('portfolioDropZone');
 
     portfolioInput.addEventListener('change', (e) => {
-      addNewPortfolioFiles(Array.from(e.target.files));
+      addPortfolioFiles(Array.from(e.target.files));
       portfolioInput.value = '';
     });
     portfolioZone.addEventListener('dragover', (e) => { e.preventDefault(); portfolioZone.style.borderColor = '#FFAF8A'; });
@@ -269,27 +288,27 @@
     portfolioZone.addEventListener('drop', (e) => {
       e.preventDefault();
       portfolioZone.style.borderColor = '#E8D0C0';
-      const files = Array.from(e.dataTransfer.files).filter(f => f.type === 'image/png' || f.type === 'image/jpeg');
-      if (files.length) addNewPortfolioFiles(files);
+      const files = Array.from(e.dataTransfer.files).filter(f => ['image/png','image/jpeg'].includes(f.type));
+      if (files.length) addPortfolioFiles(files);
     });
 
-    function addNewPortfolioFiles(files) {
-      const total = keptPortfolioUrls.length + newPortfolioFiles.filter(Boolean).length;
-      const remaining = 10 - total;
-      if (remaining <= 0) { alert('포트폴리오 이미지는 최대 10장입니다.'); return; }
-      files.slice(0, remaining).forEach(file => {
+    function addPortfolioFiles(files) {
+      const total = keptUrls.length + newPortfolioFiles.filter(Boolean).length;
+      const room  = 10 - total;
+      if (room <= 0) { alert('포트폴리오는 최대 10장입니다.'); return; }
+      files.slice(0, room).forEach(file => {
         if (file.size > 5 * 1024 * 1024) { alert(`${file.name}: 5MB 초과`); return; }
+        const idx = newPortfolioFiles.length;
         newPortfolioFiles.push(file);
-        const idx = newPortfolioFiles.length - 1;
         const reader = new FileReader();
         reader.onload = (ev) => {
           const wrap = document.createElement('div');
-          wrap.style.cssText = 'position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:2px solid #FFAF8A;';
           wrap.dataset.newIdx = idx;
+          wrap.style.cssText = 'position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:2px solid #FFAF8A;';
           wrap.innerHTML = `
             <img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;">
-            <button type="button" onclick="removeNewPortfolioFile(${idx})"
-              style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(212,83,58,.85);color:white;border:none;cursor:pointer;font-size:12px;">✕</button>
+            <button type="button" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(212,83,58,.85);color:white;border:none;cursor:pointer;font-size:12px;"
+              onclick="removeNewPortfolio(this)">✕</button>
           `;
           document.getElementById('newPortfolioGrid').appendChild(wrap);
         };
@@ -297,18 +316,19 @@
       });
     }
 
-    window.removeNewPortfolioFile = (idx) => {
+    window.removeNewPortfolio = (btn) => {
+      const wrap = btn.parentElement;
+      const idx  = parseInt(wrap.dataset.newIdx);
       newPortfolioFiles[idx] = null;
-      document.querySelector(`[data-new-idx="${idx}"]`)?.remove();
+      wrap.remove();
     };
 
-    async function uploadNewPortfolioImages() {
+    async function uploadNewPortfolios() {
       const valid = newPortfolioFiles.filter(Boolean);
       if (!valid.length) return [];
-      const progressWrap = document.getElementById('portfolioProgress');
-      const bar  = document.getElementById('portfolioProgressBar');
       const text = document.getElementById('portfolioProgressText');
-      progressWrap.style.display = 'block';
+      const bar  = document.getElementById('portfolioProgressBar');
+      document.getElementById('portfolioProgress').style.display = 'block';
       const urls = [];
       for (let i = 0; i < valid.length; i++) {
         text.textContent = `포트폴리오 업로드 ${i+1}/${valid.length}...`;
@@ -327,161 +347,97 @@
       }
       bar.style.width = '100%';
       text.textContent = '완료!';
-      setTimeout(() => { progressWrap.style.display = 'none'; }, 600);
+      setTimeout(() => { document.getElementById('portfolioProgress').style.display = 'none'; }, 600);
       return urls;
     }
 
-    // ── 프로필 사진 미리보기 ──
-    window.updatePhotoPreview = function(url) {
-      const preview = document.getElementById('photoPreview');
-      if (url) {
-        preview.src = url;
-        preview.classList.add('show');
-        preview.onerror = () => preview.classList.remove('show');
-      } else {
-        preview.classList.remove('show');
-      }
-    };
-
-    let newPhotoFile = null;
-    let currentPhotoUrl = '';
-
-    // 파일 선택
-    document.getElementById('photoFile').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      if (file.size > 5 * 1024 * 1024) { alert('5MB 이하 파일만 가능합니다.'); return; }
-      newPhotoFile = file;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        document.getElementById('editPreviewImg').src = ev.target.result;
-        document.getElementById('editPreviewName').textContent = file.name;
-        document.getElementById('editPreviewSize').textContent = (file.size/1024).toFixed(1) + ' KB';
-        document.getElementById('editPreviewWrap').style.display = 'flex';
-      };
-      reader.readAsDataURL(file);
-    });
-
-    window.removeNewPhoto = () => {
-      newPhotoFile = null;
-      document.getElementById('photoFile').value = '';
-      document.getElementById('editPreviewWrap').style.display = 'none';
-    };
-
-    function uploadImage(file) {
-      return new Promise((resolve, reject) => {
-        const ext = file.name.split('.').pop();
-        const storageRef = ref(storage, `artists/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`);
-        const task = uploadBytesResumable(storageRef, file);
-        const bar = document.getElementById('uploadProgressBar');
-        document.getElementById('uploadProgress').style.display = 'block';
-        task.on('state_changed',
-          (snap) => { bar.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + '%'; },
-          reject,
-          async () => {
-            document.getElementById('uploadProgress').style.display = 'none';
-            resolve(await getDownloadURL(task.snapshot.ref));
-          }
-        );
-      });
-    }
-
-        // ── 기존 데이터 불러오기 ──
+    // ══════════════════════════════════════════
+    // 기존 데이터 불러오기
+    // ══════════════════════════════════════════
     async function loadArtist() {
       try {
         const snap = await getDoc(doc(db, "artists", artistId));
         if (!snap.exists()) {
           alert("아티스트를 찾을 수 없습니다.");
-          location.href = "artist-mgmt.html";
+          location.replace("artist-mgmt.html");
           return;
         }
-
         const d = snap.data();
 
-        document.getElementById('a-name').value    = d.name    || '';
+        document.getElementById('a-name').value    = d.name       || '';
+        document.getElementById('a-email').value   = d.email      || '';
+        document.getElementById('a-insta').value   = d.instagram  || '';
+        document.getElementById('a-phone').value   = d.phone      || '';
+        document.getElementById('a-rating').value  = d.rating     ?? 5.0;
+        document.getElementById('a-tags').value    = (d.styleTags || []).join(', ');
+        document.getElementById('a-intro').value   = d.intro      || '';
+        document.getElementById('a-career').value  = d.career     || '';
+        document.getElementById('a-regions').value = (d.regions   || []).join(', ');
+
         currentPhotoUrl = d.photoUrl || '';
         if (d.photoUrl) {
           document.getElementById('photoPreview').src = d.photoUrl;
           document.getElementById('currentPhotoWrap').style.display = 'block';
         }
-        document.getElementById('a-email').value   = d.email   || '';
-        document.getElementById('a-insta').value   = d.instagram || '';
-        document.getElementById('a-phone').value   = d.phone   || '';
-        document.getElementById('a-rating').value  = d.rating  ?? 5.0;
-        document.getElementById('a-tags').value    = (d.styleTags  || []).join(', ');
-        document.getElementById('a-intro').value   = d.intro   || '';
-        document.getElementById('a-career').value  = d.career  || '';
-        document.getElementById('a-regions').value = (d.regions || []).join(', ');
 
-        // 서비스 체크박스
-        const selected = d.services || [];
-        document.querySelectorAll('input[name="svc"]').forEach(cb => {
-          cb.checked = selected.includes(cb.value);
+        (d.services || []).forEach(svc => {
+          const cb = document.querySelector(`input[name="svc"][value="${svc}"]`);
+          if (cb) cb.checked = true;
         });
 
-        // 프로필 사진 미리보기
-        if (d.photoUrl) updatePhotoPreview(d.photoUrl);
-
-        // 포트폴리오 URL
         renderExistingPortfolio(d.portfolioUrls || []);
 
       } catch (err) {
-        alert("아티스트 불러오기 실패: " + err.message);
+        alert("불러오기 실패: " + err.message);
       } finally {
         document.getElementById('loadingOverlay').classList.add('hidden');
       }
     }
 
-    // ── 저장 처리 ──
+    // ══════════════════════════════════════════
+    // 저장
+    // ══════════════════════════════════════════
     document.getElementById('artistEditForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
+      const btn = document.getElementById('submitBtn');
       btn.disabled = true;
-      btn.textContent = "저장 준비 중...";
-
-      // 포트폴리오 URL 수집
-      // 기존 유지 URL + 새로 업로드한 URL 합치기
-      const newUrls = await uploadNewPortfolioImages();
-      const portfolioUrls = [...keptPortfolioUrls, ...newUrls];
-
-      // 서비스 수집
-      const selectedServices = Array.from(
-        document.querySelectorAll('input[name="svc"]:checked')
-      ).map(cb => cb.value);
-
-      const styleTags = document.getElementById('a-tags').value
-        .split(',').map(t => t.trim()).filter(t => t !== '');
-      const regions = document.getElementById('a-regions').value
-        .split(',').map(r => r.trim()).filter(r => r !== '');
-
-      const updatedData = {
-        name:         document.getElementById('a-name').value,
-        photoUrl: newPhotoFile ? await uploadImage(newPhotoFile) : currentPhotoUrl,
-        email:        document.getElementById('a-email').value,
-        instagram:    document.getElementById('a-insta').value,
-        phone:        document.getElementById('a-phone').value,
-        rating:       parseFloat(document.getElementById('a-rating').value) || 5.0,
-        services:     selectedServices,
-        styleTags,
-        intro:        document.getElementById('a-intro').value,
-        career:       document.getElementById('a-career').value,
-        regions,
-        portfolioUrls,
-        updatedAt:    serverTimestamp()
-      };
 
       try {
-        await updateDoc(doc(db, "artists", artistId), updatedData);
+        // 프로필 사진
+        btn.textContent = newPhotoFile ? '프로필 사진 업로드 중...' : '저장 중...';
+        const photoUrl = newPhotoFile ? await uploadProfilePhoto(newPhotoFile) : currentPhotoUrl;
+
+        // 포트폴리오
+        btn.textContent = '포트폴리오 업로드 중...';
+        const newUrls = await uploadNewPortfolios();
+        const portfolioUrls = [...keptUrls, ...newUrls];
+
+        btn.textContent = '저장 중...';
+        await updateDoc(doc(db, "artists", artistId), {
+          name:      document.getElementById('a-name').value,
+          photoUrl,
+          email:     document.getElementById('a-email').value,
+          instagram: document.getElementById('a-insta').value,
+          phone:     document.getElementById('a-phone').value,
+          rating:    parseFloat(document.getElementById('a-rating').value) || 5.0,
+          services:  Array.from(document.querySelectorAll('input[name="svc"]:checked')).map(c => c.value),
+          styleTags: document.getElementById('a-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+          intro:     document.getElementById('a-intro').value,
+          career:    document.getElementById('a-career').value,
+          regions:   document.getElementById('a-regions').value.split(',').map(r => r.trim()).filter(Boolean),
+          portfolioUrls,
+          updatedAt: serverTimestamp()
+        });
+
         alert("아티스트 프로필이 성공적으로 수정됐습니다!");
         location.href = "artist-mgmt.html";
+
       } catch (err) {
         alert("저장 실패: " + err.message);
         btn.disabled = false;
         btn.textContent = "변경사항 저장";
       }
     });
-
   </script>
 </body>
-
 </html>
